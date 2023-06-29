@@ -395,7 +395,7 @@ function GuiSelect({
   );
   // if selectedValue is not in options, then set it to the first option
   useEffect(() => {
-    if (!selectValue.length) {
+    if (!selectValue.length && !args.allow_none) {
       setValue(args.isMulti ? [args.options[0].value] : args.options[0].value);
     }
   }, [args.isMulti, args.options, selectValue, setValue]);
