@@ -18,7 +18,7 @@ const proxyUrls = [
   "/favicon.ico",
   "/sitemap.xml/",
   "/__/*",
-  "/l/*",
+  "/q/*",
 ];
 
 /** @type {import('@remix-run/dev').AppConfig} */
@@ -54,6 +54,7 @@ module.exports = {
         route(path, "proxy.tsx", { id: path });
       }
       route("/__/realtime/*", "realtime.tsx");
+      route("/robots.txt", "robots.tsx");
       route("*", "app.tsx");
     });
   },
