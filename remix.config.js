@@ -18,7 +18,7 @@ const proxyUrls = [
   "/favicon.ico",
   "/sitemap.xml/",
   "/__/*",
-  "/q/*",
+  "/s/*",
 ];
 
 /** @type {import('@remix-run/dev').AppConfig} */
