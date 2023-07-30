@@ -399,7 +399,7 @@ function GuiSelect({
   };
 
   let selectValue = args.options.filter((opt: any) =>
-    args.isMulti ? value.includes(opt.value) : opt.value === value
+    args.isMulti ? defaultValue.includes(opt.value) : opt.value === value
   );
   // if selectedValue is not in options, then set it to the first option
   useEffect(() => {
