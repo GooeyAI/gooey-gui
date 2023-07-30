@@ -54,7 +54,6 @@ module.exports = {
         route(path, "proxy.tsx", { id: path });
       }
       route("/__/realtime/*", "realtime.tsx");
-      route("/robots.txt", "robots.tsx");
       route("*", "app.tsx");
     });
   },
