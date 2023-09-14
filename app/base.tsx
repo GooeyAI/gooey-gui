@@ -10,6 +10,7 @@ import { JsonViewer } from "@textea/json-viewer";
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from "@reach/tabs";
 import { Link } from "@remix-run/react";
 import { RenderedHTML } from "~/renderedHTML";
+import CountdownTimer from "./components/countdown";
 
 export const links: LinksFunction = () => {
   return [...fileInputLinks()];
@@ -344,6 +345,11 @@ function RenderedTreeNode({
         </__reactjsxelement>
       );
     }
+    case "countdown-timer":{
+      return(
+        <CountdownTimer durationInSeconds={props.duration} />
+      )
+    }
     default:
       return (
         <div>
@@ -354,6 +360,8 @@ function RenderedTreeNode({
       );
   }
 }
+
+
 
 export function RenderedChildren({
   children,
