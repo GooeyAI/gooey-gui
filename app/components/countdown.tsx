@@ -2,9 +2,10 @@ import { useState, useEffect } from "react";
 
 interface CountdownTimerProps {
     durationInSeconds: number;
+    fallbackText: string;
 }
 
-const CountdownTimer: React.FC<CountdownTimerProps> = ({ durationInSeconds }) => {
+const CountdownTimer: React.FC<CountdownTimerProps> = ({ durationInSeconds, fallbackText }) => {
     const [seconds, setSeconds] = useState(durationInSeconds);
     const [isComplete, setIsComplete] = useState(false);
 
@@ -29,7 +30,7 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({ durationInSeconds }) =>
 
     return (
         isComplete ? (
-            <div>Time's up! Please wait a bit until the model run completes.</div>
+            <div>{fallbackText}</div>
         ) : (
             <div style={{ fontSize: 28 }}>{seconds}s left</div>
         )

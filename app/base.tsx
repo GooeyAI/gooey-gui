@@ -45,13 +45,13 @@ export function getTransforms({
 }
 
 export const applyTransform: Record<string, (val: FormDataEntryValue) => any> =
-  {
-    checkbox: Boolean,
-    number: parseIntFloat,
-    range: parseIntFloat,
-    select: (val) => (val ? JSON.parse(`${val}`) : null),
-    file: (val) => (val ? JSON.parse(`${val}`) : null),
-  };
+{
+  checkbox: Boolean,
+  number: parseIntFloat,
+  range: parseIntFloat,
+  select: (val) => (val ? JSON.parse(`${val}`) : null),
+  file: (val) => (val ? JSON.parse(`${val}`) : null),
+};
 
 function parseIntFloat(val: FormDataEntryValue): number {
   let strVal = val.toString();
@@ -102,9 +102,8 @@ function RenderedTreeNode({
         <Link to={to} {...args}>
           <li className="nav-item" role="presentation">
             <button
-              className={`nav-link  p-2 px-md-3 py-md-2  mx-0 mx-md-2 ${
-                active ? "active" : ""
-              }`}
+              className={`nav-link  p-2 px-md-3 py-md-2  mx-0 mx-md-2 ${active ? "active" : ""
+                }`}
               type="button"
               role="tab"
               aria-controls="run"
@@ -345,9 +344,9 @@ function RenderedTreeNode({
         </__reactjsxelement>
       );
     }
-    case "countdown-timer":{
-      return(
-        <CountdownTimer durationInSeconds={props.duration} />
+    case "countdown-timer": {
+      return (
+        <CountdownTimer durationInSeconds={props.duration} fallbackText={props.text} />
       )
     }
     default:
@@ -489,9 +488,8 @@ export function GuiExpander({
       <JsonFormInput />
       {/*{JsonFormInput}*/}
       <div
-        className={`gui-expander-header accordion-header accordion-button ${
-          isOpen ? "" : "collapsed"
-        }`}
+        className={`gui-expander-header accordion-header accordion-button ${isOpen ? "" : "collapsed"
+          }`}
         onClick={() => setIsOpen(!isOpen)}
         {...props}
       >
