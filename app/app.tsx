@@ -196,7 +196,6 @@ function App() {
         onChange={handleChange}
         noValidate
       >
-        <button onClick={() => {throw new Error("test")}}>Break the world</button>;
         <RenderedChildren
           children={children}
           onChange={() => {
