@@ -6,7 +6,7 @@
     "dev": "remix dev",
     "start": "remix-serve build",
     "typecheck": "tsc",
-    "upload-sentry-sourcemap": "node ./node_modules/@sentry/remix/scripts/sentry-upload-sourcemaps.js && rm ./public/**/*.map && rm ./build/**/*.map"
+    "upload-sentry-sourcemap": "test -f ./.sentryclirc && node ./node_modules/@sentry/remix/scripts/sentry-upload-sourcemaps.js && rm ./public/**/*.map && rm ./build/**/*.map"
   },
   "dependencies": {
     "@reach/tabs": "^0.18.0",
