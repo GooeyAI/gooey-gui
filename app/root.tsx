@@ -5,8 +5,9 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLoaderData,
 } from "@remix-run/react";
-import type { LinksFunction } from "@remix-run/node"; // Depends on the runtime you choose
+import { LinksFunction, json } from "@remix-run/node"; // Depends on the runtime you choose
 import { cssBundleHref } from "@remix-run/css-bundle";
 import React from "react";
 import { globalProgressStyles, useGlobalProgress } from "~/global-progres-bar";
@@ -17,8 +18,19 @@ export const links: LinksFunction = () => [
   ...globalProgressStyles(),
 ];
 
+// export env vars to the client
+export async function loader() {
+  return json({
+    ENV: {
+      SENTRY_DSN: process.env.SENTRY_DSN,
+      SENTRY_SAMPLE_RATE: process.env.SENTRY_SAMPLE_RATE,
+    },
+  });
+}
+
 export default function App() {
   useGlobalProgress();
+  const data = useLoaderData<typeof loader>();
 
   return (
     <html lang="en">
@@ -32,6 +44,14 @@ export default function App() {
         <HydrationUtils />
         <Outlet />
         <ScrollRestoration />
+        <script
+          // load client side env vars
+          dangerouslySetInnerHTML={{
+            __html: `window.ENV = ${JSON.stringify(
+              data.ENV
+            )}`,
+          }}
+        />
         <Scripts />
         <LiveReload />
       </body>

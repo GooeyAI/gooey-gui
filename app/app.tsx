@@ -1,5 +1,6 @@
 import type { FormEvent } from "react";
 import React, { useEffect, useRef } from "react";
+import { withSentry } from "@sentry/remix";
 
 import type {
   ShouldRevalidateFunction,
@@ -152,7 +153,7 @@ function useRealtimeChannels({ channels }: { channels: string[] }) {
   return useEventSourceNullOk(url);
 }
 
-export default function App() {
+function App() {
   const [searchParams] = useSearchParams();
   const loaderData = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
@@ -195,6 +196,7 @@ export default function App() {
         onChange={handleChange}
         noValidate
       >
+        <button onClick={() => {throw new Error("test")}}>Break the world</button>;
         <RenderedChildren
           children={children}
           onChange={() => {
@@ -243,3 +245,5 @@ export default function App() {
     </div>
   );
 }
+
+export default withSentry(App);
