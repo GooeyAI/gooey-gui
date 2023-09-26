@@ -2,11 +2,11 @@
   "private": true,
   "sideEffects": false,
   "scripts": {
-    "build": "remix build --sourcemap && npm upload-sentry-sourcemap",
+    "build": "remix build --sourcemap && npm run upload-sentry-sourcemap && rm ./public/**/*.map && rm ./build/**/*.map",
     "dev": "remix dev",
     "start": "remix-serve build",
     "typecheck": "tsc",
-    "upload-sentry-sourcemap": "test -f ./.sentryclirc && node ./node_modules/@sentry/remix/scripts/sentry-upload-sourcemaps.js && rm ./public/**/*.map && rm ./build/**/*.map"
+    "upload-sentry-sourcemap": "path-exists ./.sentryclirc && node ./node_modules/@sentry/remix/scripts/sentry-upload-sourcemaps.js"
   },
   "dependencies": {
     "@reach/tabs": "^0.18.0",
