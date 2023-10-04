@@ -37,6 +37,17 @@
     border: 1px solid black;
 }
 
+.btn.btn-theme.link-button {
+    background: none;
+    border: 0;
+    color: black;
+    padding: 0;
+}
+
+.btn.btn-theme.link-button:hover {
+    background-color: white;
+}
+
 .gooey-spinner {
   scroll-margin: 20px;
   display: inline-block;
