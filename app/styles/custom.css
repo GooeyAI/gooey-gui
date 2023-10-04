@@ -25,6 +25,18 @@
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
+.btn.btn-theme.replicate-nav {
+    border-radius: 32px;
+    background: white;
+    color: black;
+    border: 1px solid transparent;
+    margin-right: 0.5em;
+}
+
+.btn.btn-theme.replicate-nav:hover {
+    border: 1px solid black;
+}
+
 .gooey-spinner {
   scroll-margin: 20px;
   display: inline-block;
