@@ -69,7 +69,7 @@ export async function loader({ params, request }: LoaderArgs) {
 export async function action({ params, request }: ActionArgs) {
   // parse form data
   const { __gooey_gui_request_body, ...inputs } = Object.fromEntries(
-    await request.formData()
+    await request.formData(),
   );
   // parse request body
   const {
@@ -146,7 +146,7 @@ function useRealtimeChannels({ channels }: { channels: string[] }) {
   let url;
   if (channels.length) {
     const params = new URLSearchParams(
-      channels.map((name) => ["channels", name])
+      channels.map((name) => ["channels", name]),
     );
     url = `/__/realtime/?${params}`;
   }

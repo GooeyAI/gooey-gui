@@ -1,7 +1,11 @@
-import type { EntryContext } from "@remix-run/node";
+import * as Sentry from "@sentry/remix";
+import type { DataFunctionArgs, EntryContext } from "@remix-run/node";
 import { RemixServer } from "@remix-run/react";
 import { renderToString } from "react-dom/server";
-import * as Sentry from "@sentry/remix";
+
+export function handleError(error: unknown, { request }: DataFunctionArgs) {
+  Sentry.captureRemixServerException(error, "remix.server", request);
+}
 
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
@@ -15,10 +19,10 @@ export default function handleRequest(
   request: Request,
   responseStatusCode: number,
   responseHeaders: Headers,
-  remixContext: EntryContext
+  remixContext: EntryContext,
 ) {
   let markup = renderToString(
-    <RemixServer context={remixContext} url={request.url} />
+    <RemixServer context={remixContext} url={request.url} />,
   );
 
   responseHeaders.set("Content-Type", "text/html");

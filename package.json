@@ -2,11 +2,11 @@
   "private": true,
   "sideEffects": false,
   "scripts": {
-    "build": "remix build --sourcemap && npm run upload-sentry-sourcemap",
+    "build": "remix build",
+    "build-prod": "remix build --sourcemap && sentry-upload-sourcemaps",
     "dev": "remix dev",
     "start": "remix-serve build",
-    "typecheck": "tsc",
-    "upload-sentry-sourcemap": "node ./node_modules/@sentry/remix/scripts/sentry-upload-sourcemaps.js && rm ./public/**/*.map && rm ./build/**/*.map"
+    "typecheck": "tsc"
   },
   "dependencies": {
     "@reach/tabs": "^0.18.0",
@@ -14,7 +14,7 @@
     "@remix-run/node": "^1.16.0",
     "@remix-run/react": "^1.16.0",
     "@remix-run/serve": "^1.16.0",
-    "@sentry/remix": "^7.72.0",
+    "@sentry/remix": "^7.73.0",
     "@textea/json-viewer": "^3.0.0",
     "@uppy/audio": "^1.1.1",
     "@uppy/core": "^3.2.0",

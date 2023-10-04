@@ -21,7 +21,7 @@ COPY package.json package-lock.json ./
 RUN npm ci
 
 COPY . .
-RUN npm run build
+RUN SENTRY_LOG_LEVEL=debug npm run build-prod
 
 ENV NODE_ENV=production
 

@@ -1,4 +1,6 @@
+import { captureRemixErrorBoundaryError } from "@sentry/remix";
 import {
+  isRouteErrorResponse,
   Links,
   LiveReload,
   Meta,
@@ -6,8 +8,9 @@ import {
   Scripts,
   ScrollRestoration,
   useLoaderData,
+  useRouteError,
 } from "@remix-run/react";
-import { LinksFunction, json } from "@remix-run/node"; // Depends on the runtime you choose
+import { json, LinksFunction } from "@remix-run/node"; // Depends on the runtime you choose
 import { cssBundleHref } from "@remix-run/css-bundle";
 import React from "react";
 import { globalProgressStyles, useGlobalProgress } from "~/global-progres-bar";
@@ -47,9 +50,7 @@ export default function App() {
         <script
           // load client side env vars
           dangerouslySetInnerHTML={{
-            __html: `window.ENV = ${JSON.stringify(
-              data.ENV
-            )}`,
+            __html: `window.ENV = ${JSON.stringify(data.ENV)};`,
           }}
         />
         <Scripts />
@@ -59,24 +60,25 @@ export default function App() {
   );
 }
 
-// export function ErrorBoundary() {
-//   const error = useRouteError();
-//
-//   // when true, this is what used to go to `CatchBoundary`
-//   if (isRouteErrorResponse(error)) {
-//     return (
-//       <div>
-//         <p>Status: {error.status}</p>
-//         <p dangerouslySetInnerHTML={{ __html: error.data }}></p>
-//       </div>
-//     );
-//   }
-//
-//   return (
-//     <div>
-//       <h1>Uh oh ...</h1>
-//       <p>Something went wrong.</p>
-//       <pre>Code: {typeof error}</pre>
-//     </div>
-//   );
-// }
+export function ErrorBoundary() {
+  const error = useRouteError();
+  captureRemixErrorBoundaryError(error);
+
+  // when true, this is what used to go to `CatchBoundary`
+  if (isRouteErrorResponse(error)) {
+    return (
+      <div>
+        <p>Status: {error.status}</p>
+        <p dangerouslySetInnerHTML={{ __html: error.data }}></p>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <h1>Uh oh ...</h1>
+      <p>Something went wrong.</p>
+      <pre>Code: {typeof error}</pre>
+    </div>
+  );
+}
