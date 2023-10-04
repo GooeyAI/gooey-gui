@@ -27,6 +27,7 @@ export async function loader() {
     ENV: {
       SENTRY_DSN: process.env.SENTRY_DSN,
       SENTRY_SAMPLE_RATE: process.env.SENTRY_SAMPLE_RATE,
+      SENTRY_RELEASE: process.env.SENTRY_RELEASE,
     },
   });
 }
@@ -78,7 +79,7 @@ export function ErrorBoundary() {
     <div>
       <h1>Uh oh ...</h1>
       <p>Something went wrong.</p>
-      <pre>Code: {typeof error}</pre>
+      <pre>{`${error}`}</pre>
     </div>
   );
 }
