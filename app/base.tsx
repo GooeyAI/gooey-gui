@@ -216,11 +216,11 @@ function RenderedTreeNode({
       const { label, ...args } = props;
       return (
         <div className="gui-input gui-input-textarea">
-          { label &&
+          {label && (
             <label>
               <RenderedMarkdown body={label} />
             </label>
-          }
+          )}
           <div>
             <textarea {...args} />
           </div>
@@ -351,6 +351,10 @@ function RenderedTreeNode({
         </__reactjsxelement>
       );
     }
+    case "script": {
+      const { src, args } = props;
+      return <ExecJs src={src} args={args}></ExecJs>;
+    }
     default:
       return (
         <div>
@@ -360,6 +364,15 @@ function RenderedTreeNode({
         </div>
       );
   }
+}
+
+function ExecJs({ src, args }: { args: any; src: any }) {
+  useEffect(() => {
+    // eslint-disable-next-line no-new-func
+    const fn = new Function(...Object.keys(args), src);
+    fn(...Object.values(args));
+  }, [src, args]);
+  return null;
 }
 
 export function RenderedChildren({

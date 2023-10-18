@@ -1,14 +1,13 @@
 import React, { useCallback, useEffect, useState } from "react";
 import XLSX from "xlsx";
+import type { GridCell, Item } from "@glideapps/glide-data-grid";
 import {
   DataEditor,
-  GridCell,
   GridCellKind,
   GridColumnIcon,
-  Item,
 } from "@glideapps/glide-data-grid";
 import { ClientOnly } from "remix-utils";
-import { LinksFunction } from "@remix-run/node";
+import type { LinksFunction } from "@remix-run/node";
 import glideappsStyles from "@glideapps/glide-data-grid/dist/index.css";
 
 export const links: LinksFunction = () => {
@@ -26,7 +25,16 @@ export function DataTable({ fileUrl }: { fileUrl: string }) {
       const file = await response.arrayBuffer();
       const workbook = XLSX.read(file);
       const sheet = workbook.Sheets[workbook.SheetNames[0]];
-      const rows: Array<any> = XLSX.utils.sheet_to_json(sheet);
+      let range = sheet["!ref"]!;
+      if (typeof sheet["A1"] === "undefined") {
+        range = XLSX.utils.encode_range({
+          s: { c: 1, r: 1 },
+          e: XLSX.utils.decode_range(range).e,
+        });
+      }
+      const rows: Array<any> = XLSX.utils.sheet_to_json(sheet, {
+        range: range,
+      });
       if (!rows.length) return;
       setColumns(
         Array.from(
@@ -52,11 +60,16 @@ export function DataTable({ fileUrl }: { fileUrl: string }) {
   }, [fileUrl]);
 
   const getContent = useCallback(
-    (cell: Item) => {
+    (cell: Item): GridCell => {
       const [col, row] = cell;
       const dataRow = data[row];
-      if (dataRow === undefined) return;
-      let displayData = `${dataRow[columns[col].title] ?? ""}`;
+      if (!dataRow) {
+        return {
+          kind: GridCellKind.Loading,
+          allowOverlay: false,
+        };
+      }
+      const displayData = `${dataRow[columns[col].title] ?? ""}`;
       return {
         kind: GridCellKind.Text,
         allowOverlay: true,
