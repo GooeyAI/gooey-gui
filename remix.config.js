@@ -17,6 +17,7 @@ const proxyUrls = [
   "/favicon",
   "/favicon.ico",
   "/sitemap.xml/",
+  "/2/*",
   "/__/*",
 ];
 
