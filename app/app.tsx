@@ -124,8 +124,40 @@ async function callServer({
     });
   }
 
-  if (!response.ok) throw response;
+  if (!response.ok) {
+    return await handleErrorResponse({ request, response }); 
+  }
+
   return response;
+}
+
+async function handleErrorResponse({ request, response }) {
+  const serverUrl = new URL(process.env["SERVER_HOST"]!);
+  serverUrl.pathname = path.join(serverUrl.pathname, "/handleError/");
+
+  let errorResponse = await fetch(serverUrl, {
+    method: "POST",
+    body: JSON.stringify({
+        "status": response.status,
+        "statusText": response.statusText,
+    }),
+    headers: request.headers,
+  });
+
+  const redirectUrl = handleRedirectResponse({ response: errorResponse });
+  if (redirectUrl) {
+    return redirect(redirectUrl, {
+      headers: errorResponse.headers,
+      status: errorResponse.status,
+      statusText: errorResponse.statusText,
+    });
+  }
+
+  return new Response(errorResponse.body, {
+    headers: errorResponse.headers,
+    status: response.status,
+    statusText: errorResponse.statusText,
+  });
 }
 
 export const shouldRevalidate: ShouldRevalidateFunction = (args) => {
