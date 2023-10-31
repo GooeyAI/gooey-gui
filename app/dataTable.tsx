@@ -85,7 +85,7 @@ export function DataTable({ fileUrl }: { fileUrl: string }) {
   return (
     <ClientOnly fallback={<p>Loading...</p>}>
       {() => {
-        return (
+        return data.length ? (
           <div style={{ border: "1px solid gray" }}>
             <DataEditor
               getCellContent={getContent}
@@ -113,6 +113,8 @@ export function DataTable({ fileUrl }: { fileUrl: string }) {
               }}
             />
           </div>
+        ) : (
+          <p>Loading...</p>
         );
       }}
     </ClientOnly>

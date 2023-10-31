@@ -45,6 +45,10 @@ export default function App() {
         <Links />
       </head>
       <body>
+        <div
+          id="portal"
+          style={{ position: "fixed", left: 0, top: 0, zIndex: 9999 }}
+        />
         <HydrationUtils />
         <Outlet />
         <ScrollRestoration />
@@ -56,7 +60,6 @@ export default function App() {
         />
         <Scripts />
         <LiveReload />
-        <div id="portal" />
       </body>
     </html>
   );
