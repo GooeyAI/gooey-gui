@@ -22,8 +22,8 @@ export function DataTable({ fileUrl }: { fileUrl: string }) {
   useEffect(() => {
     (async () => {
       const response = await fetch(fileUrl);
-      const file = await response.arrayBuffer();
-      const workbook = XLSX.read(file);
+      const data = await response.arrayBuffer();
+      const workbook = XLSX.read(data, { codepage: 65001 });
       const sheet = workbook.Sheets[workbook.SheetNames[0]];
       let range = sheet["!ref"]!;
       if (typeof sheet["A1"] === "undefined") {
@@ -34,6 +34,7 @@ export function DataTable({ fileUrl }: { fileUrl: string }) {
       }
       const rows: Array<any> = XLSX.utils.sheet_to_json(sheet, {
         range: range,
+        raw: false,
       });
       if (!rows.length) return;
       setColumns(
