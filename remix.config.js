@@ -55,6 +55,7 @@ module.exports = {
       for (const path of proxyUrls) {
         route(path, "proxy.tsx", { id: path });
       }
+      route("/docs/*", "docs.tsx");
       route("/__/realtime/*", "realtime.tsx");
       route("*", "app.tsx");
     });
