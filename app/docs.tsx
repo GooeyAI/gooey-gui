@@ -14,7 +14,7 @@ if (typeof global.htmlCaches === "undefined") {
 export async function loader({ request }: LoaderArgs) {
   const requestUrl = new URL(request.url);
 
-  const docsUrl = new URL(process.env["DOCS_SITE_URL"]!);
+  const docsUrl = new URL(process.env["DOCS_SITE_URL"] || "https://gooey-ai.gitbook.io");  // remove this default later
   docsUrl.pathname = path.join(docsUrl.pathname, requestUrl.pathname, "/");
   docsUrl.search = requestUrl.search;
   const url = docsUrl.toString();
