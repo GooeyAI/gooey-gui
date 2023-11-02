@@ -7,6 +7,7 @@ const wixUrls = [
   "/team/",
   "/jobs/",
   "/blog/",
+  "/arc-test",  // temporary
 ];
 
 const proxyUrls = [
