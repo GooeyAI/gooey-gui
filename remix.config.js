@@ -6,8 +6,12 @@ const wixUrls = [
   "/terms",
   "/team/",
   "/jobs/",
-  "/blog/",
   "/arc-test",  // temporary
+];
+
+const gitbookUrls = [
+  "/docs/*",
+  "/blog/*",
 ];
 
 const proxyUrls = [
@@ -56,7 +60,9 @@ module.exports = {
       for (const path of proxyUrls) {
         route(path, "proxy.tsx", { id: path });
       }
-      route("/docs/*", "docs.tsx");
+      for (const path of gitbookUrls) {
+        route(path, "gitbook.tsx", { id: path });
+      }
       route("/__/realtime/*", "realtime.tsx");
       route("*", "app.tsx");
     });
