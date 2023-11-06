@@ -38,6 +38,7 @@ html {
 }
 
 input[type="text"],
+input[type="password"],
 textarea {
   resize: vertical;
   width: 100%;
@@ -124,6 +125,10 @@ div.code-toolbar {
 }
 
 .gui-input-text input {
+  padding: 0.8rem;
+}
+
+.gui-input-password input {
   padding: 0.8rem;
 }
 
