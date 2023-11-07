@@ -1,5 +1,6 @@
 import type { FormEvent } from "react";
 import React, { useEffect, useRef } from "react";
+import { withSentry } from "@sentry/remix";
 
 import type {
   ShouldRevalidateFunction,
@@ -68,7 +69,7 @@ export async function loader({ params, request }: LoaderArgs) {
 export async function action({ params, request }: ActionArgs) {
   // parse form data
   const { __gooey_gui_request_body, ...inputs } = Object.fromEntries(
-    await request.formData()
+    await request.formData(),
   );
   // parse request body
   const {
@@ -123,8 +124,40 @@ async function callServer({
     });
   }
 
-  if (!response.ok) throw response;
+  if (!response.ok) {
+    return await handleErrorResponse({ request, response }); 
+  }
+
   return response;
+}
+
+async function handleErrorResponse({ request, response }) {
+  const serverUrl = new URL(process.env["SERVER_HOST"]!);
+  serverUrl.pathname = path.join(serverUrl.pathname, "/handleError/");
+
+  let errorResponse = await fetch(serverUrl, {
+    method: "POST",
+    body: JSON.stringify({
+        "status": response.status,
+        "statusText": response.statusText,
+    }),
+    headers: request.headers,
+  });
+
+  const redirectUrl = handleRedirectResponse({ response: errorResponse });
+  if (redirectUrl) {
+    return redirect(redirectUrl, {
+      headers: errorResponse.headers,
+      status: errorResponse.status,
+      statusText: errorResponse.statusText,
+    });
+  }
+
+  return new Response(errorResponse.body, {
+    headers: errorResponse.headers,
+    status: response.status,
+    statusText: errorResponse.statusText,
+  });
 }
 
 export const shouldRevalidate: ShouldRevalidateFunction = (args) => {
@@ -145,14 +178,14 @@ function useRealtimeChannels({ channels }: { channels: string[] }) {
   let url;
   if (channels.length) {
     const params = new URLSearchParams(
-      channels.map((name) => ["channels", name])
+      channels.map((name) => ["channels", name]),
     );
     url = `/__/realtime/?${params}`;
   }
   return useEventSourceNullOk(url);
 }
 
-export default function App() {
+function App() {
   const [searchParams] = useSearchParams();
   const loaderData = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
@@ -243,3 +276,5 @@ export default function App() {
     </div>
   );
 }
+
+export default withSentry(App);
