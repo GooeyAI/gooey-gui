@@ -6,7 +6,8 @@ const wixUrls = [
   "/terms",
   "/team/",
   "/jobs/",
-  "/arc-test",  // temporary
+  "/farmerchat/",
+  "/arc-test", // temporary
 ];
 
 const gitbookUrls = [
