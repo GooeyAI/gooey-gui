@@ -26,11 +26,17 @@
 }
 
 .btn.btn-theme.replicate-nav {
-    border-radius: 32px;
-    background: white;
-    color: black;
-    border: 1px solid transparent;
-    margin-right: 0.5em;
+  border-radius: 32px;
+  background: white;
+  color: black;
+  border: 1px dashed gray;
+  margin-right: 0.5em;
+}
+
+.btn.btn-theme.replicate-nav.active {
+  background: black;
+  color: white;
+  border: 1px solid transparent;
 }
 
 .btn.btn-theme.replicate-nav:hover {
