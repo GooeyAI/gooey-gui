@@ -29,7 +29,7 @@
   border-radius: 32px;
   background: white;
   color: black;
-  border: 1px dashed gray;
+  border: 1px solid #e5e5e5;
   margin-right: 0.5em;
 }
 
@@ -40,7 +40,8 @@
 }
 
 .btn.btn-theme.replicate-nav:hover {
-    border: 1px solid black;
+  background: #f3f3f3;
+  border: 1px solid black;
 }
 
 .btn.btn-theme.link-button {
