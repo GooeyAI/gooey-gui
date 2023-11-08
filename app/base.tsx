@@ -266,8 +266,8 @@ function RenderedTreeNode({
       return <RenderedHTML body={body} {...args} />;
     }
     case "markdown": {
-      const { body, ...args } = props;
-      return <RenderedMarkdown body={body} {...args} />;
+      const { body, lineClamp, ...args } = props;
+      return <RenderedMarkdown body={body} lineClamp={lineClamp} {...args} />;
     }
     case "textarea": {
       return <GooeyTextarea props={props} state={state} />;

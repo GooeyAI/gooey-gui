@@ -1,13 +1,15 @@
-import React, { useEffect, useRef } from "react";
+import React from "react";
 import { marked } from "marked";
 import { RenderedHTML } from "~/renderedHTML";
 
 export function RenderedMarkdown({
   body,
+  lineClamp,
   ...attrs
 }: // allowUnsafeHTML,
 {
   body: string;
+  lineClamp?: number;
   [attr: string]: any;
   // allowUnsafeHTML?: boolean;
 }) {
@@ -20,6 +22,7 @@ export function RenderedMarkdown({
   return (
     <RenderedHTML
       body={html}
+      lineClamp={lineClamp}
       className="gui-html-container gui-md-container"
       {...attrs}
     />

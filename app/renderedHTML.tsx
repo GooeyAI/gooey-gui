@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useRef } from "react";
+import React, { forwardRef, useEffect, useRef, useState } from "react";
 import parse, {
   attributesToProps,
   domToReact,
@@ -13,9 +13,10 @@ export const RenderedHTML = forwardRef<
   HTMLSpanElement,
   {
     body: string;
+    lineClamp?: number;
     [attr: string]: any;
   }
->(function RenderedHTML({ body, ...attrs }, ref) {
+>(function RenderedHTML({ body, lineClamp, ...attrs }, ref) {
   const reactParserOptions: HTMLReactParserOptions = {
     htmlparser2: {
       lowerCaseTags: false,
@@ -62,12 +63,96 @@ export const RenderedHTML = forwardRef<
     },
   };
   const parsedElements = parse(body, reactParserOptions);
+
   return (
-    <span ref={ref} className="gui-html-container" {...attrs}>
-      {parsedElements}
-    </span>
+    <LineClamp lines={lineClamp}>
+      <span ref={ref} className="gui-html-container" {...attrs}>
+        {parsedElements}
+      </span>
+    </LineClamp>
   );
 });
+
+function LineClamp({
+  lines,
+  children,
+}: {
+  lines?: number;
+  children: React.ReactNode;
+}) {
+  const contentRef = useRef<HTMLSpanElement>(null);
+
+  const [isClamped, setClamped] = useState(false);
+  const [isExpanded, setExpanded] = useState(false);
+
+  useEffect(() => {
+    // Function that should be called on window resize
+    function handleResize() {
+      if (contentRef && contentRef.current) {
+        setClamped(
+          contentRef.current.scrollHeight > contentRef.current.clientHeight,
+        );
+      }
+    }
+
+    handleResize();
+
+    // Add event listener to window resize
+    window.addEventListener("resize", handleResize);
+
+    // Remove event listener on cleanup
+    return () => window.removeEventListener("resize", handleResize);
+  }, []); // Empty array ensures that it would only run on mount
+
+  if (!lines) {
+    return <>{children}</>;
+  }
+
+  return (
+    <span
+      ref={contentRef}
+      style={{
+        ...(isExpanded
+          ? {}
+          : {
+              display: "-webkit-box",
+              WebkitLineClamp: lines,
+              WebkitBoxOrient: "vertical",
+              overflow: "hidden",
+              position: "relative",
+            }),
+      }}
+    >
+      {children}
+      {isExpanded || !isClamped ? (
+        <></>
+      ) : (
+        <span
+          style={{
+            position: "absolute",
+            bottom: 0,
+            right: 0,
+            padding: "0 0 0 .4rem",
+          }}
+        >
+          <button
+            style={{
+              border: "none",
+              backgroundColor: "white",
+              color: "rgba(0, 0, 0, 0.6)",
+            }}
+            type={"button"}
+            onClick={() => {
+              setExpanded(true);
+            }}
+          >
+            …see more
+          </button>
+        </span>
+      )}
+    </span>
+  );
+}
 
 function InlineScript({
   attrs,
