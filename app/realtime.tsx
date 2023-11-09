@@ -1,6 +1,6 @@
 import type { LoaderArgs } from "@remix-run/node";
 import { eventStream } from "remix-utils";
-import { redis } from "~/redis.server";
+import redis from "~/redis.server";
 
 export async function loader({ params, request }: LoaderArgs) {
   const requestUrl = new URL(request.url);
@@ -15,9 +15,11 @@ export async function loader({ params, request }: LoaderArgs) {
       send({ data: Date.now().toString() });
     }
     const subscriber = createSubscriber(channels, onMsg);
-    return () => {
+    return async () => {
       closed = true;
-      subscriber.unsubscribe();
+      await subscriber.unsubscribe();
+      await subscriber.quit();
+      console.log("Redis Disconnected:", ...channels);
     };
   });
 }
@@ -26,7 +28,7 @@ function createSubscriber(channels: string[], onMsg: () => void) {
   const subscriber = redis.duplicate();
   subscriber.on("error", (err) => console.error(err));
   subscriber.on("connect", async () => {
-    console.log("Connected to redis", channels);
+    console.log("Redis Connected:", ...channels);
     // attempt to fix the slow joiner syndrome
     if (await redis.exists(channels)) onMsg();
   });

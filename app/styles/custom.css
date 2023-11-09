@@ -108,6 +108,9 @@ h1 {
   font-family: "Space Grotesk", sans-serif;
   font-size: 32px;
   line-height: 40px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  font-weight: 400;
 }
 
 @media (min-width: 768px) {

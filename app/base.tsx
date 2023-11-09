@@ -11,9 +11,10 @@ import { Tab, TabList, TabPanel, TabPanels, Tabs } from "@reach/tabs";
 import { Link } from "@remix-run/react";
 import { RenderedHTML } from "~/renderedHTML";
 import CountdownTimer from "./components/countdown";
+import { DataTable, links as dataTableLinks } from "~/dataTable";
 
 export const links: LinksFunction = () => {
-  return [...fileInputLinks()];
+  return [...dataTableLinks(), ...fileInputLinks()];
 };
 
 type TreeNode = {
@@ -86,6 +87,10 @@ function RenderedTreeNode({
           </div>
         </div>
       );
+    case "data-table":
+      const { fileUrl, ...tableProps } = props;
+      return <DataTable fileUrl={fileUrl}></DataTable>;
+
     case "nav-tabs":
       return (
         <ul
@@ -211,9 +216,11 @@ function RenderedTreeNode({
       const { label, ...args } = props;
       return (
         <div className="gui-input gui-input-textarea">
-          <label>
-            <RenderedMarkdown body={label} />
-          </label>
+          {label && (
+            <label>
+              <RenderedMarkdown body={label} />
+            </label>
+          )}
           <div>
             <textarea {...args} />
           </div>
@@ -234,7 +241,7 @@ function RenderedTreeNode({
               label={props.label}
               accept={props.accept}
               multiple={props.multiple}
-              onChange={props.onChange}
+              onChange={onChange}
               defaultValue={props.defaultValue}
               uploadMeta={props.uploadMeta}
             />
@@ -349,6 +356,10 @@ function RenderedTreeNode({
         <CountdownTimer durationInSeconds={props.duration} fallbackText={props.text} />
       )
     }
+    case "script": {
+      const { src, args } = props;
+      return <ExecJs src={src} args={args}></ExecJs>;
+    }
     default:
       return (
         <div>
@@ -360,7 +371,14 @@ function RenderedTreeNode({
   }
 }
 
-
+function ExecJs({ src, args }: { args: any; src: any }) {
+  useEffect(() => {
+    // eslint-disable-next-line no-new-func
+    const fn = new Function(...Object.keys(args), src);
+    fn(...Object.values(args));
+  }, [src, args]);
+  return null;
+}
 
 export function RenderedChildren({
   children,
@@ -408,7 +426,7 @@ function GuiSelect({
   };
 
   let selectValue = args.options.filter((opt: any) =>
-    args.isMulti ? value.includes(opt.value) : opt.value === value
+    args.isMulti ? value.includes(opt.value) : opt.value === value,
   );
   // if selectedValue is not in options, then set it to the first option
   useEffect(() => {
