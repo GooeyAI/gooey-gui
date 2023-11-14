@@ -1,39 +1,61 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 
 interface CountdownTimerProps {
-    durationInSeconds: number;
-    fallbackText: string;
+    endTime: string;
+    delayText: string;
+    children?: React.ReactNode
 }
 
-const CountdownTimer: React.FC<CountdownTimerProps> = ({ durationInSeconds, fallbackText }) => {
-    const [seconds, setSeconds] = useState(durationInSeconds);
-    const [isComplete, setIsComplete] = useState(false);
+const CountdownTimer: React.FC<CountdownTimerProps> = ({ endTime, delayText, children }) => {
+    // get endTime as a Date object for comparison
+    const end = new Date(endTime);
 
-    const handleCountdownComplete = () => {
-        setIsComplete(true);
-    };
+    const [isDelayed, setIsDelayed] = useState(false);
+    const [remainingSeconds, setRemainingSeconds] = useState(0);
 
     useEffect(() => {
-        const interval = setInterval(() => {
-            if (seconds > 0) {
-                setSeconds((prevSeconds) => prevSeconds - 1);
-            }
-        }, 1000);
+        let intervalId: NodeJS.Timer | null = null;
 
-        if (seconds <= 0) {
-            clearInterval(interval);
-            handleCountdownComplete();
+        function updateState() {
+            const now = new Date();
+            const diff = end.getTime() - now.getTime();
+
+            if (diff <= 0) {
+                if (intervalId !== null) {
+                    clearInterval(intervalId);
+                }
+                setIsDelayed(true);
+            } else {
+                setRemainingSeconds(Math.floor(diff / 1000));
+            }
         }
 
-        return () => clearInterval(interval);
-    }, [seconds]);
+        updateState();
+
+        if (!isDelayed) {
+            intervalId = setInterval(updateState, 1000);
+        }
+
+        return () => { intervalId !== null && clearInterval(intervalId) };
+    }, [remainingSeconds, isDelayed]);
 
     return (
-        isComplete ? (
-            <div>{fallbackText}</div>
-        ) : (
-            <div style={{ fontSize: 28 }}>{seconds}s left</div>
-        )
+        <div className="container mb-3 bg-light">
+            <div className="p-3">
+                {
+                    isDelayed ? (
+                        <p>{delayText}</p>
+                    ) : (
+                        remainingSeconds > 0 &&
+                        <>
+                            <h5>Estimated time to complete:</h5>
+                            <h2>{remainingSeconds}s left</h2>
+                        </>
+                    )
+                }
+                {children}
+            </div>
+        </div>
     );
 };
 

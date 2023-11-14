@@ -353,7 +353,9 @@ function RenderedTreeNode({
     }
     case "countdown-timer": {
       return (
-        <CountdownTimer durationInSeconds={props.duration} fallbackText={props.text} />
+        <CountdownTimer endTime={props.endTime} delayText={props.delayText}>
+          <RenderedChildren children={children} onChange={onChange} />
+        </CountdownTimer>
       )
     }
     case "script": {
