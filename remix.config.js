@@ -13,6 +13,7 @@ const proxyUrls = [
   "/login/",
   "/logout/",
   "/account/",
+  "/paypal/",
   "/payment-success/",
   "/favicon",
   "/favicon.ico",
