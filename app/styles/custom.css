@@ -446,17 +446,25 @@ textarea:disabled {
   transition: all 0.2s ease-in;
 }
 
+.btn.btn-theme:hover {
+  background-color: rgba(0, 0, 0, 0.45);
+}
+
 .btn-theme.btn-secondary {
   border: 1px solid #000;
   transition: all 0.2s ease-in;
   background-color: #fff;
   color: #000;
-  padding: 12px;
 }
 
-.btn-theme.btn-secondary:hover {
-  background-color: rgba(0, 0, 0, 0.45);
-  color: #fff;
+.btn-theme.btn-secondary:hover, .btn-theme.btn-tertiary:hover {
+  background-color: hsla(0, 0%, 0%, .047);;
+}
+
+.btn-theme.btn-tertiary {
+  border: none;
+  background: none;
+  color: gray;
 }
 
 .btn.btn-theme.btn-link {
@@ -469,10 +477,6 @@ textarea:disabled {
 
 .btn.btn-theme.btn-link:hover {
   background-color: white;
-}
-
-.btn.btn-theme:hover {
-  background-color: rgba(0, 0, 0, 0.45);
 }
 
 .bg-light {
