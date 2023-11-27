@@ -475,21 +475,37 @@ textarea:disabled {
   transition: all 0.2s ease-in;
 }
 
-.btn-secondary {
+.btn.btn-theme:hover {
+  background-color: rgba(0, 0, 0, 0.45);
+}
+
+.btn-theme.btn-secondary {
   border: 1px solid #000;
   transition: all 0.2s ease-in;
   background-color: #fff;
   color: #000;
-  padding: 12px;
 }
 
-.btn-secondary:hover {
-  background-color: rgba(0, 0, 0, 0.45);
-  color: #fff;
+.btn-theme.btn-secondary:hover, .btn-theme.btn-tertiary:hover {
+  background-color: hsla(0, 0%, 0%, .047);;
 }
 
-.btn.btn-theme:hover {
-  background-color: rgba(0, 0, 0, 0.45);
+.btn-theme.btn-tertiary {
+  border: none;
+  background: none;
+  color: gray;
+}
+
+.btn.btn-theme.btn-link {
+  background: none;
+  border: 0;
+  color: gray;
+  padding: 0;
+  font-size: smaller;
+}
+
+.btn.btn-theme.btn-link:hover {
+  background-color: white;
 }
 
 .bg-light {
