@@ -10,6 +10,7 @@ import { JsonViewer } from "@textea/json-viewer";
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from "@reach/tabs";
 import { Link } from "@remix-run/react";
 import { RenderedHTML } from "~/renderedHTML";
+import CountdownTimer from "./components/countdown";
 import { DataTable, links as dataTableLinks } from "~/dataTable";
 
 export const links: LinksFunction = () => {
@@ -350,6 +351,13 @@ function RenderedTreeNode({
           <RenderedChildren children={children} onChange={onChange} />
         </__reactjsxelement>
       );
+    }
+    case "countdown-timer": {
+      return (
+        <CountdownTimer endTime={props.endTime} delayText={props.delayText}>
+          <RenderedChildren children={children} onChange={onChange} />
+        </CountdownTimer>
+      )
     }
     case "script": {
       const { src, args } = props;
