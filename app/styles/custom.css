@@ -546,6 +546,12 @@ a.text-primary:hover {
   text-decoration-thickness: 2px;
 }
 
+@media all and (max-width: 992px) {
+  [class^="col-"] {
+    margin-bottom: 12px;
+  }
+}
+
 /*
 .container {
    max-width: 100%;
