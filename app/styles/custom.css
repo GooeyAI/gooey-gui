@@ -25,6 +25,35 @@
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
+.btn.btn-theme.replicate-nav {
+  border-radius: 32px;
+  background: white;
+  color: black;
+  border: 1px solid #e5e5e5;
+  margin-right: 0.5em;
+}
+
+.btn.btn-theme.replicate-nav.active {
+  background: black;
+  color: white;
+  border: 1px solid transparent;
+}
+
+.btn.btn-theme.replicate-nav:hover {
+  background: #f3f3f3;
+}
+
+.btn.btn-theme.btn-link {
+  background: none;
+  border: 0;
+  color: black;
+  padding: 0;
+}
+
+.btn.btn-theme.btn-link:hover {
+  background-color: white;
+}
+
 .gooey-spinner {
   scroll-margin: 20px;
   display: inline-block;
@@ -465,18 +494,6 @@ textarea:disabled {
   border: none;
   background: none;
   color: gray;
-}
-
-.btn.btn-theme.btn-link {
-  background: none;
-  border: 0;
-  color: gray;
-  padding: 0;
-  font-size: smaller;
-}
-
-.btn.btn-theme.btn-link:hover {
-  background-color: white;
 }
 
 .bg-light {
