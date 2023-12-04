@@ -171,8 +171,8 @@ function RenderedTreeNode({
       );
     }
     case "img": {
-      const { caption, ...args } = props;
-      return (
+      const { caption, href, ...args } = props;
+      let child = (
         <>
           <RenderedMarkdown body={caption} />
           <img
@@ -180,12 +180,20 @@ function RenderedTreeNode({
             alt={caption}
             {...args}
             onClick={() => {
-              if (args.src.startsWith("data:")) return;
+              if (href || args.src.startsWith("data:")) return;
               window.open(args.src);
             }}
           />
         </>
       );
+      if (href) {
+        child = (
+          <Link to={href}>
+            <div>{child}</div>
+          </Link>
+        );
+      }
+      return child;
     }
     case "video": {
       const { caption, ...args } = props;
