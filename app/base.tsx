@@ -94,20 +94,14 @@ function RenderedTreeNode({
         </div>
       );
     case "data-table":
-      const { fileUrl, colorCode, ...tableProps } = props;
-      return <DataTable fileUrl={fileUrl} colorCode={colorCode}></DataTable>;
+      const { fileUrl, colorCodeMin, colorCodeMax, colorColumns, ...tableProps } = props;
+      return <DataTable fileUrl={fileUrl} colorCodeMin={colorCodeMin} colorCodeMax={colorCodeMax} colorColumns={colorColumns} {...tableProps}></DataTable>;
     case "bar-chart":
       const { data, ...chartProps } = props;
       return (
         <Bar 
           data={data}
-          options={{
-            scales: {
-              y: {
-                beginAtZero: true
-              }
-            },
-          }}
+          {...chartProps}
         />
       );
     case "nav-tabs":

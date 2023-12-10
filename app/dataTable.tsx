@@ -14,7 +14,7 @@ export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: glideappsStyles }];
 };
 
-export function DataTable({ fileUrl, colorCode }: { fileUrl: string, colorCode: boolean }) {
+export function DataTable({ fileUrl, colorCodeMin, colorCodeMax, colorColumns }: { fileUrl: string, colorCodeMin: string, colorCodeMax: string, colorColumns: Array<string> }) {
   // let data, columns
   let [data, setData] = useState<Array<any>>([]);
   let [columns, setColumns] = useState<Array<any>>([]);
@@ -80,14 +80,14 @@ export function DataTable({ fileUrl, colorCode }: { fileUrl: string, colorCode: 
       }
       const displayData = `${dataRow[columns[col].title] ?? ""}`;
       const [min, max] = extremeValues[columns[col].title];
-      const hue = (1 - (max - parseFloat(displayData)) / (max - min)) * 120;
+      const color = displayData == max ? colorCodeMax : displayData == min ? colorCodeMin : "white";
       return {
         kind: GridCellKind.Markdown,
         allowOverlay: true,
         readonly: true,
         data: displayData,
         themeOverride: { // highlight based on value
-          bgCell: !colorCode || isNaN(displayData as unknown as number) || max == min ? "white" : `hsl(${hue.toString(10)},100%,50%)`,
+          bgCell: !colorColumns.includes(columns[col].title) || isNaN(displayData as unknown as number) || max == min ? "white" : color,
         },
       };
     },
