@@ -14,7 +14,7 @@ export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: glideappsStyles }];
 };
 
-export function DataTable({ fileUrl }: { fileUrl: string }) {
+export function DataTable({ fileUrl, colorCode }: { fileUrl: string, colorCode: boolean }) {
   // let data, columns
   let [data, setData] = useState<Array<any>>([]);
   let [columns, setColumns] = useState<Array<any>>([]);
@@ -60,6 +60,14 @@ export function DataTable({ fileUrl }: { fileUrl: string }) {
     })();
   }, [fileUrl]);
 
+  // get maximum and minimum value of each column
+  const extremeValues = Object.fromEntries(columns.map((col) => {
+    const values = data.map((row) => parseFloat(row[col.title]));
+    const max = Math.max(...values);
+    const min = Math.min(...values);
+    return [col.title, [min, max]];
+  }));
+
   const getContent = useCallback(
     (cell: Item): GridCell => {
       const [col, row] = cell;
@@ -71,12 +79,16 @@ export function DataTable({ fileUrl }: { fileUrl: string }) {
         };
       }
       const displayData = `${dataRow[columns[col].title] ?? ""}`;
+      const [min, max] = extremeValues[columns[col].title];
+      const hue = (1 - (max - parseFloat(displayData)) / (max - min)) * 120;
       return {
-        kind: GridCellKind.Text,
+        kind: GridCellKind.Markdown,
         allowOverlay: true,
         readonly: true,
-        displayData: displayData,
         data: displayData,
+        themeOverride: { // highlight based on value
+          bgCell: !colorCode || isNaN(displayData as unknown as number) || max == min ? "white" : `hsl(${hue.toString(10)},100%,50%)`,
+        },
       };
     },
     [columns, data],

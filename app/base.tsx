@@ -12,6 +12,12 @@ import { Link } from "@remix-run/react";
 import { RenderedHTML } from "~/renderedHTML";
 import CountdownTimer from "./components/countdown";
 import { DataTable, links as dataTableLinks } from "~/dataTable";
+import { Bar } from "react-chartjs-2"; 
+import { CategoryScale, LinearScale, BarElement, Chart, Tooltip } from "chart.js";
+Chart.register(CategoryScale);
+Chart.register(LinearScale);
+Chart.register(BarElement);
+Chart.register(Tooltip);
 
 export const links: LinksFunction = () => {
   return [...dataTableLinks(), ...fileInputLinks()];
@@ -88,9 +94,22 @@ function RenderedTreeNode({
         </div>
       );
     case "data-table":
-      const { fileUrl, ...tableProps } = props;
-      return <DataTable fileUrl={fileUrl}></DataTable>;
-
+      const { fileUrl, colorCode, ...tableProps } = props;
+      return <DataTable fileUrl={fileUrl} colorCode={colorCode}></DataTable>;
+    case "bar-chart":
+      const { data, ...chartProps } = props;
+      return (
+        <Bar 
+          data={data}
+          options={{
+            scales: {
+              y: {
+                beginAtZero: true
+              }
+            },
+          }}
+        />
+      );
     case "nav-tabs":
       return (
         <ul
