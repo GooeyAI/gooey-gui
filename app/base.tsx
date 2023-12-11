@@ -12,6 +12,7 @@ import { Link } from "@remix-run/react";
 import { RenderedHTML } from "~/renderedHTML";
 import CountdownTimer from "./components/countdown";
 import { DataTable, links as dataTableLinks } from "~/dataTable";
+import { ClientOnly } from "remix-utils";
 
 export const links: LinksFunction = () => {
   return [...dataTableLinks(), ...fileInputLinks()];
@@ -298,9 +299,7 @@ function RenderedTreeNode({
     case "option": {
       const { label, ...args } = props;
       return (
-        <option {...args}>
-          <RenderedMarkdown body={label} />
-        </option>
+        <option {...args}>{label && <RenderedMarkdown body={label} />}</option>
       );
     }
     case "json":
@@ -365,11 +364,22 @@ function RenderedTreeNode({
         <CountdownTimer endTime={props.endTime} delayText={props.delayText}>
           <RenderedChildren children={children} onChange={onChange} />
         </CountdownTimer>
-      )
+      );
     }
     case "script": {
       const { src, args } = props;
       return <ExecJs src={src} args={args}></ExecJs>;
+    }
+    case "plotly-chart": {
+      const { chart, ...args } = props;
+      return (
+        <ClientOnly fallback={<p>Loading...</p>}>
+          {() => {
+            const Plot = require("react-plotly.js").default;
+            return <Plot {...chart} style={{ width: "100%" }} />;
+          }}
+        </ClientOnly>
+      );
     }
     default:
       return (
@@ -448,9 +458,11 @@ function GuiSelect({
 
   return (
     <div className="gui-input gui-input-select">
-      <label htmlFor={name}>
-        <RenderedMarkdown body={label} />
-      </label>
+      {label && (
+        <label htmlFor={name}>
+          <RenderedMarkdown body={label} />
+        </label>
+      )}
       <JsonFormInput />
       {/*{JsonFormInput}*/}
       <Select value={selectValue} onChange={onSelectChange} {...args} />

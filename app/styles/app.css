@@ -96,21 +96,8 @@ div.code-toolbar {
   margin-bottom: 0.9rem;
 }
 
-.gui-input h3,
-.gui-input h5 {
+.gui-input h3 {
   font-size: 1rem;
-  color: #000000;
-  word-wrap: break-word;
-  background-color: rgba(0, 0, 0, 0.05);
-  display: inline-block;
-  line-height: 1.25rem;
-  padding: 0.25rem 0.5rem;
-  letter-spacing: 1px;
-  /*
-    font-size: 32px;
-    line-height: 40px;
-    font-weight: 400;
-     */
 }
 
 .gui-input label p {
@@ -251,7 +238,9 @@ button .gui-html-container,
 }
 
 #nprogress .peg {
-  box-shadow: 0 0 10px #02b3a1, 0 0 5px #02b3a1;
+  box-shadow:
+    0 0 10px #02b3a1,
+    0 0 5px #02b3a1;
   width: 100%;
   transform: none;
 }

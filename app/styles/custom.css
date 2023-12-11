@@ -183,10 +183,20 @@ h4 {
 
 h5 {
   font-family: "Space Grotesk", sans-serif;
-  font-size: 20px;
+  font-size: 1rem;
   line-height: 24px;
 
   font-weight: 400;
+}
+
+h3,
+h5 {
+  color: #000000;
+  word-wrap: break-word;
+  background-color: rgba(0, 0, 0, 0.05);
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  letter-spacing: 1px;
 }
 
 h6 {
@@ -226,7 +236,9 @@ h6 {
   /*padding: 12px !important;*/
   color: #00000073;
   text-decoration: none;
-  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+  transition:
+    color 0.15s ease-in-out,
+    background-color 0.15s ease-in-out,
     border-color 0.15s ease-in-out;
 }
 
@@ -486,8 +498,9 @@ textarea:disabled {
   color: #000;
 }
 
-.btn-theme.btn-secondary:hover, .btn-theme.btn-tertiary:hover {
-  background-color: hsla(0, 0%, 0%, .047);;
+.btn-theme.btn-secondary:hover,
+.btn-theme.btn-tertiary:hover {
+  background-color: hsla(0, 0%, 0%, 0.047);
 }
 
 .btn-theme.btn-tertiary {

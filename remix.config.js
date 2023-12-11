@@ -10,10 +10,7 @@ const wixUrls = [
   "/arc-test", // temporary
 ];
 
-const gitbookUrls = [
-  "/docs/*",
-  "/blog/*",
-];
+const gitbookUrls = ["/docs/*", "/blog/*"];
 
 const proxyUrls = [
   "/static/*",
