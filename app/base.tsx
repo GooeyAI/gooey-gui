@@ -13,11 +13,12 @@ import { RenderedHTML } from "~/renderedHTML";
 import CountdownTimer from "./components/countdown";
 import { DataTable, links as dataTableLinks } from "~/dataTable";
 import { Bar } from "react-chartjs-2"; 
-import { CategoryScale, LinearScale, BarElement, Chart, Tooltip } from "chart.js";
+import { CategoryScale, LinearScale, BarElement, Chart } from "chart.js";
+import ChartDataLabels from 'chartjs-plugin-datalabels';
+Chart.register(ChartDataLabels);
 Chart.register(CategoryScale);
 Chart.register(LinearScale);
 Chart.register(BarElement);
-Chart.register(Tooltip);
 
 export const links: LinksFunction = () => {
   return [...dataTableLinks(), ...fileInputLinks()];
@@ -97,11 +98,23 @@ function RenderedTreeNode({
       const { fileUrl, colorCodeMin, colorCodeMax, colorColumns, ...tableProps } = props;
       return <DataTable fileUrl={fileUrl} colorCodeMin={colorCodeMin} colorCodeMax={colorCodeMax} colorColumns={colorColumns} {...tableProps}></DataTable>;
     case "bar-chart":
-      const { data, ...chartProps } = props;
+      const { data, options, ...chartProps } = props;
       return (
         <Bar 
           data={data}
-          {...chartProps}
+          options={{
+            plugins: {
+              datalabels: {
+                font: {
+                  size: 32,
+                },
+                display: true, 
+                formatter: x => Math.round(x * 100) / 100,
+              },
+            },
+            ...options
+          }}
+          {...chartProps} 
         />
       );
     case "nav-tabs":

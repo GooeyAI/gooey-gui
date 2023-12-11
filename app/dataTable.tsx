@@ -112,7 +112,7 @@ export function DataTable({ fileUrl, colorCodeMin, colorCodeMax, colorColumns }:
               rowMarkers={"both"}
               verticalBorder={true}
               rows={data.length}
-              height={"300px"}
+              height={data.length > 7 ? "300px" : data.length * 80 + "px"}
               onColumnResize={(col: any, width) => {
                 col.width = width;
                 setColumns([...columns]);

@@ -29,6 +29,7 @@
     "@uppy/webcam": "^3.3.1",
     "@uppy/xhr-upload": "^3.2.0",
     "chart.js": "^4.4.1",
+    "chartjs-plugin-datalabels": "^2.2.0",
     "firebase-admin": "^11.9.0",
     "html-react-parser": "^4.0.0",
     "isbot": "^3.6.8",
