@@ -11,7 +11,7 @@ import { Tab, TabList, TabPanel, TabPanels, Tabs } from "@reach/tabs";
 import { Link } from "@remix-run/react";
 import { RenderedHTML } from "~/renderedHTML";
 import CountdownTimer from "./components/countdown";
-import { DataTable, links as dataTableLinks } from "~/dataTable";
+import { DataTable, DataTableRaw, links as dataTableLinks } from "~/dataTable";
 import { ClientOnly } from "remix-utils";
 
 export const links: LinksFunction = () => {
@@ -88,10 +88,14 @@ function RenderedTreeNode({
           </div>
         </div>
       );
-    case "data-table":
+    case "data-table": {
       const { fileUrl, ...tableProps } = props;
       return <DataTable fileUrl={fileUrl}></DataTable>;
-
+    }
+    case "data-table-raw": {
+      const { cells, ...tableProps } = props;
+      return <DataTableRaw cells={cells}></DataTableRaw>;
+    }
     case "nav-tabs":
       return (
         <ul
