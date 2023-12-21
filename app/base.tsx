@@ -261,9 +261,6 @@ function RenderedTreeNode({
           );
         }
         case "checkbox":
-        case "radio": {
-          const { label, ...args } = props;
-
           // if the state value is changed by the server code, then update the checked state
           useEffect(() => {
             const element = document.getElementById(id) as HTMLInputElement;
@@ -271,7 +268,8 @@ function RenderedTreeNode({
               element.checked = state[props.name];
             }
           }, [state, props.name]);
-
+        case "radio": {
+          const { label, ...args } = props;
           return (
             <div className={className + " "}>
               <input id={id} {...args} />
