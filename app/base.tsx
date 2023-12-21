@@ -71,20 +71,22 @@ function parseIntFloat(val: FormDataEntryValue): number {
 function RenderedTreeNode({
   node,
   onChange,
+  state,
 }: {
   node: TreeNode;
   onChange: () => void;
+  state?: Record<string, any>;
 }) {
   const { name, props, children } = node;
 
   switch (name) {
     case "":
-      return <RenderedChildren children={children} onChange={onChange} />;
+      return <RenderedChildren children={children} onChange={onChange} state={state} />;
     case "nav-tab-content":
       return (
         <div className="tab-content">
           <div className="tab-pane show active" role="tabpanel">
-            <RenderedChildren children={children} onChange={onChange} />
+            <RenderedChildren children={children} onChange={onChange} state={state} />
           </div>
         </div>
       );
@@ -103,7 +105,7 @@ function RenderedTreeNode({
           role="tablist"
           {...props}
         >
-          <RenderedChildren children={children} onChange={onChange} />
+          <RenderedChildren children={children} onChange={onChange} state={state} />
         </ul>
       );
     case "nav-item": {
@@ -121,7 +123,7 @@ function RenderedTreeNode({
               aria-selected="true"
             >
               <p className="mb-0">
-                <RenderedChildren children={children} onChange={onChange} />
+                <RenderedChildren children={children} onChange={onChange} state={state} />
               </p>
             </button>
           </li>
@@ -139,26 +141,26 @@ function RenderedTreeNode({
     case "ul": {
       return (
         <ul {...props}>
-          <RenderedChildren children={children} onChange={onChange} />
+          <RenderedChildren children={children} onChange={onChange} state={state} />
         </ul>
       );
     }
     case "div": {
       return (
         <div {...props}>
-          <RenderedChildren children={children} onChange={onChange} />
+          <RenderedChildren children={children} onChange={onChange} state={state} />
         </div>
       );
     }
     case "tabs":
       const tabs = children.map((elem) => (
         <Tab key={elem.props.label}>
-          <RenderedMarkdown body={elem.props.label} />
+          <RenderedMarkdown body={elem.props.label} state={state} />
         </Tab>
       ));
       const panels = children.map((elem) => (
         <TabPanel key={elem.props.label} {...elem.props}>
-          <RenderedChildren children={elem.children} onChange={onChange} />
+          <RenderedChildren children={elem.children} onChange={onChange} state={state} />
         </TabPanel>
       ));
       return (
@@ -171,7 +173,7 @@ function RenderedTreeNode({
       const { label, open, ...args } = props;
       return (
         <GuiExpander open={open} label={label} {...args}>
-          <RenderedChildren children={children} onChange={onChange} />
+          <RenderedChildren children={children} onChange={onChange} state={state} />
         </GuiExpander>
       );
     }
@@ -246,7 +248,7 @@ function RenderedTreeNode({
       const id = inputId(props);
       switch (props.type) {
         case "range": {
-          return <GooeySlider className={className} id={id} props={props} />;
+          return <GooeySlider className={className} id={id} props={props} state={state} />;
         }
         case "file": {
           return (
@@ -258,12 +260,22 @@ function RenderedTreeNode({
               onChange={onChange}
               defaultValue={props.defaultValue}
               uploadMeta={props.uploadMeta}
+              state={state}
             />
           );
         }
         case "checkbox":
         case "radio": {
           const { label, ...args } = props;
+
+          // if the state value is changed by the server code, then update the checked state
+          useEffect(() => {
+            const element = document.getElementById(id) as HTMLInputElement;
+            if (state && state[props.name] !== element.checked) {
+              element.checked = state[props.name];
+            }
+          }, [state, props.name]);
+
           return (
             <div className={className + " "}>
               <input id={id} {...args} />
@@ -275,6 +287,15 @@ function RenderedTreeNode({
         }
         default: {
           const { label, ...args } = props;
+
+          // if the state value is changed by the server code, then update the value
+          useEffect(() => {
+            const element = document.getElementById(id) as HTMLInputElement;
+            if (state && state[props.name] !== element.value) {
+              element.value = state[props.name];
+            }
+          }, [state, props.name]);
+
           return (
             <div className={className}>
               <label htmlFor={id}>
@@ -299,7 +320,7 @@ function RenderedTreeNode({
       );
     }
     case "select":
-      return <GuiSelect props={props} onChange={onChange} />;
+      return <GuiSelect props={props} onChange={onChange} state={state} />;
     case "option": {
       const { label, ...args } = props;
       return (
@@ -322,51 +343,51 @@ function RenderedTreeNode({
     case "table":
       return (
         <table>
-          {<RenderedChildren children={children} onChange={onChange} />}
+          {<RenderedChildren children={children} onChange={onChange} state={state} />}
         </table>
       );
     case "thead":
       return (
         <thead>
-          {<RenderedChildren children={children} onChange={onChange} />}
+          {<RenderedChildren children={children} onChange={onChange} state={state} />}
         </thead>
       );
     case "tbody":
       return (
         <tbody>
-          {<RenderedChildren children={children} onChange={onChange} />}
+          {<RenderedChildren children={children} onChange={onChange} state={state} />}
         </tbody>
       );
     case "tr":
       return (
-        <tr>{<RenderedChildren children={children} onChange={onChange} />}</tr>
+        <tr>{<RenderedChildren children={children} onChange={onChange} state={state} />}</tr>
       );
     case "th":
       return (
-        <th>{<RenderedChildren children={children} onChange={onChange} />}</th>
+        <th>{<RenderedChildren children={children} onChange={onChange} state={state} />}</th>
       );
     case "td":
       return (
-        <td>{<RenderedChildren children={children} onChange={onChange} />}</td>
+        <td>{<RenderedChildren children={children} onChange={onChange} state={state} />}</td>
       );
     case "Link":
       return (
         <Link to={props.to} {...props}>
-          <RenderedChildren children={children} onChange={onChange} />
+          <RenderedChildren children={children} onChange={onChange} state={state} />
         </Link>
       );
     case "tag": {
       const { __reactjsxelement, ...args } = props;
       return (
         <__reactjsxelement {...args}>
-          <RenderedChildren children={children} onChange={onChange} />
+          <RenderedChildren children={children} onChange={onChange} state={state} />
         </__reactjsxelement>
       );
     }
     case "countdown-timer": {
       return (
         <CountdownTimer endTime={props.endTime} delayText={props.delayText}>
-          <RenderedChildren children={children} onChange={onChange} />
+          <RenderedChildren children={children} onChange={onChange} state={state} />
         </CountdownTimer>
       );
     }
@@ -408,9 +429,11 @@ function ExecJs({ src, args }: { args: any; src: any }) {
 export function RenderedChildren({
   children,
   onChange,
+  state,
 }: {
   children: Array<TreeNode>;
   onChange: () => void;
+  state?: Record<string, any>;
 }) {
   let elements = children.map((node, idx) => {
     let key;
@@ -419,7 +442,7 @@ export function RenderedChildren({
     } else {
       key = `idx:${idx}`;
     }
-    return <RenderedTreeNode key={key} node={node} onChange={onChange} />;
+    return <RenderedTreeNode key={key} node={node} onChange={onChange} state={state} />;
   });
   return <>{elements}</>;
 }
@@ -427,9 +450,11 @@ export function RenderedChildren({
 function GuiSelect({
   props,
   onChange,
+  state,
 }: {
   props: Record<string, any>;
   onChange: () => void;
+  state?: Record<string, any>;
 }) {
   const { defaultValue, name, label, ...args } = props;
   const [JsonFormInput, value, setValue] = useJsonFormInput({
@@ -437,6 +462,13 @@ function GuiSelect({
     name,
     onChange,
   });
+
+  // if the state value is changed by the server code, then update the value
+  useEffect(() => {
+    if (state && state[name] !== value) {
+      setValue(state[name]);
+    }
+  }, [state, name]);
 
   const onSelectChange = (newValue: any) => {
     if (newValue === undefined) return;
@@ -478,14 +510,27 @@ function GooeySlider({
   className,
   id,
   props,
+  state,
 }: {
   className: string;
   id: string;
   props: Record<string, any>;
+  state?: Record<string, any>;
 }) {
   const { label, ...args } = props;
   const ref1 = useRef<HTMLInputElement>(null);
   const ref2 = useRef<HTMLInputElement>(null);
+
+  // if server changed the value, update both inputs
+  useEffect(() => {
+    for (const element of [ref1.current, ref2.current]) {
+      if (!element) continue;
+      if (state && state[props.name] !== element.value) {
+        element.value = state[props.name];
+      }
+    }
+  }, [state, props.name]);
+
   return (
     <div className={className}>
       <label htmlFor={id}>
