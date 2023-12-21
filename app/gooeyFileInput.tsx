@@ -30,6 +30,7 @@ export function GooeyFileInput({
   onChange,
   defaultValue,
   uploadMeta,
+  state,
 }: {
   name: string;
   label: string;
@@ -38,9 +39,19 @@ export function GooeyFileInput({
   onChange: () => void;
   defaultValue: string | string[] | undefined;
   uploadMeta: Record<string, string>;
+  state?: Record<string, any>;
 }) {
   const [uppy, setUppy] = useState<Uppy | null>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
+
+  // if server changed the value, update the input
+  useEffect(() => {
+      const element = inputRef.current;
+      if (!element) return;
+      if (state && state[name] !== element.value) {
+        element.value = state[name];
+      }
+  }, [state, name]);
 
   useEffect(() => {
     const onFilesChanged = () => {

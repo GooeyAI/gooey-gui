@@ -233,6 +233,7 @@ function App() {
           onChange={() => {
             if (formRef.current) submit(formRef.current);
           }}
+          state={state}
         />
         <input
           type="hidden"
