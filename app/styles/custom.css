@@ -1,11 +1,15 @@
-@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap");
+/* @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap"); */
+
+@import url("https://static.parastorage.com/services/santa-resources/resources/viewer/user-site-fonts/fonts/Avenir_Family_Pack/v1/AvenirLTW05-85Heavy.woff2");
+
+/* avenir-lt-w01_85-heavy1475544,avenir-lt-w05_85-heavy,sans-serif */
 
 .streamlit-like-btn,
 .streamlit-like-btn:visited,
 .streamlit-like-btn:hover,
 .streamlit-like-btn:active {
   cursor: pointer;
-  font-family: "Space Grotesk", sans-serif;
+  font-family: avenir-lt-w01_85-heavy1475544,avenir-lt-w05_85-heavy,"Space Grotesk", sans-serif;
   font-size: 15px;
   text-decoration: none !important;
   color: white !important;
@@ -36,11 +40,17 @@
 .btn.btn-theme.replicate-nav.active {
   background: black;
   color: white;
-  border: 1px solid transparent;
+  border: 1px solid black;
 }
 
 .btn.btn-theme.replicate-nav:hover {
-  background: #f3f3f3;
+  background: #fff0f5;
+}
+
+.btn.btn-theme.replicate-nav.active:hover {
+  background:  #a5ffee; /* mint */;
+  color: black;
+  border: 1px solid transparent;
 }
 
 .btn.btn-theme.btn-link {
@@ -90,6 +100,11 @@ html {
 }
 
 @font-face {
+  font-family: avenir-lt-w05_85-heavy;
+  src: url("https://static.parastorage.com/services/santa-resources/resources/viewer/user-site-fonts/fonts/Avenir_Family_Pack/v1/AvenirLTW05-85Heavy.woff2");
+}
+
+@font-face {
   font-family: basiercircle;
   src: url("basiercircle-regular.otf");
 }
@@ -105,7 +120,7 @@ body {
   color: #000;
 }
 
-.semobold {
+.semobold, .semibold {
   font-weight: 600;
 }
 
@@ -133,8 +148,10 @@ a:hover {
   text-decoration-thickness: 2px;
 }
 
+h1, h2, h3, h4, h5, h6 {
+    font-family: avenir-lt-w01_85-heavy1475544,avenir-lt-w05_85-heavy,"avenir-lt-w05_85-heavy","Space Grotesk", sans-serif;
+}
 h1 {
-  font-family: "Space Grotesk", sans-serif;
   font-size: 32px;
   line-height: 40px;
   margin-top: 20px;
@@ -150,7 +167,6 @@ h1 {
 }
 
 h2 {
-  font-family: "Space Grotesk", sans-serif;
   font-size: 32px;
   line-height: 40px;
   margin-top: 20px;
@@ -166,7 +182,6 @@ h2 {
 }
 
 h3 {
-  font-family: "Space Grotesk", sans-serif;
   font-size: 32px;
   line-height: 40px;
 
@@ -174,7 +189,6 @@ h3 {
 }
 
 h4 {
-  font-family: "Space Grotesk", sans-serif;
   font-size: 24px;
   line-height: 35px;
 
@@ -182,10 +196,8 @@ h4 {
 }
 
 h5 {
-  font-family: "Space Grotesk", sans-serif;
   font-size: 1rem;
   line-height: 24px;
-
   font-weight: 400;
 }
 
@@ -193,17 +205,15 @@ h3,
 h5 {
   color: #000000;
   word-wrap: break-word;
-  background-color: rgba(0, 0, 0, 0.05);
   display: inline-block;
+  background-color: rgba(0, 0, 0, 0.05);
   padding: 0.25rem 0.5rem;
   letter-spacing: 1px;
 }
 
 h6 {
-  font-family: "Space Grotesk", sans-serif;
   font-size: 16px;
   line-height: 24px;
-
   font-weight: 400;
 }
 
@@ -444,11 +454,16 @@ h6 {
   /*padding: 20px;*/
 }
 
+input {
+  border-radius: 6px;
+}
+
 textarea {
   width: 100%;
   padding: 12px;
   background-color: #fff;
   border: 1px solid #000;
+  border-radius: 6px;
 }
 textarea:disabled {
   background-color: rgba(0, 0, 0, 0.05);
@@ -476,38 +491,61 @@ textarea:disabled {
 }
 
 .btn {
-  border-radius: 0px;
+  margin: 0 0 0 1px;
+  border-radius: 6px;
+ /* font-weight: 800; */
 }
 
 .btn.btn-theme {
   background-color: #000;
-  color: #3cffea;
+  color: white; /* mint-text #3cffea;  */
   padding: 12px;
   border: 1px solid #000;
-  transition: all 0.2s ease-in;
+  transition: all 0.1s ease-in;
+  font-weight: bold;
 }
 
 .btn.btn-theme:hover {
-  background-color: rgba(0, 0, 0, 0.45);
+  /* background-color: rgba(0, 0, 0, 0.45); */
+  background-color: #3cffea;
+  color: black; /* mint-text #3cffea;  */
+  border: 1px solid black;
 }
 
 .btn-theme.btn-secondary {
-  border: 1px solid #000;
+  /*
+  border: 1px solid #f2f2f2;
   transition: all 0.2s ease-in;
-  background-color: #fff;
+  background-color: #fff0f5;
   color: #000;
+  */
+    border: 1px solid #c9c9c9;
+    transition: all .2s ease-in;
+    background-color: #fff;
+    color: black;
 }
-
-.btn-theme.btn-secondary:hover,
-.btn-theme.btn-tertiary:hover {
-  background-color: hsla(0, 0%, 0%, 0.047);
+.btn-theme.btn-secondary:hover {
+  background-color: #fff0f5; /* #a5ffee; mint */
+  color: black;
+  border-color: black;
 }
 
 .btn-theme.btn-tertiary {
-  border: none;
+  border: 1px solid transparent;
   background: none;
   color: gray;
 }
+
+.btn-theme.btn-tertiary:hover {
+  /* background-color: hsla(0, 0%, 0%, 0.047); */
+  background-color: #fff0f5; /* #a5ffee; mint */
+  color: black;
+  border: 1px solid transparent;
+}
+
+
+
+
 
 .bg-light {
   padding: 15px 20px;
