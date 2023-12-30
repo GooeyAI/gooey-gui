@@ -1,6 +1,6 @@
 import type { LinksFunction } from "@remix-run/node";
 import type { ReactNode } from "react";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Select from "react-select";
 import { GooeyFileInput, links as fileInputLinks } from "~/gooeyFileInput";
 import { RenderedMarkdown } from "~/renderedMarkdown";
@@ -225,7 +225,19 @@ function RenderedTreeNode({
       return <RenderedMarkdown body={body} {...args} />;
     }
     case "textarea": {
-      const { label, ...args } = props;
+      const { label, defaultValue, ...args } = props;
+
+      // if the state value is changed by the server code, then update the value
+      // we need to use this extra state variable because DOM limitations mean textarea values can't be updated directly (https://github.com/elm/virtual-dom/issues/115)
+      // instead the React way is to have a value and onChange handler (https://react.dev/reference/react-dom/components/textarea)
+      // but to avoid reloading the page on every change with onChange (gets very annoying when typing), we need to use this extra state variable with a useEffect
+      const [value, setValue] = useState<string>(state[name] || defaultValue);
+      useEffect(() => {
+        if (state && state[name] !== value) {
+          setValue(state[name] || defaultValue);
+        }
+      }, [state[name], defaultValue]);
+
       return (
         <div className="gui-input gui-input-textarea">
           {label && (
@@ -234,7 +246,7 @@ function RenderedTreeNode({
             </label>
           )}
           <div>
-            <textarea {...args} />
+            <textarea value={value} onChange={(e) => setValue(e.target.value)} {...args} />
           </div>
         </div>
       );
@@ -422,6 +434,13 @@ function GooeyRadio({
   className: string
 }) {
   const { label, ...args } = props;
+
+  // if the state value is changed by the server code, then update the value
+  useEffect(() => {
+    const element = document.getElementById(id) as HTMLInputElement;
+    element.checked = state[props.name] === element.value;
+  }, [state, props.name]);
+
   return (
     <div className={className}>
       <input id={id} {...args} />
