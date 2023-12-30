@@ -39,7 +39,7 @@ export function GooeyFileInput({
   onChange: () => void;
   defaultValue: string | string[] | undefined;
   uploadMeta: Record<string, string>;
-  state?: Record<string, any>;
+  state: Record<string, any>;
 }) {
   const [uppy, setUppy] = useState<Uppy | null>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);

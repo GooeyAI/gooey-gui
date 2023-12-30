@@ -43,7 +43,7 @@ export default function App() {
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <Meta />
         <Links />
-        <script src="https://kit.fontawesome.com/8af9787bd5.js" crossorigin="anonymous"></script>
+        <script src="https://kit.fontawesome.com/8af9787bd5.js" crossOrigin="anonymous"></script>
       </head>
       <body>
         <div

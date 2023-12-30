@@ -75,7 +75,7 @@ function RenderedTreeNode({
 }: {
   node: TreeNode;
   onChange: () => void;
-  state?: Record<string, any>;
+  state: Record<string, any>;
 }) {
   const { name, props, children } = node;
 
@@ -431,7 +431,7 @@ export function RenderedChildren({
 }: {
   children: Array<TreeNode>;
   onChange: () => void;
-  state?: Record<string, any>;
+  state: Record<string, any>;
 }) {
   let elements = children.map((node, idx) => {
     let key;
@@ -452,7 +452,7 @@ function GuiSelect({
 }: {
   props: Record<string, any>;
   onChange: () => void;
-  state?: Record<string, any>;
+  state: Record<string, any>;
 }) {
   const { defaultValue, name, label, ...args } = props;
   const [JsonFormInput, value, setValue] = useJsonFormInput({
@@ -513,7 +513,7 @@ function GooeySlider({
   className: string;
   id: string;
   props: Record<string, any>;
-  state?: Record<string, any>;
+  state: Record<string, any>;
 }) {
   const { label, ...args } = props;
   const ref1 = useRef<HTMLInputElement>(null);
