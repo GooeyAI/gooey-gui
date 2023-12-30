@@ -44,15 +44,6 @@ export function GooeyFileInput({
   const [uppy, setUppy] = useState<Uppy | null>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
 
-  // if server changed the value, update the input
-  useEffect(() => {
-      const element = inputRef.current;
-      if (!element) return;
-      if (state && state[name] !== element.value) {
-        element.value = state[name];
-      }
-  }, [state, name]);
-
   useEffect(() => {
     const onFilesChanged = () => {
       const element = inputRef.current;
@@ -61,7 +52,7 @@ export function GooeyFileInput({
         .getFiles()
         .map((file) => file.response?.uploadURL)
         .filter((url) => url);
-      element.value =
+      element.value = 
         JSON.stringify(multiple ? uploadUrls : uploadUrls[0]) || "";
       onChange();
     };
@@ -86,43 +77,28 @@ export function GooeyFileInput({
       .use(XHR, { endpoint: "/__/file-upload/" })
       .on("upload-success", onFilesChanged)
       .on("file-removed", onFilesChanged);
-    let urls = defaultValue;
-    if (typeof urls === "string") {
-      urls = [urls];
-    }
-    urls ||= [];
-    for (let url of urls) {
-      try {
-        let filename;
-        if (!isUserUploadedUrl(url)) {
-          filename = urlToFilename(url);
-        } else {
-          filename = url;
-        }
-        const contentType = mime.lookup(filename) || undefined;
-        const fileId = _uppy.addFile({
-          name: filename,
-          type: contentType,
-          data: new Blob(),
-          preview: contentType?.startsWith("image/") ? url : undefined,
-        });
-        _uppy.setFileState(fileId, {
-          progress: { uploadComplete: true, uploadStarted: true },
-          uploadURL: url,
-        });
-      } catch (e) {}
-    }
-    if (_uppy.getFiles().length) {
-      _uppy.setState({
-        totalProgress: 100,
-      });
-    }
-    // only set this after initial files have been added
-    _uppy.setOptions({
-      autoProceed: true,
-    });
+    initUppy(defaultValue, _uppy);
     setUppy(_uppy);
+    // Clean up event handlers etc.
+    return () => {
+      _uppy.close();
+    };
   }, []);
+
+  // if the server value changes, update the uppy state
+  useEffect(() => {
+    const element = inputRef.current;
+    if (!uppy || !element || JSON.stringify(state[name]) == element?.value || state[name] == element?.value) return;
+    for (const file of uppy.getFiles()) {
+      uppy.removeFile(file.id);
+    }
+    initUppy(state[name] || [], uppy);
+    // JS event loop hack to make sure the value is set before onChange is called
+    setTimeout(() => {
+      element.value = JSON.stringify(state[name]) || "";
+      onChange();
+    });
+  }, [state[name]]);
 
   if (!uppy) return <></>;
 
@@ -153,6 +129,44 @@ export function GooeyFileInput({
       />
     </div>
   );
+}
+
+function initUppy(defaultValue: string | string[] | undefined, uppy: Uppy) {
+  let urls = defaultValue;
+  if (typeof urls === "string") {
+    urls = [urls];
+  }
+  urls ||= [];
+  for (let url of urls) {
+    try {
+      let filename;
+      if (!isUserUploadedUrl(url)) {
+        filename = urlToFilename(url);
+      } else {
+        filename = url;
+      }
+      const contentType = mime.lookup(filename) || undefined;
+      const fileId = uppy.addFile({
+        name: filename,
+        type: contentType,
+        data: new Blob(),
+        preview: contentType?.startsWith("image/") ? url : undefined,
+      });
+      uppy.setFileState(fileId, {
+        progress: { uploadComplete: true, uploadStarted: true },
+        uploadURL: url,
+      });
+    } catch (e) { }
+  }
+  if (uppy.getFiles().length) {
+    uppy.setState({
+      totalProgress: 100,
+    });
+  }
+  // only set this after initial files have been added
+  uppy.setOptions({
+    autoProceed: true,
+  });
 }
 
 function urlToFilename(url: string) {
