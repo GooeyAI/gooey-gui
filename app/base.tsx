@@ -265,43 +265,12 @@ function RenderedTreeNode({
           );
         }
         case "checkbox":
-          // if the state value is changed by the server code, then update the checked state
-          useEffect(() => {
-            const element = document.getElementById(id) as HTMLInputElement;
-            if (state && state[props.name] !== element.checked) {
-              element.checked = state[props.name];
-            }
-          }, [state, props.name]);
+          return <GooeyCheckbox props={props} id={id} state={state} className={className}></GooeyCheckbox>;
         case "radio": {
-          const { label, ...args } = props;
-          return (
-            <div className={className + " "}>
-              <input id={id} {...args} />
-              <label htmlFor={id}>
-                <RenderedMarkdown body={label} />
-              </label>
-            </div>
-          );
+          return <GooeyRadio props={props} id={id} state={state} className={className}></GooeyRadio>;
         }
         default: {
-          const { label, ...args } = props;
-
-          // if the state value is changed by the server code, then update the value
-          useEffect(() => {
-            const element = document.getElementById(id) as HTMLInputElement;
-            if (state && state[props.name] !== element.value) {
-              element.value = state[props.name];
-            }
-          }, [state, props.name]);
-
-          return (
-            <div className={className}>
-              <label htmlFor={id}>
-                <RenderedMarkdown body={label} />
-              </label>
-              <input id={id} {...args} />
-            </div>
-          );
+          return <GooeyInput props={props} id={id} state={state} className={className}></GooeyInput>;
         }
       }
     }
@@ -413,6 +382,89 @@ function RenderedTreeNode({
         </div>
       );
   }
+}
+
+function GooeyCheckbox({
+  props, 
+  id, 
+  state, 
+  className
+}: {
+  props: Record<string, any>, 
+  id: string, 
+  state: Record<string, any>, 
+  className: string
+}) {
+  // if the state value is changed by the server code, then update the checked state
+  useEffect(() => {
+    const element = document.getElementById(id) as HTMLInputElement;
+    if (state && state[props.name] !== element.checked) {
+      element.checked = state[props.name];
+    }
+  }, [state, props.name]);
+
+  const { label, ...args } = props;
+  return (
+    <div className={className}>
+      <input id={id} {...args} />
+      <label htmlFor={id}>
+        <RenderedMarkdown body={label} />
+      </label>
+    </div>
+  );
+}
+
+function GooeyRadio({
+  props, 
+  id, 
+  state, 
+  className
+}: {
+  props: Record<string, any>, 
+  id: string, 
+  state: Record<string, any>, 
+  className: string
+}) {
+  const { label, ...args } = props;
+  return (
+    <div className={className}>
+      <input id={id} {...args} />
+      <label htmlFor={id}>
+        <RenderedMarkdown body={label} />
+      </label>
+    </div>
+  );
+}
+
+function GooeyInput({
+  props, 
+  id, 
+  state, 
+  className
+}: {
+  props: Record<string, any>, 
+  id: string, 
+  state: Record<string, any>, 
+  className: string
+}) {
+  const { label, ...args } = props;
+
+  // if the state value is changed by the server code, then update the value
+  useEffect(() => {
+    const element = document.getElementById(id) as HTMLInputElement;
+    if (state && state[props.name] !== element.value) {
+      element.value = state[props.name];
+    }
+  }, [state, props.name]);
+
+  return (
+    <div className={className}>
+      <label htmlFor={id}>
+        <RenderedMarkdown body={label} />
+      </label>
+      <input id={id} {...args} />
+    </div>
+  );
 }
 
 function ExecJs({ src, args }: { args: any; src: any }) {
