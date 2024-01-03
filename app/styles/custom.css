@@ -80,6 +80,14 @@ span:has(> .uppy-DashboardTab) {
   grid-template-columns: 1fr 1fr;
 }
 
+.uppy-Container > * {
+  font-family: inherit;
+}
+
+.uppy-size--md .uppy-Dashboard-AddFiles-title {
+  font-size: 20px;
+}
+
 .uppy-Dashboard-innerWrap {
   opacity: 1;
   resize: vertical;
@@ -87,6 +95,22 @@ span:has(> .uppy-DashboardTab) {
 
 .uppy-DashboardContent-title {
   display: none;
+}
+
+.uppy-DashboardContent-back {
+  visibility: hidden;
+}
+
+.uppy-DashboardContent-addMore {
+  visibility: hidden;
+}
+
+.uppy-DashboardContent-addMore::after {
+  content: "Add File";
+  visibility: visible;
+  position: absolute;
+  right: 2%;
+  top: 30%;
 }
 
 .gooey-spinner {
