@@ -166,7 +166,7 @@ class UrlUpload extends UIPlugin<Options> {
       const doc = parser.parseFromString(data, 'text/html');
       var title = doc.querySelector('title')?.textContent || name;
       var description = doc.querySelector('meta[name="description"]')?.getAttribute('content') || '';
-      var image = doc.querySelector('meta[property="og:image"]')?.getAttribute('content') || url;
+      var image = doc.querySelector('meta[property="og:image"]')?.getAttribute('content') || (type?.startsWith("image/") ? url : undefined);
       var size = response.headers.get('content-length') || data.length * 8;
     } catch (err: any) {
       this.uppy.log(`[URL] Error when fetching metadata: ${err}`);
@@ -200,7 +200,7 @@ class UrlUpload extends UIPlugin<Options> {
       const meta = await this.getMeta(url);
       const tagFile: any = {
         name: `${meta.title}`,
-        type: meta.type,
+        type: meta.type || "url/undefined",
         data: meta.data,
         preview: meta.preview,
         meta: optionalMeta,
@@ -325,7 +325,7 @@ export function GooeyFileInput({
       restrictions: {
         maxFileSize: 250 * 1024 * 1024,
         maxNumberOfFiles: multiple ? 50 : 1,
-        // allowedFileTypes: accept,
+        allowedFileTypes: accept.concat(["url/undefined"]),
       },
       locale: {
         strings: {
