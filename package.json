@@ -25,6 +25,7 @@
     "@uppy/file-input": "^3.0.2",
     "@uppy/progress-bar": "^3.0.2",
     "@uppy/react": "^3.1.2",
+    "@uppy/remote-sources": "^1.1.0",
     "@uppy/tus": "^3.1.0",
     "@uppy/webcam": "^3.3.1",
     "@uppy/xhr-upload": "^3.2.0",

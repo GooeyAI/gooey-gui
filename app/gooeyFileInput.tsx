@@ -140,10 +140,10 @@ class UrlUpload extends UIPlugin<Options> {
   title: string;
   icon: () => any;
 
-  constructor(uppy: Uppy, opts: Options) {
+  constructor(uppy: Uppy, opts: Options | undefined) {
     super(uppy, opts);
     this.uppy = uppy;
-    this.opts = opts;
+    this.opts = opts || {};
     this.id = this.opts.id || 'Url';
     this.title = this.opts.title || 'Link';
     this.type = 'acquirer';
@@ -181,7 +181,7 @@ class UrlUpload extends UIPlugin<Options> {
       title: title,
       name: name,
       type: type,
-      size: 0,
+      size: size,
       description: description,
       preview: image,
       data: new Blob([data]),
@@ -199,19 +199,20 @@ class UrlUpload extends UIPlugin<Options> {
     try {
       const meta = await this.getMeta(url);
       const tagFile: any = {
-        name: `${meta.title} (${url})`,
+        name: `${meta.title}`,
         type: meta.type,
         data: meta.data,
         preview: meta.preview,
         meta: optionalMeta,
       };
-      this.uppy.log('[URL] Adding remote file');
+      this.uppy.log('[URL] Adding new file');
       try {
         const fileId = this.uppy.addFile(tagFile);
         this.uppy.setFileState(fileId, {
           progress: { uploadComplete: true, uploadStarted: true },
           uploadURL: url,
         });
+        this.uppy.emit('upload-success');
         return fileId;
       } catch (err: any) {
         if (!err.isRestriction) {
@@ -267,6 +268,24 @@ export const links: LinksFunction = () => {
   ];
 };
 
+function fix_previews() {
+  setTimeout(async () => {
+    for (const el of document.getElementsByClassName("uppy-Dashboard-Item")) {
+      // @ts-ignore
+      const url = el.firstChild.firstChild.firstChild.href;
+      const truncatedUrl = (url.length > 40) ? url.slice(0, 40 - 1) + '...' : url;
+      // @ts-ignore
+      el.childNodes[1].firstChild.firstChild.firstChild.textContent = el.childNodes[1].firstChild.firstChild.firstChild.title;
+      // @ts-ignore
+      const size = el.childNodes[1].firstChild.children[1].textContent.replace(truncatedUrl + " ", "").replace("(","").replace(")","");
+      // @ts-ignore
+      el.childNodes[1].firstChild.children[1].textContent = `${truncatedUrl} (${size})`;
+      // @ts-ignore
+      el.childNodes[1].firstChild.children[1].title = url;
+    }
+  });
+}
+
 export function GooeyFileInput({
   name,
   label,
@@ -293,11 +312,12 @@ export function GooeyFileInput({
       if (!element) return;
       const uploadUrls = _uppy
         .getFiles()
-        .map((file) => file.response?.uploadURL)
+        .map((file) => (file as any).uploadURL || file.response?.uploadURL)
         .filter((url) => url);
       element.value =
         JSON.stringify(multiple ? uploadUrls : uploadUrls[0]) || "";
       onChange();
+      fix_previews();
     };
     const _uppy: Uppy = new Uppy({
       id: name,
@@ -317,7 +337,7 @@ export function GooeyFileInput({
     })
       .use(Webcam)
       .use(Audio)
-      .use(UrlUpload as any, { })
+      .use(UrlUpload)
       .use(XHR, { endpoint: "/__/file-upload/" })
       .on("upload-success", onFilesChanged)
       .on("file-removed", onFilesChanged);
@@ -326,38 +346,51 @@ export function GooeyFileInput({
       urls = [urls];
     }
     urls ||= [];
+    const allPromises = [];
     for (let url of urls) {
       try {
-        let filename;
-        if (!isUserUploadedUrl(url)) {
-          filename = urlToFilename(url);
-        } else {
-          filename = url;
-        }
-        const contentType = mime.lookup(filename) || undefined;
-        const fileId = _uppy.addFile({
-          name: filename,
-          type: contentType,
-          data: new Blob(),
-          preview: contentType?.startsWith("image/") ? url : undefined,
-        });
-        _uppy.setFileState(fileId, {
-          progress: { uploadComplete: true, uploadStarted: true },
-          uploadURL: url,
+        const promise = UrlUpload.prototype.getMeta.call(_uppy.getPlugin("Url") as UrlUpload, url);
+        allPromises.push(promise);
+          promise.then((meta) => {
+          const fileId = _uppy.addFile({
+            name: meta.title,
+            type: meta.type,
+            data: meta.data,
+            preview: meta.preview,
+          });
+          _uppy.setFileState(fileId, {
+            progress: { uploadComplete: true, uploadStarted: true },
+            uploadURL: url,
+          });
         });
       } catch (e) {}
     }
-    if (_uppy.getFiles().length) {
-      _uppy.setState({
-        totalProgress: 100,
+    Promise.all(allPromises).then(() => {
+      if (_uppy.getFiles().length) {
+        _uppy.setState({
+          totalProgress: 100,
+        });
+      }
+      // only set this after initial files have been added
+      _uppy.setOptions({
+        autoProceed: true,
       });
-    }
-    // only set this after initial files have been added
-    _uppy.setOptions({
-      autoProceed: true,
+      fix_previews();
     });
     setUppy(_uppy);
   }, []);
+
+  useEffect(() => {
+    setTimeout(() => {
+      for (const el of document.getElementsByClassName("uppy-Dashboard-inner")) {
+        if (!el.firstChild) continue;
+        new ResizeObserver(() => {
+          // @ts-ignore
+          el.style.height = parseInt(el.firstChild.style.height) + 2 + "px";
+        }).observe(el.firstChild as Element);
+      }
+    });
+  }, [uppy]);
 
   if (!uppy) return <></>;
 
@@ -382,7 +415,7 @@ export function GooeyFileInput({
         height={250}
         width={550}
         singleFileFullScreen={false}
-        plugins={["Webcam", "Audio"]}
+        plugins={["Webcam", "Audio", "Url"]}
         // @ts-ignore
         doneButtonHandler={null}
       />
@@ -393,10 +426,4 @@ export function GooeyFileInput({
 function urlToFilename(url: string) {
   let pathname = new URL(url).pathname;
   return decodeURIComponent(path.basename(pathname));
-}
-
-function isUserUploadedUrl(url: string) {
-  return (
-    url.includes(`storage.googleapis.com`) && url.includes(`daras_ai/media`)
-  );
 }

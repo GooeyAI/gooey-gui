@@ -64,6 +64,31 @@
   background-color: white;
 }
 
+span:has(> .uppy-DashboardTab) {
+  grid-column: span 2;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.uppy-Dashboard-AddFiles-list {
+  -webkit-overflow-scrolling: touch;
+  display: grid;
+  flex: 1;
+  margin-top: 2px;
+  overflow-y: auto;
+  padding: 2px 0;
+  grid-template-columns: 1fr 1fr;
+}
+
+.uppy-Dashboard-innerWrap {
+  opacity: 1;
+  resize: vertical;
+}
+
+.uppy-DashboardContent-title {
+  display: none;
+}
+
 .gooey-spinner {
   scroll-margin: 20px;
   display: inline-block;
