@@ -226,6 +226,7 @@ function RenderedTreeNode({
     }
     case "textarea": {
       const { label, defaultValue, ...args } = props;
+      const inputRef = useRef<HTMLTextAreaElement>(null);
 
       // if the state value is changed by the server code, then update the value
       // we need to use this extra state variable because DOM limitations mean textarea values can't be updated directly (https://github.com/elm/virtual-dom/issues/115)
@@ -233,7 +234,8 @@ function RenderedTreeNode({
       // but to avoid reloading the page on every change with onChange (gets very annoying when typing), we need to use this extra state variable with a useEffect
       const [value, setValue] = useState<string>(state[name] || defaultValue);
       useEffect(() => {
-        if (state && state[name] !== value) {
+        const element = inputRef.current;
+        if (state && state[name] !== value && document.activeElement !== element) {
           setValue(state[name] || defaultValue);
         }
       }, [state[name], defaultValue]);
@@ -246,7 +248,11 @@ function RenderedTreeNode({
             </label>
           )}
           <div>
-            <textarea value={value} onChange={(e) => setValue(e.target.value)} {...args} />
+            <textarea 
+              value={value}
+              onChange={(e) => setValue(e.target.value)} {...args}
+              ref={inputRef}
+            />
           </div>
         </div>
       );
@@ -467,10 +473,10 @@ function GooeyInput({
   // if the state value is changed by the server code, then update the value
   useEffect(() => {
     const element = document.getElementById(id) as HTMLInputElement;
-    if (state && state[props.name] !== element.value) {
+    if (state && state[props.name] !== element.value && document.activeElement !== element) {
       element.value = state[props.name];
     }
-  }, [state, props.name]);
+  }, [state[props.name]]);
 
   return (
     <div className={className}>
