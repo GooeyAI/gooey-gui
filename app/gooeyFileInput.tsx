@@ -273,7 +273,7 @@ function fix_previews() {
     for (const el of document.getElementsByClassName("uppy-Dashboard-Item")) {
       // @ts-ignore
       const url = el.firstChild.firstChild.firstChild.href;
-      const truncatedUrl = (url.length > 40) ? url.slice(0, 40 - 1) + '...' : url;
+      const truncatedUrl = (url.length > 30) ? url.slice(0, 30 - 1) + '...' : url;
       // @ts-ignore
       el.childNodes[1].firstChild.firstChild.firstChild.textContent = el.childNodes[1].firstChild.firstChild.firstChild.title;
       // @ts-ignore
@@ -325,7 +325,7 @@ export function GooeyFileInput({
       restrictions: {
         maxFileSize: 250 * 1024 * 1024,
         maxNumberOfFiles: multiple ? 50 : 1,
-        allowedFileTypes: accept.concat(["url/undefined"]),
+        allowedFileTypes: accept ? accept.concat(["url/undefined"]) : undefined,
       },
       locale: {
         strings: {
@@ -387,6 +387,7 @@ export function GooeyFileInput({
         new ResizeObserver(() => {
           // @ts-ignore
           el.style.height = parseInt(el.firstChild.style.height) + 2 + "px";
+          fix_previews();
         }).observe(el.firstChild as Element);
       }
     });
