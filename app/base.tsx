@@ -319,36 +319,6 @@ function RenderedTreeNode({
           {...props}
         />
       );
-    case "table":
-      return (
-        <table>
-          {<RenderedChildren children={children} onChange={onChange} />}
-        </table>
-      );
-    case "thead":
-      return (
-        <thead>
-          {<RenderedChildren children={children} onChange={onChange} />}
-        </thead>
-      );
-    case "tbody":
-      return (
-        <tbody>
-          {<RenderedChildren children={children} onChange={onChange} />}
-        </tbody>
-      );
-    case "tr":
-      return (
-        <tr>{<RenderedChildren children={children} onChange={onChange} />}</tr>
-      );
-    case "th":
-      return (
-        <th>{<RenderedChildren children={children} onChange={onChange} />}</th>
-      );
-    case "td":
-      return (
-        <td>{<RenderedChildren children={children} onChange={onChange} />}</td>
-      );
     case "Link":
       return (
         <Link to={props.to} {...props}>
