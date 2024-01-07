@@ -238,7 +238,7 @@ function RenderedTreeNode({
         if (state && state[name] !== value && document.activeElement !== element) {
           setValue(state[name] || defaultValue);
         }
-      }, [state[name], defaultValue]);
+      }, [state, name, defaultValue]);
 
       return (
         <div className="gui-input gui-input-textarea">

@@ -98,7 +98,7 @@ export function GooeyFileInput({
       element.value = JSON.stringify(state[name]) || "";
       onChange();
     });
-  }, [state[name]]);
+  }, [state, name]);
 
   if (!uppy) return <></>;
 
