@@ -207,16 +207,10 @@ function App() {
     let target = event.target;
     // debounce based on input type - generally text inputs are slow, everything else is fast
     if (
-      (target instanceof HTMLInputElement && target.type === "text" ) ||
+      (target instanceof HTMLInputElement && target.type === "text") ||
       target instanceof HTMLTextAreaElement
     ) {
       debouncedSubmit(event.currentTarget);
-    } else if (target instanceof HTMLInputElement && target.type === "number" && document.activeElement === target) {
-      // number inputs have annoying limits and step sizes that make them hard to edit unless we postpone autocorrection until focusout
-      const submitTarget = event.currentTarget;
-      target.addEventListener("focusout", function() {
-        submit(submitTarget);
-      }, {once : true});
     } else {
       submit(event.currentTarget);
     }
