@@ -493,7 +493,7 @@ function GooeyInput({
     if (state && state[props.name] !== element.value && document.activeElement !== element) {
       element.value = state[props.name];
     }
-  }, [state[props.name]]);
+  }, [state, props.name]);
 
   return (
     <div className={className}>
