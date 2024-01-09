@@ -225,36 +225,12 @@ function RenderedTreeNode({
       return <RenderedMarkdown body={body} {...args} />;
     }
     case "textarea": {
-      const { label, defaultValue, ...args } = props;
-      const inputRef = useRef<HTMLTextAreaElement>(null);
-
-      // if the state value is changed by the server code, then update the value
-      // we need to use this extra state variable because DOM limitations mean textarea values can't be updated directly (https://github.com/elm/virtual-dom/issues/115)
-      // instead the React way is to have a value and onChange handler (https://react.dev/reference/react-dom/components/textarea)
-      // but to avoid reloading the page on every change with onChange (gets very annoying when typing), we need to use this extra state variable with a useEffect
-      const [value, setValue] = useState<string>(state[name] || defaultValue);
-      useEffect(() => {
-        const element = inputRef.current;
-        if (state && state[name] !== value && document.activeElement !== element) {
-          setValue(state[name] || defaultValue);
-        }
-      }, [state, name, defaultValue]);
-
       return (
-        <div className="gui-input gui-input-textarea">
-          {label && (
-            <label>
-              <RenderedMarkdown body={label} />
-            </label>
-          )}
-          <div>
-            <textarea 
-              value={value}
-              onChange={(e) => setValue(e.target.value)} {...args}
-              ref={inputRef}
-            />
-          </div>
-        </div>
+        <GooeyTextarea
+          props={props}
+          state={state}
+          name={name}
+        />
       );
     }
     case "input": {
@@ -396,6 +372,47 @@ function RenderedTreeNode({
         </div>
       );
   }
+}
+
+function GooeyTextarea({
+  props, 
+  state, 
+  name
+}: {
+  props: Record<string, any>, 
+  state: Record<string, any>, 
+  name: string
+}) {
+  const { label, defaultValue, ...args } = props;
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  // if the state value is changed by the server code, then update the value
+  // we need to use this extra state variable because DOM limitations mean textarea values can't be updated directly (https://github.com/elm/virtual-dom/issues/115)
+  // instead the React way is to have a value and onChange handler (https://react.dev/reference/react-dom/components/textarea)
+  // but to avoid reloading the page on every change with onChange (gets very annoying when typing), we need to use this extra state variable with a useEffect
+  const [value, setValue] = useState<string>(state[name] || defaultValue);
+  useEffect(() => {
+    const element = inputRef.current;
+    if (state && state[name] !== value && document.activeElement !== element) {
+      setValue(state[name] || defaultValue);
+    }
+  }, [state, name, defaultValue]);
+
+  return (
+    <div className="gui-input gui-input-textarea">
+      {label && (
+        <label>
+          <RenderedMarkdown body={label} />
+        </label>
+      )}
+      <div>
+        <textarea
+          value={value}
+          onChange={(e) => setValue(e.target.value)} {...args}
+          ref={inputRef} />
+      </div>
+    </div>
+  );
 }
 
 function GooeyCheckbox({
