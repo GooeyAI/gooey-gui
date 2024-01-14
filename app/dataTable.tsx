@@ -14,8 +14,69 @@ export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: glideappsStyles }];
 };
 
+const maxColWidth = 300;
+
+export function DataTableRaw({ cells }: { cells: Array<any> }) {
+  let [data, setData] = useState<Array<any>>([]);
+  let [columns, setColumns] = useState<Array<any>>([]);
+
+  useEffect(() => {
+    setData(cells.slice(1));
+    setColumns(
+      Array.from(
+        cells[0].map((colName: any, idx: number) => {
+          if (typeof colName === "object") {
+            colName = colName.data;
+          }
+          const width = Math.min(
+            Math.max(
+              ...cells.map(
+                (row: any) => `${row[idx].data || row[idx] || ""}`.length * 8,
+              ),
+              colName.length * 20,
+            ),
+            maxColWidth,
+          );
+          return {
+            title: colName,
+            id: colName,
+            icon: GridColumnIcon.HeaderString,
+            width: width,
+          };
+        }),
+      ),
+    );
+  }, [cells]);
+
+  const getContent = useCallback(
+    ([col, row]: Item): GridCell => {
+      let cell = data[row] && data[row][col];
+      if (!cell) {
+        return {
+          kind: GridCellKind.Loading,
+          allowOverlay: false,
+        };
+      }
+      if (typeof cell !== "object") {
+        cell = {
+          data: `${cell ?? ""}`,
+        };
+      }
+      return {
+        kind: GridCellKind.Text,
+        allowOverlay: true,
+        readonly: true,
+        displayData: cell.data,
+        ...cell,
+      };
+    },
+    [data],
+  );
+
+  return DataTableComponent(data, getContent, columns, setColumns, setData);
+}
+
 export function DataTable({ fileUrl }: { fileUrl: string }) {
-  // let data, columns
   let [data, setData] = useState<Array<any>>([]);
   let [columns, setColumns] = useState<Array<any>>([]);
 
@@ -39,17 +100,17 @@ export function DataTable({ fileUrl }: { fileUrl: string }) {
       if (!rows.length) return;
       setColumns(
         Array.from(
-          Object.keys(rows[0]).map((key) => {
+          Object.keys(rows[0]).map((colName) => {
             const width = Math.min(
               Math.max(
-                ...rows.map((row) => `${row[key] || ""}`.length * 8),
-                key.length * 12,
+                ...rows.map((row) => `${row[colName] || ""}`.length * 8),
+                colName.length * 20,
               ),
-              400,
+              maxColWidth,
             );
             return {
-              title: key,
-              id: key,
+              title: colName,
+              id: colName,
               icon: GridColumnIcon.HeaderString,
               width: width,
             };
@@ -82,6 +143,20 @@ export function DataTable({ fileUrl }: { fileUrl: string }) {
     [columns, data],
   );
 
+  return DataTableComponent(data, getContent, columns, setColumns, setData);
+}
+
+function DataTableComponent(
+  data: Array<any>,
+  getContent: (cell: Item) => GridCell,
+  columns: Array<any>,
+  setColumns: (
+    value: ((prevState: Array<any>) => Array<any>) | Array<any>,
+  ) => void,
+  setData: (
+    value: ((prevState: Array<any>) => Array<any>) | Array<any>,
+  ) => void,
+) {
   return (
     <ClientOnly fallback={<p>Loading...</p>}>
       {() => {
