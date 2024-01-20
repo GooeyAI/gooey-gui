@@ -111,7 +111,8 @@ class UrlUI extends Component {
   }
   render() {
     return h("div", {
-      className: "uppy-Url"
+      className: "uppy-Url",
+      style: {textAlign: "center"}
     }, h("input", {
       className: "uppy-u-reset uppy-c-textInput uppy-Url-input",
       type: "text",
@@ -124,9 +125,10 @@ class UrlUI extends Component {
       form: this.form.id
     }), h("button", {
       className: "uppy-u-reset uppy-c-btn uppy-c-btn-primary uppy-Url-importButton",
+      style: {marginTop: "8px"},
       type: "submit",
       form: this.form.id
-    }, 'import'));
+    }, 'Import'));
   }
 }
 
@@ -157,7 +159,7 @@ class UrlUpload extends UIPlugin<Options> {
   }
   async getMeta(url: string) {
     const name = urlToFilename(url);
-    const type = mime.lookup(name) || undefined;
+    const type = mime.lookup(name) || "url/undefined";
 
     try {
       const parser = new DOMParser();
@@ -167,16 +169,23 @@ class UrlUpload extends UIPlugin<Options> {
       var title = doc.querySelector('title')?.textContent || name;
       var description = doc.querySelector('meta[name="description"]')?.getAttribute('content') || '';
       var image = doc.querySelector('meta[property="og:image"]')?.getAttribute('content') || (type?.startsWith("image/") ? url : undefined);
-      var size = response.headers.get('content-length') || data.length * 8;
+      var size = parseInt(response.headers.get('content-length') || "0") || data.length * 8;
     } catch (err: any) {
       this.uppy.log(`[URL] Error when fetching metadata: ${err}`);
-      title = name;
-      size = 0;
-      image = url;
-      description = '';
-      data = url;
+      console.error(err);
+      const youtube_video_id = url?.match(/youtube\.com.*(\?v=|\/embed\/)(.{11})/)?.pop();
+      if (youtube_video_id?.length == 11) {
+        image = 'http://img.youtube.com/vi/'+youtube_video_id+'/0.jpg';
+        title ||= "YouTube Video (" + youtube_video_id + ")";
+      }
+      title ||= name;
+      size ||= 0;
+      image ||= url;
+      description ||= '';
+      data ||= url;
     }
 
+    console.log(image);
     return {
       title: title,
       name: name,
@@ -184,7 +193,7 @@ class UrlUpload extends UIPlugin<Options> {
       size: size,
       description: description,
       preview: image,
-      data: new Blob([data]),
+      data: new Blob(['.'.repeat(size)]),
     };
   }
   async addFile(protocollessUrl: string, optionalMeta?: any) {
@@ -200,7 +209,7 @@ class UrlUpload extends UIPlugin<Options> {
       const meta = await this.getMeta(url);
       const tagFile: any = {
         name: `${meta.title}`,
-        type: meta.type || "url/undefined",
+        type: meta.type,
         data: meta.data,
         preview: meta.preview,
         meta: optionalMeta,
@@ -272,8 +281,8 @@ function fix_previews() {
   setTimeout(async () => {
     for (const el of document.getElementsByClassName("uppy-Dashboard-Item")) {
       // @ts-ignore
-      const url = el.firstChild.firstChild.firstChild.href;
-      const truncatedUrl = (url.length > 30) ? url.slice(0, 30 - 1) + '...' : url;
+      const url = el.firstChild.firstChild.firstChild.href.replace("http://", "").replace("https://", "");
+      const truncatedUrl = (url.length > 65) ? url.slice(0, 65 - 1) + '...' : url;
       // @ts-ignore
       el.childNodes[1].firstChild.firstChild.firstChild.textContent = el.childNodes[1].firstChild.firstChild.firstChild.title;
       // @ts-ignore
@@ -305,6 +314,7 @@ export function GooeyFileInput({
 }) {
   const [uppy, setUppy] = useState<Uppy | null>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
+  const clearAllRef = React.useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const onFilesChanged = () => {
@@ -318,6 +328,11 @@ export function GooeyFileInput({
         JSON.stringify(multiple ? uploadUrls : uploadUrls[0]) || "";
       onChange();
       fix_previews();
+      if (uploadUrls.length) {
+        clearAllRef.current?.style.setProperty("display", "block");
+      } else {
+        clearAllRef.current?.style.setProperty("display", "none");
+      }
     };
     const _uppy: Uppy = new Uppy({
       id: name,
@@ -335,12 +350,21 @@ export function GooeyFileInput({
       },
       meta: uploadMeta,
     })
-      .use(Webcam)
-      .use(Audio)
       .use(UrlUpload)
       .use(XHR, { endpoint: "/__/file-upload/" })
       .on("upload-success", onFilesChanged)
       .on("file-removed", onFilesChanged);
+    // only enable relevant plugins
+    if (!accept || accept.some((a) => a.startsWith("*"))) {
+      _uppy.use(Webcam).use(Audio);
+    } else {
+      if (accept.some((a) => a.startsWith("image") || a.startsWith("video"))) {
+        _uppy.use(Webcam);
+      }
+      if (accept.some((a) => a.startsWith("audio"))) {
+        _uppy.use(Audio);
+      }
+    }
     let urls = defaultValue;
     if (typeof urls === "string") {
       urls = [urls];
@@ -370,6 +394,9 @@ export function GooeyFileInput({
         _uppy.setState({
           totalProgress: 100,
         });
+        if (clearAllRef.current) {
+          clearAllRef.current.style.display = "block";
+        }
       }
       // only set this after initial files have been added
       _uppy.setOptions({
@@ -394,7 +421,6 @@ export function GooeyFileInput({
   }, [uppy]);
 
   if (!uppy) return <></>;
-
   return (
     <div className="gui-input">
       {label ? (
@@ -408,18 +434,28 @@ export function GooeyFileInput({
         name={name}
         defaultValue={JSON.stringify(defaultValue)}
       />
-      <Dashboard
-        showRemoveButtonAfterComplete
-        showLinkToFileUploadResult
-        hideUploadButton
-        uppy={uppy}
-        height={250}
-        width={"100%"}
-        singleFileFullScreen={false}
-        plugins={["Webcam", "Audio", "Url"]}
-        // @ts-ignore
-        doneButtonHandler={null}
-      />
+      <div style={{position: "relative"}}>
+        <Dashboard
+          showRemoveButtonAfterComplete
+          showLinkToFileUploadResult
+          hideUploadButton
+          uppy={uppy}
+          height={250}
+          width={"100%"}
+          singleFileFullScreen={false}
+          plugins={["Webcam", "Audio", "Url"]}
+          // @ts-ignore
+          doneButtonHandler={null}
+        />
+        <button 
+          className="uppy-Dashboard__clear-all" 
+          role="button"
+          ref={clearAllRef}
+          style={{display: "none"}}
+          onClick={() => uppy.cancelAll()}>
+            Clear All <i className="fa-regular fa-trash-can-xmark"></i>
+        </button>
+      </div>
     </div>
   );
 }

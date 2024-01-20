@@ -64,28 +64,78 @@
   background-color: white;
 }
 
-span:has(> .uppy-DashboardTab) {
-  grid-column: span 2;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-}
-
-.uppy-Dashboard-AddFiles-list {
-  -webkit-overflow-scrolling: touch;
-  display: grid;
-  flex: 1;
-  margin-top: 2px;
-  overflow-y: auto;
-  padding: 2px 0;
-  grid-template-columns: 1fr 1fr;
-}
-
-.uppy-Container > * {
+.uppy-Container * {
   font-family: inherit;
+  font-size: 16px;
+}
+
+.uppy-Container .uppy-Dashboard-Item-status {
+  font-size: 10px;
+}
+
+.uppy-Dashboard-AddFiles-title {
+  margin-top: 4px;
+  margin-bottom: -5px;
 }
 
 .uppy-size--md .uppy-Dashboard-AddFiles-title {
-  font-size: 20px;
+  font-size: 16px;
+}
+
+.uppy-Dashboard__clear-all {
+  -webkit-appearance: none;
+  background: none;
+  border: 0;
+  border-radius: 3px;
+  color: #2275d7;
+  cursor: pointer;
+  height: 29px;
+  line-height: 1;
+  margin: 0;
+  padding: 7px 8px;
+  position: absolute;
+  left: 1%;
+  top: 7px;
+  z-index: 2000;
+  font-family: inherit;
+  font-size: 16px;
+}
+
+span:has(> .uppy-DashboardTab) {
+  display: flex;
+  flex-direction: column-reverse;
+}
+.uppy-size--md span:has(> .uppy-DashboardTab) {
+  display: flex;
+  flex-direction: row-reverse;
+}
+
+.uppy-Dashboard-AddFiles-list {
+  flex-direction: column-reverse;
+  justify-content: flex-end;
+}
+.uppy-size--md .uppy-Dashboard-AddFiles-list {
+  flex-direction: row-reverse;
+}
+
+.uppy-Dashboard-AddFiles-list .uppy-DashboardTab {
+  border: none;
+}
+
+.uppy-DashboardTab[data-uppy-acquirer-id="MyDevice"] {
+  display: none;
+}
+
+.uppy-Dashboard-filesInner {
+  height: max-content;
+}
+.uppy-Dashboard-filesInner::after, .uppy-Dashboard-filesInner::before {
+  content: "";
+  clear: both;
+  display: table;
+}
+.uppy-Dashboard-Item {
+  height: fit-content !important;
 }
 
 .uppy-Dashboard-innerWrap {
@@ -93,12 +143,19 @@ span:has(> .uppy-DashboardTab) {
   resize: vertical;
 }
 
+.uppy-size--md .uppy-Dashboard-Item-fileInfoAndButtons {
+  margin-right: -10px;
+}
+
 .uppy-DashboardContent-title {
   display: none;
 }
 
-.uppy-DashboardContent-back {
-  visibility: hidden;
+.uppy-DashboardContent-back,
+.uppy-size--md .uppy-DashboardContent-back {
+  position: absolute;
+  right: 2%;
+  font-size: 16px;
 }
 
 .uppy-DashboardContent-addMore {
@@ -106,11 +163,16 @@ span:has(> .uppy-DashboardTab) {
 }
 
 .uppy-DashboardContent-addMore::after {
-  content: "Add File";
+  content: "Add File +";
   visibility: visible;
   position: absolute;
   right: 2%;
   top: 30%;
+  font-size: 16px;
+}
+
+[dir=ltr] .uppy-Dashboard-Item-fileInfo {
+  overflow: hidden;
 }
 
 .gooey-spinner {
