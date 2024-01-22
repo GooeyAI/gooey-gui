@@ -88,7 +88,7 @@
   margin: 0;
   padding: 7px 8px;
   position: absolute;
-  left: 1%;
+  right: 1%;
   top: 8px;
   z-index: 2000;
   font-family: inherit;
@@ -148,7 +148,7 @@ span:has(> .uppy-DashboardTab) {
 .uppy-DashboardContent-back,
 .uppy-size--md .uppy-DashboardContent-back {
   position: absolute;
-  right: 2%;
+  left: 2%;
   font-size: 16px;
 }
 
@@ -160,7 +160,7 @@ span:has(> .uppy-DashboardTab) {
   content: "+ Add File";
   visibility: visible;
   position: absolute;
-  right: 2%;
+  left: 2%;
   top: 30%;
   font-size: 16px;
 }
