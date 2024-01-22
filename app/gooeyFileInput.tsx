@@ -185,7 +185,6 @@ class UrlUpload extends UIPlugin<Options> {
       data ||= url;
     }
 
-    console.log(image);
     return {
       title: title,
       name: name,
@@ -292,6 +291,12 @@ function fix_previews() {
       // @ts-ignore
       el.childNodes[1].firstChild.children[1].title = url;
     }
+    for (const el of document.getElementsByClassName("uppy-DashboardContent-bar")) {
+      // @ts-ignore
+      if (el.children[1].style.display == "none") continue;
+      // @ts-ignore
+      el.firstChild.style.display = "none";
+    }
   });
 }
 
@@ -318,6 +323,7 @@ export function GooeyFileInput({
 
   useEffect(() => {
     const onFilesChanged = () => {
+      // @ts-ignore
       const element = inputRef.current;
       if (!element) return;
       const uploadUrls = _uppy
@@ -453,7 +459,7 @@ export function GooeyFileInput({
           ref={clearAllRef}
           style={{display: "none"}}
           onClick={() => uppy.cancelAll()}>
-            Clear All <i className="fa-regular fa-trash-can-xmark"></i>
+            <i className="fa-regular fa-trash-can-xmark"></i> Clear All
         </button>
       </div>
     </div>
