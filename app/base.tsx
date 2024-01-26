@@ -233,7 +233,7 @@ function RenderedTreeNode({
         <GooeyTextarea
           props={props}
           state={state}
-          name={name}
+          name={props.name}
         />
       );
     }
@@ -397,7 +397,7 @@ function GooeyTextarea({
   const [value, setValue] = useState<string>(state[name] || defaultValue);
   useEffect(() => {
     const element = inputRef.current;
-    if (state && state[name] !== value && document.activeElement !== element) {
+    if (state && state[name] !== value && element?.dataset.debounceInProgress !== 'true') {
       setValue(state[name] || defaultValue);
     }
   }, [state, name, defaultValue]);
@@ -494,7 +494,7 @@ function GooeyInput({
   // if the state value is changed by the server code, then update the value
   useEffect(() => {
     const element = document.getElementById(id) as HTMLInputElement;
-    if (state && state[props.name] !== element.value && document.activeElement !== element) {
+    if (state && state[props.name] !== element.value && element?.dataset.debounceInProgress !== 'true') {
       element.value = state[props.name];
     }
   }, [state, props.name]);
