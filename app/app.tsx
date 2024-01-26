@@ -201,7 +201,10 @@ function App() {
     }
   }, [fetcher.state, realtimeEvent, submit]);
 
-  const debouncedSubmit = useDebouncedCallback(submit, 500);
+  const debouncedSubmit = useDebouncedCallback((el, tar) => {
+    tar.dataset.debounceInProgress = 'false';
+    submit(el);
+  }, 500);
 
   const handleChange = (event: FormEvent<HTMLFormElement>) => {
     let target = event.target;
@@ -210,7 +213,8 @@ function App() {
       (target instanceof HTMLInputElement && target.type === "text") ||
       target instanceof HTMLTextAreaElement
     ) {
-      debouncedSubmit(event.currentTarget);
+      target.dataset.debounceInProgress = 'true';
+      debouncedSubmit(event.currentTarget, target);
     } else if (target instanceof HTMLInputElement && target.type === "number" && document.activeElement === target) {
       // number inputs have annoying limits and step sizes that make them hard to edit unless we postpone autocorrection until focusout
       // debounce does not work here because the step size prevents key intermediate states while typing
