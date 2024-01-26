@@ -475,7 +475,7 @@ export function GooeyFileInput({
           ref={clearAllRef}
           style={{display: "none"}}
           onClick={() => uppy.cancelAll()}>
-            <i className="fa-regular fa-trash-can-xmark"></i> Clear All
+            🗑 Clear All
         </button>
       </div>
     </div>
