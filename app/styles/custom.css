@@ -92,7 +92,21 @@
   top: 8px;
   z-index: 2000;
   font-family: inherit;
+  font-feature-settings: normal;
+  font-kerning: auto;
+  font-optical-sizing: auto;
   font-size: 16px;
+  font-stretch: 100%;
+  font-style: normal;
+  font-variant-alternates: normal;
+  font-variant-caps: normal;
+  font-variant-east-asian: normal;
+  font-variant-ligatures: normal;
+  font-variant-numeric: normal;
+  font-variant-position: normal;
+  font-variation-settings: normal;
+  font-weight: 500;
+  -webkit-font-smoothing: antialiased;
 }
 
 span:has(> .uppy-DashboardTab) {
@@ -156,8 +170,12 @@ span:has(> .uppy-DashboardTab) {
   visibility: hidden;
 }
 
+.uppy-StatusBar.is-complete {
+  display: none;
+}
+
 .uppy-DashboardContent-addMore::after {
-  content: "+ Add File";
+  content: "📎 Add File";
   visibility: visible;
   position: absolute;
   left: 2%;

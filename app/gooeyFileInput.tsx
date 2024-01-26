@@ -112,7 +112,7 @@ class UrlUI extends Component {
   render() {
     return h("div", {
       className: "uppy-Url",
-      style: {textAlign: "center"}
+      style: {textAlign: "center", width: "80%"}
     }, h("input", {
       className: "uppy-u-reset uppy-c-textInput uppy-Url-input",
       type: "text",
@@ -308,6 +308,7 @@ export function GooeyFileInput({
   onChange,
   defaultValue,
   uploadMeta,
+  allowBigPreview = undefined,
 }: {
   name: string;
   label: string;
@@ -316,10 +317,16 @@ export function GooeyFileInput({
   onChange: () => void;
   defaultValue: string | string[] | undefined;
   uploadMeta: Record<string, string>;
+  allowBigPreview: boolean | undefined;
 }) {
   const [uppy, setUppy] = useState<Uppy | null>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
   const clearAllRef = React.useRef<HTMLButtonElement>(null);
+  const selfRef = React.useRef<HTMLDivElement>(null);
+
+  if (allowBigPreview === undefined) {
+    allowBigPreview = !multiple;
+  } 
 
   useEffect(() => {
     const onFilesChanged = () => {
@@ -421,6 +428,9 @@ export function GooeyFileInput({
           // @ts-ignore
           el.style.height = parseInt(el.firstChild.style.height) + 2 + "px";
           fix_previews();
+          if (!allowBigPreview) {
+            selfRef.current?.querySelector('.uppy-size--md')?.classList.remove('uppy-size--md');
+          }
         }).observe(el.firstChild as Element);
       }
     });
@@ -428,7 +438,7 @@ export function GooeyFileInput({
 
   if (!uppy) return <></>;
   return (
-    <div className="gui-input">
+    <div className="gui-input" ref={selfRef}>
       {label ? (
         <label>
           <RenderedMarkdown body={label} />
@@ -446,7 +456,7 @@ export function GooeyFileInput({
           showLinkToFileUploadResult
           hideUploadButton
           uppy={uppy}
-          height={250}
+          height={(defaultValue || "").length > 0 ? 280 : 180}
           width={"100%"}
           singleFileFullScreen={false}
           plugins={["Webcam", "Audio", "Url"]}
