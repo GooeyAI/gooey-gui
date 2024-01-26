@@ -433,6 +433,12 @@ export function GooeyFileInput({
           }
         }).observe(el.firstChild as Element);
       }
+      // @ts-ignore
+      if (!window._uppy_preview_observer) {
+        // @ts-ignore
+        window._uppy_preview_observer = true;
+        window.addEventListener("scroll", fix_previews, true);
+      }
     });
   }, [uppy]);
 
