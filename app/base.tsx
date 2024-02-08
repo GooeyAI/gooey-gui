@@ -1,6 +1,6 @@
 import type { LinksFunction } from "@remix-run/node";
 import type { ReactNode } from "react";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import Select from "react-select";
 import { GooeyFileInput, links as fileInputLinks } from "~/gooeyFileInput";
 import { RenderedMarkdown } from "~/renderedMarkdown";
@@ -13,6 +13,12 @@ import { RenderedHTML } from "~/renderedHTML";
 import CountdownTimer from "./components/countdown";
 import { DataTable, DataTableRaw, links as dataTableLinks } from "~/dataTable";
 import { ClientOnly } from "remix-utils";
+import {
+  GooeyCheckbox,
+  GooeyInput,
+  GooeyRadio,
+  GooeyTextarea,
+} from "~/gooeyInput";
 
 export const links: LinksFunction = () => {
   return [...dataTableLinks(), ...fileInputLinks()];
@@ -81,12 +87,22 @@ function RenderedTreeNode({
 
   switch (name) {
     case "":
-      return <RenderedChildren children={children} onChange={onChange} state={state} />;
+      return (
+        <RenderedChildren
+          children={children}
+          onChange={onChange}
+          state={state}
+        />
+      );
     case "nav-tab-content":
       return (
         <div className="tab-content">
           <div className="tab-pane show active" role="tabpanel">
-            <RenderedChildren children={children} onChange={onChange} state={state} />
+            <RenderedChildren
+              children={children}
+              onChange={onChange}
+              state={state}
+            />
           </div>
         </div>
       );
@@ -105,7 +121,11 @@ function RenderedTreeNode({
           role="tablist"
           {...props}
         >
-          <RenderedChildren children={children} onChange={onChange} state={state} />
+          <RenderedChildren
+            children={children}
+            onChange={onChange}
+            state={state}
+          />
         </ul>
       );
     case "nav-item": {
@@ -123,7 +143,11 @@ function RenderedTreeNode({
               aria-selected="true"
             >
               <p className="mb-0">
-                <RenderedChildren children={children} onChange={onChange} state={state} />
+                <RenderedChildren
+                  children={children}
+                  onChange={onChange}
+                  state={state}
+                />
               </p>
             </button>
           </li>
@@ -141,14 +165,22 @@ function RenderedTreeNode({
     case "ul": {
       return (
         <ul {...props}>
-          <RenderedChildren children={children} onChange={onChange} state={state} />
+          <RenderedChildren
+            children={children}
+            onChange={onChange}
+            state={state}
+          />
         </ul>
       );
     }
     case "div": {
       return (
         <div {...props}>
-          <RenderedChildren children={children} onChange={onChange} state={state} />
+          <RenderedChildren
+            children={children}
+            onChange={onChange}
+            state={state}
+          />
         </div>
       );
     }
@@ -160,7 +192,11 @@ function RenderedTreeNode({
       ));
       const panels = children.map((elem) => (
         <TabPanel key={elem.props.label} {...elem.props}>
-          <RenderedChildren children={elem.children} onChange={onChange} state={state} />
+          <RenderedChildren
+            children={elem.children}
+            onChange={onChange}
+            state={state}
+          />
         </TabPanel>
       ));
       return (
@@ -173,7 +209,11 @@ function RenderedTreeNode({
       const { label, open, ...args } = props;
       return (
         <GuiExpander open={open} label={label} {...args}>
-          <RenderedChildren children={children} onChange={onChange} state={state} />
+          <RenderedChildren
+            children={children}
+            onChange={onChange}
+            state={state}
+          />
         </GuiExpander>
       );
     }
@@ -229,22 +269,22 @@ function RenderedTreeNode({
       return <RenderedMarkdown body={body} {...args} />;
     }
     case "textarea": {
-      return (
-        <GooeyTextarea
-          props={props}
-          state={state}
-          name={props.name}
-        />
-      );
+      return <GooeyTextarea props={props} state={state} />;
     }
     case "input": {
       const className = `gui-input gui-input-${props.type}`;
       const id = inputId(props);
       switch (props.type) {
-        case "range": {
-          return <GooeySlider className={className} id={id} props={props} state={state} />;
-        }
-        case "file": {
+        case "range":
+          return (
+            <GooeySlider
+              className={className}
+              id={id}
+              props={props}
+              state={state}
+            />
+          );
+        case "file":
           return (
             <GooeyFileInput
               name={props.name}
@@ -257,15 +297,33 @@ function RenderedTreeNode({
               state={state}
             />
           );
-        }
         case "checkbox":
-          return <GooeyCheckbox props={props} id={id} state={state} className={className}></GooeyCheckbox>;
-        case "radio": {
-          return <GooeyRadio props={props} id={id} state={state} className={className}></GooeyRadio>;
-        }
-        default: {
-          return <GooeyInput props={props} id={id} state={state} className={className}></GooeyInput>;
-        }
+          return (
+            <GooeyCheckbox
+              props={props}
+              id={id}
+              state={state}
+              className={className}
+            ></GooeyCheckbox>
+          );
+        case "radio":
+          return (
+            <GooeyRadio
+              props={props}
+              id={id}
+              state={state}
+              className={className}
+            ></GooeyRadio>
+          );
+        default:
+          return (
+            <GooeyInput
+              props={props}
+              id={id}
+              state={state}
+              className={className}
+            ></GooeyInput>
+          );
       }
     }
     case "gui-button": {
@@ -304,51 +362,105 @@ function RenderedTreeNode({
     case "table":
       return (
         <table>
-          {<RenderedChildren children={children} onChange={onChange} state={state} />}
+          {
+            <RenderedChildren
+              children={children}
+              onChange={onChange}
+              state={state}
+            />
+          }
         </table>
       );
     case "thead":
       return (
         <thead>
-          {<RenderedChildren children={children} onChange={onChange} state={state} />}
+          {
+            <RenderedChildren
+              children={children}
+              onChange={onChange}
+              state={state}
+            />
+          }
         </thead>
       );
     case "tbody":
       return (
         <tbody>
-          {<RenderedChildren children={children} onChange={onChange} state={state} />}
+          {
+            <RenderedChildren
+              children={children}
+              onChange={onChange}
+              state={state}
+            />
+          }
         </tbody>
       );
     case "tr":
       return (
-        <tr>{<RenderedChildren children={children} onChange={onChange} state={state} />}</tr>
+        <tr>
+          {
+            <RenderedChildren
+              children={children}
+              onChange={onChange}
+              state={state}
+            />
+          }
+        </tr>
       );
     case "th":
       return (
-        <th>{<RenderedChildren children={children} onChange={onChange} state={state} />}</th>
+        <th>
+          {
+            <RenderedChildren
+              children={children}
+              onChange={onChange}
+              state={state}
+            />
+          }
+        </th>
       );
     case "td":
       return (
-        <td>{<RenderedChildren children={children} onChange={onChange} state={state} />}</td>
+        <td>
+          {
+            <RenderedChildren
+              children={children}
+              onChange={onChange}
+              state={state}
+            />
+          }
+        </td>
       );
     case "Link":
       return (
         <Link to={props.to} {...props}>
-          <RenderedChildren children={children} onChange={onChange} state={state} />
+          <RenderedChildren
+            children={children}
+            onChange={onChange}
+            state={state}
+          />
         </Link>
       );
     case "tag": {
       const { __reactjsxelement, ...args } = props;
       return (
         <__reactjsxelement {...args}>
-          <RenderedChildren children={children} onChange={onChange} state={state} />
+          <RenderedChildren
+            children={children}
+            onChange={onChange}
+            state={state}
+          />
         </__reactjsxelement>
       );
     }
     case "countdown-timer": {
       return (
         <CountdownTimer endTime={props.endTime} delayText={props.delayText}>
-          <RenderedChildren children={children} onChange={onChange} state={state} />
+          <RenderedChildren
+            children={children}
+            onChange={onChange}
+            state={state}
+          />
         </CountdownTimer>
       );
     }
@@ -378,137 +490,6 @@ function RenderedTreeNode({
   }
 }
 
-function GooeyTextarea({
-  props, 
-  state, 
-  name
-}: {
-  props: Record<string, any>, 
-  state: Record<string, any>, 
-  name: string
-}) {
-  const { label, defaultValue, ...args } = props;
-  const inputRef = useRef<HTMLTextAreaElement>(null);
-
-  // if the state value is changed by the server code, then update the value
-  // we need to use this extra state variable because DOM limitations mean textarea values can't be updated directly (https://github.com/elm/virtual-dom/issues/115)
-  // instead the React way is to have a value and onChange handler (https://react.dev/reference/react-dom/components/textarea)
-  // but to avoid reloading the page on every change with onChange (gets very annoying when typing), we need to use this extra state variable with a useEffect
-  const [value, setValue] = useState<string>(state[name] || defaultValue);
-  useEffect(() => {
-    const element = inputRef.current;
-    if (state && state[name] !== value && element?.dataset.debounceInProgress !== 'true') {
-      setValue(state[name] || defaultValue);
-    }
-  }, [state, name, defaultValue]);
-
-  return (
-    <div className="gui-input gui-input-textarea">
-      {label && (
-        <label>
-          <RenderedMarkdown body={label} />
-        </label>
-      )}
-      <div>
-        <textarea
-          value={value}
-          onChange={(e) => setValue(e.target.value)} {...args}
-          ref={inputRef} />
-      </div>
-    </div>
-  );
-}
-
-function GooeyCheckbox({
-  props, 
-  id, 
-  state, 
-  className
-}: {
-  props: Record<string, any>, 
-  id: string, 
-  state: Record<string, any>, 
-  className: string
-}) {
-  // if the state value is changed by the server code, then update the checked state
-  useEffect(() => {
-    const element = document.getElementById(id) as HTMLInputElement;
-    if (state && state[props.name] !== element.checked) {
-      element.checked = state[props.name];
-    }
-  }, [state, props.name]);
-
-  const { label, ...args } = props;
-  return (
-    <div className={className}>
-      <input id={id} {...args} />
-      <label htmlFor={id}>
-        <RenderedMarkdown body={label} />
-      </label>
-    </div>
-  );
-}
-
-function GooeyRadio({
-  props, 
-  id, 
-  state, 
-  className
-}: {
-  props: Record<string, any>, 
-  id: string, 
-  state: Record<string, any>, 
-  className: string
-}) {
-  const { label, ...args } = props;
-
-  // if the state value is changed by the server code, then update the value
-  useEffect(() => {
-    const element = document.getElementById(id) as HTMLInputElement;
-    element.checked = state[props.name] === element.value;
-  }, [state, props.name]);
-
-  return (
-    <div className={className}>
-      <input id={id} {...args} />
-      <label htmlFor={id}>
-        <RenderedMarkdown body={label} />
-      </label>
-    </div>
-  );
-}
-
-function GooeyInput({
-  props, 
-  id, 
-  state, 
-  className
-}: {
-  props: Record<string, any>, 
-  id: string, 
-  state: Record<string, any>, 
-  className: string
-}) {
-  const { label, ...args } = props;
-
-  // if the state value is changed by the server code, then update the value
-  useEffect(() => {
-    const element = document.getElementById(id) as HTMLInputElement;
-    if (state && state[props.name] !== element.value && element?.dataset.debounceInProgress !== 'true') {
-      element.value = state[props.name];
-    }
-  }, [state, props.name]);
-
-  return (
-    <div className={className}>
-      <label htmlFor={id}>
-        <RenderedMarkdown body={label} />
-      </label>
-      <input id={id} {...args} />
-    </div>
-  );
-}
-
 function ExecJs({ src, args }: { args: any; src: any }) {
   useEffect(() => {
     // eslint-disable-next-line no-new-func
@@ -534,7 +515,14 @@ export function RenderedChildren({
     } else {
       key = `idx:${idx}`;
     }
-    return <RenderedTreeNode key={key} node={node} onChange={onChange} state={state} />;
+    return (
+      <RenderedTreeNode
+        key={key}
+        node={node}
+        onChange={onChange}
+        state={state}
+      />
+    );
   });
   return <>{elements}</>;
 }
