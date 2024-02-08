@@ -125,21 +125,27 @@ async function callServer({
   }
 
   if (!response.ok) {
-    return await handleErrorResponse({ request, response }); 
+    return await handleErrorResponse({ request, response });
   }
 
   return response;
 }
 
-async function handleErrorResponse({ request, response }) {
+async function handleErrorResponse({
+  request,
+  response,
+}: {
+  request: Request;
+  response: Response;
+}) {
   const serverUrl = new URL(process.env["SERVER_HOST"]!);
   serverUrl.pathname = path.join(serverUrl.pathname, "/handleError/");
 
   let errorResponse = await fetch(serverUrl, {
     method: "POST",
     body: JSON.stringify({
-        "status": response.status,
-        "statusText": response.statusText,
+      status: response.status,
+      statusText: response.statusText,
     }),
     headers: request.headers,
   });
@@ -201,20 +207,21 @@ function App() {
     }
   }, [fetcher.state, realtimeEvent, submit]);
 
-  const debouncedSubmit = useDebouncedCallback((el, tar) => {
-    tar.dataset.debounceInProgress = 'false';
-    submit(el);
+  const debouncedSubmit = useDebouncedCallback((form: HTMLFormElement) => {
+    form.removeAttribute("debounceInProgress");
+    submit(form);
   }, 500);
 
   const handleChange = (event: FormEvent<HTMLFormElement>) => {
-    let target = event.target;
+    const target = event.target;
+    const form = event.currentTarget;
     // debounce based on input type - generally text inputs are slow, everything else is fast
     if (
       (target instanceof HTMLInputElement && target.type === "text") ||
       target instanceof HTMLTextAreaElement
     ) {
-      target.dataset.debounceInProgress = 'true';
-      debouncedSubmit(event.currentTarget, target);
+      form.setAttribute("debounceInProgress", "true");
+      debouncedSubmit(form);
     } else if (target instanceof HTMLInputElement && target.type === "number" && document.activeElement === target) {
       // number inputs have annoying limits and step sizes that make them hard to edit unless we postpone autocorrection until focusout
       // debounce does not work here because the step size prevents key intermediate states while typing
@@ -223,7 +230,7 @@ function App() {
         submit(submitTarget);
       }, {once : true});
     } else {
-      submit(event.currentTarget);
+      submit(form);
     }
   };
 
