@@ -21,26 +21,28 @@ export const links: LinksFunction = () => {
   ];
 };
 
+// uppy hardcodes some styles and bugs via javascript (!!), so we need to override them via javascript
 function fix_previews() {
+  // set timeout ensures this executes after uppy overwrites the styles via javascript
   setTimeout(async () => {
     for (const el of document.getElementsByClassName("uppy-Dashboard-Item")) {
-      // @ts-ignore
-      const url = el.firstChild.firstChild.firstChild.href.replace("http://", "").replace("https://", "");
+      // uppy does not use css to set the '...' truncation, 
+      // so we get the full url from the href attribute 
+      // and truncate it to the length we want before display
+      const url = el.querySelector<HTMLAnchorElement>(".uppy-Dashboard-Item-previewLink")!.href.replace("http://", "").replace("https://", "");
       const truncatedUrl = (url.length > 65) ? url.slice(0, 65 - 1) + '...' : url;
-      // @ts-ignore
-      el.childNodes[1].firstChild.firstChild.firstChild.textContent = el.childNodes[1].firstChild.firstChild.firstChild.title;
-      // @ts-ignore
-      const size = el.childNodes[1].firstChild.children[1].textContent.replace(truncatedUrl + " ", "").replace("(","").replace(")","");
-      // @ts-ignore
-      el.childNodes[1].firstChild.children[1].textContent = `${truncatedUrl} (${size})`;
-      // @ts-ignore
-      el.childNodes[1].firstChild.children[1].title = url;
+      // We insert the truncated url right before the size and surround the size with parenthesis:
+      const subtitleSpan = el.querySelector<HTMLSpanElement>(".uppy-Dashboard-Item-status")!;
+      const size = subtitleSpan.textContent!.replace(truncatedUrl + " ", "").replace("(","").replace(")","");
+      subtitleSpan.textContent = `${truncatedUrl} (${size})`;
+      // uppy also hides the full title in the tooltip (title attribute), so we copy over that attribute to the textContent:
+      const titleSpan = el.querySelector<HTMLSpanElement>(".uppy-Dashboard-Item-name")!;
+      titleSpan.textContent = titleSpan.title;
     }
-    for (const el of document.getElementsByClassName("uppy-DashboardContent-bar")) {
-      // @ts-ignore
-      if (el.children[1].style.display == "none") continue;
-      // @ts-ignore
-      el.firstChild.style.display = "none";
+    // this fixes an uppy bug where it will show the cancel button when nothing can be cancelled by hiding that button:
+    for (const el of document.querySelectorAll<HTMLElement>(".uppy-DashboardContent-bar")) {
+      if ((el.children[1] as HTMLElement).style.display == "none") continue;
+      (el.firstChild as HTMLElement).style.display = "none";
     }
   });
 }
