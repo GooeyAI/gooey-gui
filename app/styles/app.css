@@ -232,6 +232,10 @@ button .gui-html-container,
   display: none;
 }
 
+.uppy-StatusBar.is-complete {
+  display: none;
+}
+
 #nprogress .bar {
   background: #02b3a1;
   height: 4px;

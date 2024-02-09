@@ -47,12 +47,12 @@ export function GooeyFileInput({
   useEffect(() => {
     const onFilesChanged = () => {
       const element = inputRef.current;
-      if (!element) return;
+      if (!element || !_uppy || !element.hasAttribute("initDone")) return;
       const uploadUrls = _uppy
         .getFiles()
-        .map((file) => file.response?.uploadURL)
+        .map((file: any) => file.uploadURL)
         .filter((url) => url);
-      element.value = 
+      element.value =
         JSON.stringify(multiple ? uploadUrls : uploadUrls[0]) || "";
       onChange();
     };
@@ -62,7 +62,7 @@ export function GooeyFileInput({
       restrictions: {
         maxFileSize: 250 * 1024 * 1024,
         maxNumberOfFiles: multiple ? 50 : 1,
-        allowedFileTypes: accept,
+        allowedFileTypes: accept ? accept.concat(["url/undefined"]) : undefined,
       },
       locale: {
         strings: {
@@ -71,6 +71,7 @@ export function GooeyFileInput({
         },
       },
       meta: uploadMeta,
+      autoProceed: true,
     })
       .use(Webcam)
       .use(Audio)
@@ -78,6 +79,7 @@ export function GooeyFileInput({
       .on("upload-success", onFilesChanged)
       .on("file-removed", onFilesChanged);
     initUppy(defaultValue, _uppy);
+    inputRef.current?.setAttribute("initDone", "true");
     setUppy(_uppy);
     // Clean up event handlers etc.
     return () => {
@@ -88,19 +90,13 @@ export function GooeyFileInput({
   // if the server value changes, update the uppy state
   useEffect(() => {
     const element = inputRef.current;
-    if (!uppy || !element || JSON.stringify(state[name]) == element?.value || state[name] == element?.value) return;
-    for (const file of uppy.getFiles()) {
-      uppy.removeFile(file.id);
-    }
-    initUppy(state[name] || [], uppy);
-    // JS event loop hack to make sure the value is set before onChange is called
-    setTimeout(() => {
+    if (uppy && element && JSON.stringify(state[name]) != element.value) {
       element.value = JSON.stringify(state[name]) || "";
-      onChange();
-    });
+      element.removeAttribute("initDone");
+      initUppy(state[name] || [], uppy);
+      element.setAttribute("initDone", "true");
+    }
   }, [state, name]);
-
-  if (!uppy) return <></>;
 
   return (
     <div className="gui-input">
@@ -115,63 +111,76 @@ export function GooeyFileInput({
         name={name}
         defaultValue={JSON.stringify(defaultValue)}
       />
-      <Dashboard
-        showRemoveButtonAfterComplete
-        showLinkToFileUploadResult
-        hideUploadButton
-        uppy={uppy}
-        height={250}
-        width={550}
-        singleFileFullScreen={false}
-        plugins={["Webcam", "Audio"]}
-        // @ts-ignore
-        doneButtonHandler={null}
-      />
+      {uppy ? (
+        <Dashboard
+          showRemoveButtonAfterComplete
+          showLinkToFileUploadResult
+          hideUploadButton
+          uppy={uppy}
+          height={250}
+          width={576}
+          singleFileFullScreen={false}
+          plugins={["Webcam", "Audio"]}
+          // @ts-ignore
+          doneButtonHandler={null}
+        />
+      ) : null}
     </div>
   );
 }
 
 function initUppy(defaultValue: string | string[] | undefined, uppy: Uppy) {
+  for (const file of uppy.getFiles()) {
+    uppy.removeFile(file.id);
+  }
   let urls = defaultValue;
   if (typeof urls === "string") {
     urls = [urls];
   }
   urls ||= [];
   for (let url of urls) {
+    let filename;
     try {
-      let filename;
-      if (!isUserUploadedUrl(url)) {
-        filename = urlToFilename(url);
-      } else {
-        filename = url;
-      }
-      const contentType = mime.lookup(filename) || undefined;
-      const fileId = uppy.addFile({
+      filename = urlToFilename(url);
+    } catch (e) {
+      continue;
+    }
+    const contentType = mime.lookup(filename) || "url/undefined";
+    let fileId;
+    try {
+      fileId = uppy.addFile({
         name: filename,
         type: contentType,
         data: new Blob(),
         preview: contentType?.startsWith("image/") ? url : undefined,
+        meta: {
+          relativePath: new Date().toISOString(), // this is a hack to make the file unique
+        },
       });
-      uppy.setFileState(fileId, {
-        progress: { uploadComplete: true, uploadStarted: true },
-        uploadURL: url,
-      });
-    } catch (e) { }
+    } catch (e) {
+      console.error(e);
+      continue;
+    }
+    uppy.setFileState(fileId, {
+      progress: { uploadComplete: true, uploadStarted: true, percentage: 100 },
+      uploadURL: url,
+      size: undefined,
+    });
   }
   if (uppy.getFiles().length) {
     uppy.setState({
       totalProgress: 100,
     });
   }
-  // only set this after initial files have been added
-  uppy.setOptions({
-    autoProceed: true,
-  });
 }
 
 function urlToFilename(url: string) {
   let pathname = new URL(url).pathname;
-  return decodeURIComponent(path.basename(pathname));
+  if (isUserUploadedUrl(url)) {
+    return decodeURIComponent(path.basename(pathname));
+  } else {
+    return decodeURIComponent(path.relative("/", pathname));
+  }
 }
 
 function isUserUploadedUrl(url: string) {
