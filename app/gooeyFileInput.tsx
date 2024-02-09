@@ -1,4 +1,4 @@
-import type { LinksFunction } from "@remix-run/node";
+import { LinksFunction } from "@remix-run/node";
 import Uppy from "@uppy/core";
 import { Dashboard } from "@uppy/react";
 import Webcam from "@uppy/webcam";
@@ -56,12 +56,22 @@ export function GooeyFileInput({
         JSON.stringify(multiple ? uploadUrls : uploadUrls[0]) || "";
       onChange();
     };
+    const onFileAdded = (file: any) => {
+      onFilesChanged();
+      loadPreview({
+        url: file.uploadURL,
+        uppy: _uppy,
+        fileId: file.id,
+        filename: file.name,
+        preview: file.preview,
+      });
+    };
     const _uppy: Uppy = new Uppy({
       id: name,
       allowMultipleUploadBatches: true,
       restrictions: {
         maxFileSize: 250 * 1024 * 1024,
-        maxNumberOfFiles: multiple ? 50 : 1,
+        maxNumberOfFiles: multiple ? 500 : 1,
         allowedFileTypes: accept ? accept.concat(["url/undefined"]) : undefined,
       },
       locale: {
@@ -76,7 +86,7 @@ export function GooeyFileInput({
       .use(Webcam)
       .use(Audio)
       .use(XHR, { endpoint: "/__/file-upload/" })
-      .on("upload-success", onFilesChanged)
+      .on("upload-success", onFileAdded)
       .on("file-removed", onFilesChanged);
     initUppy(defaultValue, _uppy);
     inputRef.current?.setAttribute("initDone", "true");
@@ -146,13 +156,14 @@ function initUppy(defaultValue: string | string[] | undefined, uppy: Uppy) {
       continue;
     }
     const contentType = mime.lookup(filename) || "url/undefined";
+    const preview = contentType?.startsWith("image/") ? url : undefined;
     let fileId;
     try {
       fileId = uppy.addFile({
         name: filename,
         type: contentType,
         data: new Blob(),
-        preview: contentType?.startsWith("image/") ? url : undefined,
+        preview: preview,
         meta: {
           relativePath: new Date().toISOString(), // this is a hack to make the file unique
         },
@@ -166,6 +177,7 @@ function initUppy(defaultValue: string | string[] | undefined, uppy: Uppy) {
       uploadURL: url,
       size: undefined,
     });
+    loadPreview({ url, uppy, fileId, filename, preview });
   }
   if (uppy.getFiles().length) {
     uppy.setState({
@@ -174,12 +186,81 @@ function initUppy(defaultValue: string | string[] | undefined, uppy: Uppy) {
   }
 }
 
-function urlToFilename(url: string) {
-  let pathname = new URL(url).pathname;
-  if (isUserUploadedUrl(url)) {
-    return decodeURIComponent(path.basename(pathname));
+async function loadPreview({
+  url,
+  uppy,
+  fileId,
+  filename,
+  preview,
+}: {
+  url: string;
+  uppy: Uppy;
+  fileId: string;
+  filename?: string;
+  preview?: string;
+}) {
+  const response = await fetch(url);
+  const contentType = response.headers.get("content-type") || "url/undefined";
+  const contentLength = response.headers.get("content-length");
+  const text = await textResponseHead({ response });
+
+  preview = contentType?.startsWith("image/") ? url : preview;
+
+  if (text && contentType?.startsWith("text/html")) {
+    const doc = new DOMParser().parseFromString(text, "text/html");
+
+    filename =
+      doc.querySelector('meta[property="og:title"]')?.getAttribute("content") ||
+      doc.querySelector("title")?.textContent ||
+      filename;
+
+    preview =
+      doc.querySelector('meta[property="og:image"]')?.getAttribute("content") ||
+      preview;
+
+    uppy.setFileMeta(fileId, {
+      name: filename,
+    });
+  }
+
+  uppy.setFileState(fileId, {
+    size: contentLength ? parseInt(contentLength) : undefined,
+    preview: preview,
+  });
+}
+
+/**
+ * Read the first n characters of a response body as text
+ */
+async function textResponseHead({
+  response,
+  n = 10240,
+}: {
+  response: Response;
+  n?: number;
+}) {
+  const reader = response.body?.getReader();
+  if (!reader) return "";
+  let text = "";
+  const utf8Decoder = new TextDecoder("utf-8");
+  while (true) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    text += utf8Decoder.decode(value, { stream: true });
+    if (text.length > n) {
+      await reader.cancel();
+      break;
+    }
+  }
+  return text;
+}
+
+function urlToFilename(_url: string) {
+  const url = new URL(_url);
+  if (isUserUploadedUrl(_url)) {
+    return decodeURIComponent(path.basename(url.pathname));
   } else {
-    return decodeURIComponent(path.relative("/", pathname));
+    return `${url.hostname}${url.pathname}${url.search}`;
   }
 }
 
