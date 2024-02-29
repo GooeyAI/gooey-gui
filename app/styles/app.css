@@ -228,6 +228,10 @@ button .gui-html-container,
   color: rgba(255, 255, 255, var(--tw-text-opacity));
 }
 
+#react-select-2-listbox {
+  z-index: 9999;
+}
+
 .uppy-Dashboard-Item-progressIcon--circle {
   display: none;
 }
