@@ -554,7 +554,7 @@ function GooeySlider({
       }
     }
   }, [state, props.name]);
-
+  const numberArgs = (({ name, type, ...object }) => object)(args);
   return (
     <div className={className}>
       <label htmlFor={id}>
@@ -566,7 +566,7 @@ function GooeySlider({
           onChange={(e) => {
             if (ref2.current) ref2.current.value = e.target.value;
           }}
-          {...args}
+          {...numberArgs}
           type="number"
         />
         <input
