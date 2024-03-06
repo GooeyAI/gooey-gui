@@ -88,7 +88,7 @@ export function GooeyFileInput({
         JSON.stringify(multiple ? uploadUrls : uploadUrls[0]) || "";
       onChange();
       fix_previews();
-      if (uploadUrls.length) {
+      if (uploadUrls.length && clearAllRef.current?.dataset.allowed== "true") {
         clearAllRef.current?.style.setProperty("display", "block");
       } else {
         clearAllRef.current?.style.setProperty("display", "none");
@@ -159,6 +159,7 @@ export function GooeyFileInput({
         });
         if (clearAllRef.current) {
           clearAllRef.current.style.display = "block";
+          clearAllRef.current.dataset.allowed = "true";
         }
       }
       // only set this after initial files have been added
