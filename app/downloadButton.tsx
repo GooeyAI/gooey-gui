@@ -27,14 +27,19 @@ export function DownloadButton({
         }
       }}
     >
-      {isDownloading ? (
-        <div style={{ position: "relative", width: "0", height: "0" }}>
-          <div style={{ position: "absolute", left: "30px", top: "-5px" }}>
+      <div style={isDownloading ? { opacity: 0.3, position: "relative" } : {}}>
+        {isDownloading ? (
+          <div
+            style={{
+              position: "absolute",
+              width: "100%",
+              height: "100%",
+              top: "-5px",
+            }}
+          >
             <div className="gooey-spinner"></div>
           </div>
-        </div>
-      ) : null}
-      <div style={{ opacity: isDownloading ? 0.3 : 1 }}>
+        ) : null}
         <RenderedMarkdown body={label} />
       </div>
     </div>
