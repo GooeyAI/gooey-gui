@@ -2,11 +2,7 @@ import type { LinksFunction } from "@remix-run/node";
 import type { ReactNode } from "react";
 import React, { useEffect, useRef } from "react";
 import Select from "react-select";
-import {
-  GooeyFileInput,
-  links as fileInputLinks,
-  urlToFilename,
-} from "~/gooeyFileInput";
+import { GooeyFileInput, links as fileInputLinks } from "~/gooeyFileInput";
 import { RenderedMarkdown } from "~/renderedMarkdown";
 
 import { useJsonFormInput } from "~/jsonFormInput";
