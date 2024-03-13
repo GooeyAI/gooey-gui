@@ -65,7 +65,7 @@ export const RenderedHTML = forwardRef<
   const parsedElements = parse(body, reactParserOptions);
 
   return (
-    <LineClamp lines={lineClamp}>
+    <LineClamp lines={lineClamp} key={body.slice(0, 10)}>
       <span ref={ref} className="gui-html-container" {...attrs}>
         {parsedElements}
       </span>
@@ -133,6 +133,7 @@ function LineClamp({
             bottom: 0,
             right: 0,
             padding: "0 0 0 .4rem",
+            lineHeight: '130%'
           }}
         >
           <button
