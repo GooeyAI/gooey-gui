@@ -1,7 +1,11 @@
 import type { LinksFunction } from "@remix-run/node";
 import type { ReactNode } from "react";
 import React, { useEffect, useRef } from "react";
-import Select from "react-select";
+import Select, {
+  components,
+  OptionProps,
+  SingleValueProps,
+} from "react-select";
 import { GooeyFileInput, links as fileInputLinks } from "~/gooeyFileInput";
 import { RenderedMarkdown } from "~/renderedMarkdown";
 
@@ -521,10 +525,34 @@ function GuiSelect({
       )}
       <JsonFormInput />
       {/*{JsonFormInput}*/}
-      <Select value={selectValue} onChange={onSelectChange} {...args} />
+      <Select
+        value={selectValue}
+        onChange={onSelectChange}
+        components={{ Option, SingleValue }}
+        {...args}
+      />
     </div>
   );
 }
+const Option = (props: OptionProps) => (
+  <components.Option
+    {...props}
+    children={
+      <RenderedMarkdown body={props.label} className="container-margin-reset" />
+    }
+  />
+);
+
+const SingleValue = ({ children, ...props }: SingleValueProps) => (
+  <components.SingleValue {...props}>
+    {children ? (
+      <RenderedMarkdown
+        body={children.toString()}
+        className="container-margin-reset"
+      />
+    ) : null}
+  </components.SingleValue>
+);
 
 function GooeySlider({
   className,

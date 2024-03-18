@@ -161,6 +161,11 @@ div.code-toolbar {
   display: contents;
 }
 
+.container-margin-reset p {
+    margin: 0;
+
+}
+
 .gui-md-container {
   max-width: 100%;
   word-break: break-word;
