@@ -232,6 +232,9 @@ function RenderedPrismCode({
   useEffect(() => {
     // @ts-ignore
     if (!ref.current || !window.Prism) return;
+    
+    ref.current.innerHTML = ref.current.textContent!; // decode html entities
+
     // @ts-ignore
     window.Prism.highlightElement(ref.current);
   }, [body]);
