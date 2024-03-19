@@ -1,11 +1,8 @@
 import type { LinksFunction } from "@remix-run/node";
 import type { ReactNode } from "react";
 import React, { useEffect, useRef } from "react";
-import Select, {
-  components,
-  OptionProps,
-  SingleValueProps,
-} from "react-select";
+import type { OptionProps, SingleValueProps } from "react-select";
+import Select, { components } from "react-select";
 import { GooeyFileInput, links as fileInputLinks } from "~/gooeyFileInput";
 import { RenderedMarkdown } from "~/renderedMarkdown";
 

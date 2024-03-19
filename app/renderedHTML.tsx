@@ -47,7 +47,7 @@ export const RenderedHTML = forwardRef<
 
   const parsedElements = parse(body2, reactParserOptions);
   return (
-    <LineClamp lines={lineClamp} key={body.slice(0, 10)}>
+    <LineClamp lines={lineClamp} key={body2}>
       <span ref={ref} className="gui-html-container" {...attrs2}>
         {parsedElements}
       </span>
