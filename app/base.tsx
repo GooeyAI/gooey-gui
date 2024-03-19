@@ -1,7 +1,11 @@
 import type { LinksFunction } from "@remix-run/node";
 import type { ReactNode } from "react";
 import React, { useEffect, useRef } from "react";
-import Select from "react-select";
+import Select, {
+  components,
+  OptionProps,
+  SingleValueProps,
+} from "react-select";
 import { GooeyFileInput, links as fileInputLinks } from "~/gooeyFileInput";
 import { RenderedMarkdown } from "~/renderedMarkdown";
 
@@ -13,13 +17,13 @@ import { RenderedHTML } from "~/renderedHTML";
 import CountdownTimer from "./components/countdown";
 import { DataTable, DataTableRaw, links as dataTableLinks } from "~/dataTable";
 import { ClientOnly } from "remix-utils";
-import download from "downloadjs";
 import {
   GooeyCheckbox,
   GooeyInput,
   GooeyRadio,
   GooeyTextarea,
 } from "~/gooeyInput";
+import { DownloadButton } from "~/downloadButton";
 
 export const links: LinksFunction = () => {
   return [...dataTableLinks(), ...fileInputLinks()];
@@ -340,18 +344,14 @@ function RenderedTreeNode({
       );
     }
     case "download-button": {
-      const { label, className, ...args } = props;
+      const { label, className, url, ...args } = props;
       return (
-        <button
-          type="button"
-          className={`btn btn-theme ${className ?? ""}`}
+        <DownloadButton
+          label={label}
+          className={className}
+          url={url}
           {...args}
-          onClick={() => {
-            console.log(download(args.url));
-          }}
-        >
-          <RenderedMarkdown body={label} />
-        </button>
+        />
       );
     }
     case "select":
@@ -525,10 +525,34 @@ function GuiSelect({
       )}
       <JsonFormInput />
       {/*{JsonFormInput}*/}
-      <Select value={selectValue} onChange={onSelectChange} {...args} />
+      <Select
+        value={selectValue}
+        onChange={onSelectChange}
+        components={{ Option, SingleValue }}
+        {...args}
+      />
     </div>
   );
 }
+const Option = (props: OptionProps) => (
+  <components.Option
+    {...props}
+    children={
+      <RenderedMarkdown body={props.label} className="container-margin-reset" />
+    }
+  />
+);
+
+const SingleValue = ({ children, ...props }: SingleValueProps) => (
+  <components.SingleValue {...props}>
+    {children ? (
+      <RenderedMarkdown
+        body={children.toString()}
+        className="container-margin-reset"
+      />
+    ) : null}
+  </components.SingleValue>
+);
 
 function GooeySlider({
   className,

@@ -17,61 +17,89 @@ export const RenderedHTML = forwardRef<
     [attr: string]: any;
   }
 >(function RenderedHTML({ body, lineClamp, ...attrs }, ref) {
-  const reactParserOptions: HTMLReactParserOptions = {
-    htmlparser2: {
-      lowerCaseTags: false,
-      lowerCaseAttributeNames: false,
-    },
-    replace: function (domNode) {
-      if (!(domNode instanceof Element && domNode.attribs)) return;
+  const {
+    renderLocalDt,
+    renderLocalDtDateOptions,
+    renderLocalDtTimeOptions,
+    ...attrs2
+  } = attrs;
+  const [body2, setBody] = useState(body);
 
-      if (
-        domNode.children.length &&
-        domNode.children[0] instanceof Element &&
-        domNode.children[0].name === "code" &&
-        domNode.children[0].attribs.class?.includes("language-")
-      ) {
-        return (
-          <RenderedPrismCode domNode={domNode} options={reactParserOptions} />
-        );
-      }
+  useEffect(() => {
+    if (!renderLocalDt) {
+      if (body2 !== body) setBody(body);
+      return;
+    }
+    const date = new Date(renderLocalDt);
+    let yearToShow = "";
+    if (date.getFullYear() != new Date().getFullYear()) {
+      yearToShow = " " + date.getFullYear().toString();
+    }
+    const localeDateString = date.toLocaleDateString(
+      "en-IN",
+      renderLocalDtDateOptions,
+    );
+    const localTimeString = date
+      .toLocaleTimeString("en-IN", renderLocalDtTimeOptions)
+      .toUpperCase();
+    setBody(localeDateString + yearToShow + ", " + localTimeString);
+  }, [body, renderLocalDt, renderLocalDtDateOptions, renderLocalDtTimeOptions]);
 
-      if (typeof domNode.attribs["data-internal-link"] !== "undefined") {
-        const href = domNode.attribs.href;
-        delete domNode.attribs.href;
-        return (
-          <Link to={href} {...attributesToProps(domNode.attribs)}>
-            {domToReact(domNode.children, reactParserOptions)}
-          </Link>
-        );
-      }
-
-      for (const [attr, value] of Object.entries(domNode.attribs)) {
-        if (!attr.startsWith("on")) continue;
-        // @ts-ignore
-        domNode.attribs[attr] = (event: React.SyntheticEvent) => {
-          // eslint-disable-next-line no-new-func
-          const fn = new Function("event", value);
-          return fn.call(event.currentTarget, event.nativeEvent);
-        };
-      }
-
-      if (domNode.type === "script") {
-        let body = getTextBody(domNode);
-        return <InlineScript attrs={domNode.attribs} body={body} />;
-      }
-    },
-  };
-  const parsedElements = parse(body, reactParserOptions);
-
+  const parsedElements = parse(body2, reactParserOptions);
   return (
     <LineClamp lines={lineClamp} key={body.slice(0, 10)}>
-      <span ref={ref} className="gui-html-container" {...attrs}>
+      <span ref={ref} className="gui-html-container" {...attrs2}>
         {parsedElements}
       </span>
     </LineClamp>
   );
 });
+
+const reactParserOptions: HTMLReactParserOptions = {
+  htmlparser2: {
+    lowerCaseTags: false,
+    lowerCaseAttributeNames: false,
+  },
+  replace: function (domNode) {
+    if (!(domNode instanceof Element && domNode.attribs)) return;
+
+    if (
+      domNode.children.length &&
+      domNode.children[0] instanceof Element &&
+      domNode.children[0].name === "code" &&
+      domNode.children[0].attribs.class?.includes("language-")
+    ) {
+      return (
+        <RenderedPrismCode domNode={domNode} options={reactParserOptions} />
+      );
+    }
+
+    if (typeof domNode.attribs["data-internal-link"] !== "undefined") {
+      const href = domNode.attribs.href;
+      delete domNode.attribs.href;
+      return (
+        <Link to={href} {...attributesToProps(domNode.attribs)}>
+          {domToReact(domNode.children, reactParserOptions)}
+        </Link>
+      );
+    }
+
+    for (const [attr, value] of Object.entries(domNode.attribs)) {
+      if (!attr.startsWith("on")) continue;
+      // @ts-ignore
+      domNode.attribs[attr] = (event: React.SyntheticEvent) => {
+        // eslint-disable-next-line no-new-func
+        const fn = new Function("event", value);
+        return fn.call(event.currentTarget, event.nativeEvent);
+      };
+    }
+
+    if (domNode.type === "script") {
+      let body = getTextBody(domNode);
+      return <InlineScript attrs={domNode.attribs} body={body} />;
+    }
+  },
+};
 
 function LineClamp({
   lines,
@@ -133,7 +161,7 @@ function LineClamp({
             bottom: 0,
             right: 0,
             padding: "0 0 0 .4rem",
-            lineHeight: '130%'
+            lineHeight: "130%",
           }}
         >
           <button
@@ -191,6 +219,7 @@ function InlineScript({
     );
   }
 }
+
 function RenderedPrismCode({
   domNode,
   options,

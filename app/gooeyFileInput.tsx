@@ -255,7 +255,7 @@ async function textResponseHead({
   return text;
 }
 
-function urlToFilename(_url: string) {
+export function urlToFilename(_url: string) {
   const url = new URL(_url);
   if (isUserUploadedUrl(_url)) {
     return decodeURIComponent(path.basename(url.pathname));
