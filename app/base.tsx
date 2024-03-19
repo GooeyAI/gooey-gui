@@ -1,11 +1,8 @@
 import type { LinksFunction } from "@remix-run/node";
 import type { ReactNode } from "react";
 import React, { useEffect, useRef } from "react";
-import Select, {
-  components,
-  OptionProps,
-  SingleValueProps,
-} from "react-select";
+import type { OptionProps, SingleValueProps } from "react-select";
+import Select, { components } from "react-select";
 import { GooeyFileInput, links as fileInputLinks } from "~/gooeyFileInput";
 import { RenderedMarkdown } from "~/renderedMarkdown";
 
@@ -270,8 +267,8 @@ function RenderedTreeNode({
       return <RenderedHTML body={body} {...args} />;
     }
     case "markdown": {
-      const { body, ...args } = props;
-      return <RenderedMarkdown body={body} {...args} />;
+      const { body, lineClamp, ...args } = props;
+      return <RenderedMarkdown body={body} lineClamp={lineClamp} {...args} />;
     }
     case "textarea": {
       return <GooeyTextarea props={props} state={state} />;
