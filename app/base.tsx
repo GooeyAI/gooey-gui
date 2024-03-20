@@ -562,7 +562,7 @@ function GooeySlider({
   props: Record<string, any>;
   state: Record<string, any>;
 }) {
-  const { label, ...args } = props;
+  const { label, name, type, ...args } = props;
   const ref1 = useRef<HTMLInputElement>(null);
   const ref2 = useRef<HTMLInputElement>(null);
 
@@ -575,7 +575,6 @@ function GooeySlider({
       }
     }
   }, [state, props.name]);
-  const numberArgs = (({ name, type, ...object }) => object)(args);
   return (
     <div className={className}>
       <label htmlFor={id}>
@@ -587,8 +586,8 @@ function GooeySlider({
           onChange={(e) => {
             if (ref2.current) ref2.current.value = e.target.value;
           }}
-          {...numberArgs}
           type="number"
+          {...args}
         />
         <input
           ref={ref2}
@@ -596,6 +595,8 @@ function GooeySlider({
             if (ref1.current) ref1.current.value = e.target.value;
           }}
           id={id}
+          name={name}
+          type={type}
           {...args}
         />
       </div>
