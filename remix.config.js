@@ -23,6 +23,7 @@ const proxyUrls = [
   "/sitemap.xml/",
   "/2/*",
   "/__/*",
+  "/2/*",
 ];
 
 /** @type {import('@remix-run/dev').AppConfig} */
@@ -62,6 +63,7 @@ module.exports = {
         route(path, "gitbook.tsx", { id: path });
       }
       route("/__/realtime/*", "realtime.tsx");
+      route("/robots.txt", "robots.tsx");
       route("*", "app.tsx");
     });
   },
