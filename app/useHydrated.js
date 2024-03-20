@@ -17,7 +17,9 @@ export function HydrationUtils() {
   useEffect(() => {
     if (!isBrowser || isHydrated || navigation.state !== "idle") return;
     window.hydrated = true;
-    window.dispatchEvent(new Event("hydrated"));
+    setTimeout(() => {
+      window.dispatchEvent(new Event("hydrated"));
+    });
   }, [isBrowser, isHydrated, navigation.state]);
 
   return (

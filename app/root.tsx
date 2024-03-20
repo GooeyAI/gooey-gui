@@ -43,15 +43,18 @@ export default function App() {
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <Meta />
         <Links />
-        <script src="https://kit.fontawesome.com/8af9787bd5.js" crossOrigin="anonymous"></script>
+        <script
+          src="https://kit.fontawesome.com/8af9787bd5.js"
+          crossOrigin="anonymous"
+        ></script>
       </head>
       <body>
         <div
           id="portal"
           style={{ position: "fixed", left: 0, top: 0, zIndex: 9999 }}
         />
-        <HydrationUtils />
         <Outlet />
+        <HydrationUtils />
         <ScrollRestoration />
         <script
           // load client side env vars
