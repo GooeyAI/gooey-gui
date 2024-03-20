@@ -229,11 +229,13 @@ function App() {
     ) {
       // number inputs have annoying limits and step sizes that make them hard to edit unless we postpone autocorrection until focusout
       // debounce does not work here because the step size prevents key intermediate states while typing
-      const submitTarget = event.currentTarget;
+      if (form.getAttribute("debounceInProgress") == "true") return;
+      form.setAttribute("debounceInProgress", "true");
       target.addEventListener(
         "focusout",
         function () {
-          submit(submitTarget);
+          form.removeAttribute("debounceInProgress");
+          submit(form);
         },
         { once: true },
       );
