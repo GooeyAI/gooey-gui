@@ -161,6 +161,11 @@ div.code-toolbar {
   display: contents;
 }
 
+.container-margin-reset p {
+    margin: 0;
+
+}
+
 .gui-md-container {
   max-width: 100%;
   word-break: break-word;
@@ -226,6 +231,11 @@ button .gui-html-container,
   background-color: rgba(0, 0, 0, var(--tw-bg-opacity));
   --tw-text-opacity: 1;
   color: rgba(255, 255, 255, var(--tw-text-opacity));
+}
+
+/* match any #react-select-XXX-listbox */
+div[id^="react-select-"][id$="-listbox"] {
+  z-index: 9999;
 }
 
 .uppy-Dashboard-Item-progressIcon--circle {

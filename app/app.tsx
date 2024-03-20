@@ -222,15 +222,23 @@ function App() {
     ) {
       form.setAttribute("debounceInProgress", "true");
       debouncedSubmit(form);
-    } else if (target instanceof HTMLInputElement && target.type === "number" && document.activeElement === target) {
+    } else if (
+      target instanceof HTMLInputElement &&
+      target.type === "number" &&
+      document.activeElement === target
+    ) {
       // number inputs have annoying limits and step sizes that make them hard to edit unless we postpone autocorrection until focusout
       // debounce does not work here because the step size prevents key intermediate states while typing
       if (form.getAttribute("debounceInProgress") == "true") return;
       form.setAttribute("debounceInProgress", "true");
-      target.addEventListener("focusout", function() {
-        form.removeAttribute("debounceInProgress");
+      target.addEventListener(
+        "focusout",
+        function () {
+          form.removeAttribute("debounceInProgress");
         submit(form);
-      }, {once : true});
+        },
+        { once: true },
+      );
     } else {
       submit(form);
     }
