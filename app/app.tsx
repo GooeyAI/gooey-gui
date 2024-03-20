@@ -215,6 +215,12 @@ function App() {
   const handleChange = (event: FormEvent<HTMLFormElement>) => {
     const target = event.target;
     const form = event.currentTarget;
+
+    // ignore elements that have `data-submit-disabled` set
+    if (target instanceof HTMLElement && target.hasAttribute("data-submit-disabled")) {
+      return;
+    }
+
     // debounce based on input type - generally text inputs are slow, everything else is fast
     if (
       (target instanceof HTMLInputElement && target.type === "text") ||
