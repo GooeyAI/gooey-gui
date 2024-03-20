@@ -235,7 +235,7 @@ function App() {
         "focusout",
         function () {
           form.removeAttribute("debounceInProgress");
-        submit(form);
+          submit(form);
         },
         { once: true },
       );
