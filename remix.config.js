@@ -16,7 +16,6 @@ const proxyUrls = [
   "/static/*",
   "/login/",
   "/logout/",
-  "/account/",
   "/payment-success/",
   "/favicon",
   "/favicon.ico",
