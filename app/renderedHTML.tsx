@@ -176,7 +176,7 @@ function LineClamp({
               setExpanded(true);
             }}
           >
-            …see more
+            …more
           </button>
         </span>
       )}
