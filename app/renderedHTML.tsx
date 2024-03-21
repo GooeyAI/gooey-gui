@@ -83,8 +83,9 @@ const reactParserOptions: HTMLReactParserOptions = {
 
     for (const [attr, value] of Object.entries(domNode.attribs)) {
       if (!attr.startsWith("on")) continue;
+      const reactAttrName = "on" + attr[2].toUpperCase() + attr.slice(3);
       // @ts-ignore
-      domNode.attribs[attr] = (event: React.SyntheticEvent) => {
+      domNode.attribs[reactAttrName] = (event: React.SyntheticEvent) => {
         // eslint-disable-next-line no-new-func
         const fn = new Function("event", value);
         return fn.call(event.currentTarget, event.nativeEvent);
