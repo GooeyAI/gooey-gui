@@ -1,5 +1,6 @@
 import React from "react";
 import { marked } from "marked";
+import hljs from "highlight.js";
 import { RenderedHTML } from "~/renderedHTML";
 
 export function RenderedMarkdown({
@@ -18,10 +19,19 @@ export function RenderedMarkdown({
     gfm: true,
     headerIds: false,
     mangle: false,
+    highlight(code, lang) {
+      try {
+        return hljs.highlight(code, { language: lang }).value;
+      } catch (_) {
+        return hljs.highlightAuto(code).value;
+      }
+    },
   });
+
   return (
     <RenderedHTML
       body={html}
+      key={body}
       lineClamp={lineClamp}
       className="gui-html-container gui-md-container"
       {...attrs}
