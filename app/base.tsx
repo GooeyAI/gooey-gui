@@ -1,7 +1,8 @@
 import type { LinksFunction } from "@remix-run/node";
 import type { ReactNode } from "react";
 import React, { useEffect, useRef } from "react";
-import Select from "react-select";
+import type { OptionProps, SingleValueProps } from "react-select";
+import Select, { components } from "react-select";
 import { GooeyFileInput, links as fileInputLinks } from "~/gooeyFileInput";
 import { RenderedMarkdown } from "~/renderedMarkdown";
 
@@ -266,8 +267,8 @@ function RenderedTreeNode({
       return <RenderedHTML body={body} {...args} />;
     }
     case "markdown": {
-      const { body, ...args } = props;
-      return <RenderedMarkdown body={body} {...args} />;
+      const { body, lineClamp, ...args } = props;
+      return <RenderedMarkdown body={body} lineClamp={lineClamp} {...args} />;
     }
     case "textarea": {
       return <GooeyTextarea props={props} state={state} />;
@@ -521,10 +522,34 @@ function GuiSelect({
       )}
       <JsonFormInput />
       {/*{JsonFormInput}*/}
-      <Select value={selectValue} onChange={onSelectChange} {...args} />
+      <Select
+        value={selectValue}
+        onChange={onSelectChange}
+        components={{ Option, SingleValue }}
+        {...args}
+      />
     </div>
   );
 }
+const Option = (props: OptionProps) => (
+  <components.Option
+    {...props}
+    children={
+      <RenderedMarkdown body={props.label} className="container-margin-reset" />
+    }
+  />
+);
+
+const SingleValue = ({ children, ...props }: SingleValueProps) => (
+  <components.SingleValue {...props}>
+    {children ? (
+      <RenderedMarkdown
+        body={children.toString()}
+        className="container-margin-reset"
+      />
+    ) : null}
+  </components.SingleValue>
+);
 
 function GooeySlider({
   className,
@@ -537,7 +562,7 @@ function GooeySlider({
   props: Record<string, any>;
   state: Record<string, any>;
 }) {
-  const { label, ...args } = props;
+  const { label, name, type, ...args } = props;
   const ref1 = useRef<HTMLInputElement>(null);
   const ref2 = useRef<HTMLInputElement>(null);
 
@@ -550,7 +575,6 @@ function GooeySlider({
       }
     }
   }, [state, props.name]);
-
   return (
     <div className={className}>
       <label htmlFor={id}>
@@ -562,8 +586,8 @@ function GooeySlider({
           onChange={(e) => {
             if (ref2.current) ref2.current.value = e.target.value;
           }}
-          {...args}
           type="number"
+          {...args}
         />
         <input
           ref={ref2}
@@ -571,6 +595,8 @@ function GooeySlider({
             if (ref1.current) ref1.current.value = e.target.value;
           }}
           id={id}
+          name={name}
+          type={type}
           {...args}
         />
       </div>

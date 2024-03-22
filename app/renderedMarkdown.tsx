@@ -5,10 +5,12 @@ import { RenderedHTML } from "~/renderedHTML";
 
 export function RenderedMarkdown({
   body,
+  lineClamp,
   ...attrs
 }: // allowUnsafeHTML,
 {
   body: string;
+  lineClamp?: number;
   [attr: string]: any;
   // allowUnsafeHTML?: boolean;
 }) {

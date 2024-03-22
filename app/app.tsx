@@ -215,6 +215,12 @@ function App() {
   const handleChange = (event: FormEvent<HTMLFormElement>) => {
     const target = event.target;
     const form = event.currentTarget;
+
+    // ignore elements that have `data-submit-disabled` set
+    if (target instanceof HTMLElement && target.hasAttribute("data-submit-disabled")) {
+      return;
+    }
+
     // debounce based on input type - generally text inputs are slow, everything else is fast
     if (
       (target instanceof HTMLInputElement && target.type === "text") ||
@@ -229,11 +235,13 @@ function App() {
     ) {
       // number inputs have annoying limits and step sizes that make them hard to edit unless we postpone autocorrection until focusout
       // debounce does not work here because the step size prevents key intermediate states while typing
-      const submitTarget = event.currentTarget;
+      if (form.getAttribute("debounceInProgress") == "true") return;
+      form.setAttribute("debounceInProgress", "true");
       target.addEventListener(
         "focusout",
         function () {
-          submit(submitTarget);
+          form.removeAttribute("debounceInProgress");
+          submit(form);
         },
         { once: true },
       );

@@ -199,6 +199,8 @@ async function loadPreview({
   filename?: string;
   preview?: string;
 }) {
+  if (uppy.getFile(fileId).meta.type?.startsWith("image/")) return;
+
   const response = await fetch(url);
   const contentType = response.headers.get("content-type") || "url/undefined";
   const contentLength = response.headers.get("content-length");
