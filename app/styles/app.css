@@ -238,6 +238,21 @@ div[id^="react-select-"][id$="-listbox"] {
   z-index: 9999;
 }
 
+.uppy-Dashboard--clear-all {
+  font-size: 14px;
+  background: none;
+  border: none;
+  color: #2275d7;
+  cursor: pointer;
+  height: 29px;
+  line-height: 1;
+  margin: 0;
+  position: absolute;
+  left: 7px;
+  top: 7px;
+  z-index: 1004;
+}
+
 .uppy-Dashboard-Item-progressIcon--circle {
   display: none;
 }

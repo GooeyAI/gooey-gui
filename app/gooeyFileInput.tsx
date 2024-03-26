@@ -1,5 +1,5 @@
 import { LinksFunction } from "@remix-run/node";
-import Uppy from "@uppy/core";
+import Uppy, { UppyFile } from "@uppy/core";
 import { Dashboard } from "@uppy/react";
 import Webcam from "@uppy/webcam";
 import React, { useEffect, useState } from "react";
@@ -12,6 +12,7 @@ import dashboardStyle from "@uppy/dashboard/dist/style.min.css";
 import webcamStyle from "@uppy/webcam/dist/style.min.css";
 import audioStyle from "@uppy/audio/dist/style.min.css";
 import path from "path";
+import Url from "@uppy/url";
 
 export const links: LinksFunction = () => {
   return [
@@ -34,7 +35,7 @@ export function GooeyFileInput({
 }: {
   name: string;
   label: string;
-  accept: string[];
+  accept: string[] | undefined;
   multiple: boolean;
   onChange: () => void;
   defaultValue: string | string[] | undefined;
@@ -43,6 +44,7 @@ export function GooeyFileInput({
 }) {
   const [uppy, setUppy] = useState<Uppy | null>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
+  const [showClearAll, setShowClearAll] = useState(false);
 
   useEffect(() => {
     const onFilesChanged = () => {
@@ -54,12 +56,43 @@ export function GooeyFileInput({
         .filter((url) => url);
       element.value =
         JSON.stringify(multiple ? uploadUrls : uploadUrls[0]) || "";
+      setShowClearAll(
+        uploadUrls.length > 0 && _uppy.getState().totalProgress >= 100,
+      );
       onChange();
     };
-    const onFileAdded = (file: any) => {
+    const onFileUploaded = (file: any) => {
       onFilesChanged();
       loadPreview({
         url: file.uploadURL,
+        uppy: _uppy,
+        fileId: file.id,
+        filename: file.name,
+        preview: file.preview,
+      });
+    };
+    const onFileAdded = (file: UppyFile) => {
+      if (file.source != "Url") {
+        setShowClearAll(false);
+        return;
+      }
+      const url = file?.remote?.body?.url?.toString();
+      if (!url) return;
+      _uppy.setFileState(file.id, {
+        progress: {
+          uploadComplete: true,
+          uploadStarted: true,
+          percentage: 100,
+          bytesUploaded: file.data.size,
+        },
+        uploadURL: url,
+      });
+      _uppy.setFileMeta(file.id, {
+        name: urlToFilename(url),
+      });
+      onFilesChanged();
+      loadPreview({
+        url: url,
         uppy: _uppy,
         fileId: file.id,
         filename: file.name,
@@ -83,14 +116,33 @@ export function GooeyFileInput({
       meta: uploadMeta,
       autoProceed: true,
     })
-      .use(Webcam)
-      .use(Audio)
+      .use(Url, { companionUrl: "/__/file-upload/" })
       .use(XHR, { endpoint: "/__/file-upload/" })
-      .on("upload-success", onFileAdded)
+      .on("file-added", onFileAdded)
+      .on("upload-success", onFileUploaded)
       .on("file-removed", onFilesChanged);
-    initUppy(defaultValue, _uppy);
+
+    // only enable relevant plugins
+    if (
+      !accept ||
+      accept.some(
+        (a) =>
+          a.startsWith("image") || a.startsWith("video") || a.startsWith("*"),
+      )
+    ) {
+      _uppy.use(Webcam);
+    }
+    if (
+      !accept ||
+      accept.some((a) => a.startsWith("audio") || a.startsWith("*"))
+    ) {
+      _uppy.use(Audio);
+    }
+
+    setShowClearAll(initUppy(defaultValue, _uppy));
     inputRef.current?.setAttribute("initDone", "true");
     setUppy(_uppy);
+
     // Clean up event handlers etc.
     return () => {
       _uppy.close();
@@ -103,7 +155,7 @@ export function GooeyFileInput({
     if (uppy && element && JSON.stringify(state[name]) != element.value) {
       element.value = JSON.stringify(state[name]) || "";
       element.removeAttribute("initDone");
-      initUppy(state[name] || [], uppy);
+      setShowClearAll(initUppy(state[name] || [], uppy));
       element.setAttribute("initDone", "true");
     }
   }, [state, name]);
@@ -122,24 +174,40 @@ export function GooeyFileInput({
         defaultValue={JSON.stringify(defaultValue)}
       />
       {uppy ? (
-        <Dashboard
-          showRemoveButtonAfterComplete
-          showLinkToFileUploadResult
-          hideUploadButton
-          uppy={uppy}
-          height={250}
-          width={576}
-          singleFileFullScreen={false}
-          plugins={["Webcam", "Audio"]}
-          // @ts-ignore
-          doneButtonHandler={null}
-        />
-      ) : null}
+        <div className="w-100 position-relative">
+          <Dashboard
+            showRemoveButtonAfterComplete
+            showLinkToFileUploadResult
+            hideUploadButton
+            uppy={uppy}
+            height={250}
+            width={576}
+            singleFileFullScreen={false}
+            plugins={["Url", "Webcam", "Audio"]}
+            // @ts-ignore
+            doneButtonHandler={null}
+          />
+          {showClearAll ? (
+            <button
+              className="uppy-Dashboard--clear-all"
+              role="button"
+              onClick={() => uppy.cancelAll()}
+            >
+              🗑 Clear All
+            </button>
+          ) : null}
+        </div>
+      ) : (
+        "Loading..."
+      )}
     </div>
   );
 }
 
-function initUppy(defaultValue: string | string[] | undefined, uppy: Uppy) {
+function initUppy(
+  defaultValue: string | string[] | undefined,
+  uppy: Uppy,
+): boolean {
   for (const file of uppy.getFiles()) {
     uppy.removeFile(file.id);
   }
@@ -179,11 +247,11 @@ function initUppy(defaultValue: string | string[] | undefined, uppy: Uppy) {
     });
     loadPreview({ url, uppy, fileId, filename, preview });
   }
-  if (uppy.getFiles().length) {
-    uppy.setState({
-      totalProgress: 100,
-    });
+  const hasFiles = uppy.getFiles().length > 0;
+  if (hasFiles) {
+    uppy.setState({ totalProgress: 100 });
   }
+  return hasFiles;
 }
 
 async function loadPreview({

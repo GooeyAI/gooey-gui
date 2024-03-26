@@ -26,6 +26,7 @@
     "@uppy/progress-bar": "^3.0.2",
     "@uppy/react": "^3.1.2",
     "@uppy/tus": "^3.1.0",
+    "@uppy/url": "^3.5.0",
     "@uppy/webcam": "^3.3.1",
     "@uppy/xhr-upload": "^3.2.0",
     "firebase-admin": "^11.9.0",

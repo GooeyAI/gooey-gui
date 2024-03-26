@@ -45,6 +45,8 @@ module.exports = {
     /exifr/,
     /firebase-admin/,
     /glideapps/,
+    /p-retry/,
+    /is-network-error/,
   ],
   routes(defineRoutes) {
     return defineRoutes((route) => {
