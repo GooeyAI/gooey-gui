@@ -90,6 +90,7 @@ export function GooeyFileInput({
       _uppy.setFileMeta(file.id, {
         name: urlToFilename(url),
       });
+      (_uppy as any).calculateTotalProgress();
       onFilesChanged();
       loadPreview({
         url: url,
