@@ -100,7 +100,6 @@ export function useGooeyStringInput<
       element.form &&
       !element.form.hasAttribute("debounceInProgress")
     ) {
-      console.log("setting value", state, name, [name]);
       setValue(state[name] || defaultValue || "");
     }
   }, [state, name]);

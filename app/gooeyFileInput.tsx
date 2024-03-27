@@ -63,6 +63,7 @@ export function GooeyFileInput({
     };
     const onFileUploaded = (file: any) => {
       onFilesChanged();
+      file = _uppy.getFile(file.id); // for some reason, the file object is not the same as the one in the uppy state
       loadPreview({
         url: file.uploadURL,
         uppy: _uppy,
