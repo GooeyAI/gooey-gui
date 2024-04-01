@@ -3,13 +3,16 @@ import React, { useEffect, useMemo } from "react";
 
 // language=JavaScript
 const hydrationUtil = `
-    window.waitUntilHydrated = new Promise(resolve =>
-          window.hydrated ? resolve() : window.addEventListener("hydrated", resolve)
-    );
+  window.waitUntilHydrated = new Promise(resolve =>
+      window.hydrated ? resolve() : window.addEventListener("hydrated", resolve)
+  );
 `;
+export function HydrationUtilsPreRender() {
+  return <script dangerouslySetInnerHTML={{ __html: hydrationUtil }} />;
+}
 
 /** a hook that lets everyone know when the page is done hydrating **/
-export function HydrationUtils() {
+export function HydrationUtilsPostRender() {
   const navigation = useNavigation();
   const isBrowser = typeof window !== "undefined";
   const isHydrated = isBrowser && window.hydrated;
@@ -22,11 +25,7 @@ export function HydrationUtils() {
     });
   }, [isBrowser, isHydrated, navigation.state]);
 
-  return (
-    <>
-      <script dangerouslySetInnerHTML={{ __html: hydrationUtil }} />
-    </>
-  );
+  return <></>;
 }
 
 let hydrated = false;

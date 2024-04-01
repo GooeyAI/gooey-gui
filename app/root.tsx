@@ -10,11 +10,15 @@ import {
   useLoaderData,
   useRouteError,
 } from "@remix-run/react";
-import { json, LinksFunction } from "@remix-run/node"; // Depends on the runtime you choose
+import type { LinksFunction } from "@remix-run/node";
+import { json } from "@remix-run/node"; // Depends on the runtime you choose
 import { cssBundleHref } from "@remix-run/css-bundle";
 import React from "react";
 import { globalProgressStyles, useGlobalProgress } from "~/global-progres-bar";
-import { HydrationUtils } from "~/useHydrated";
+import {
+  HydrationUtilsPreRender,
+  HydrationUtilsPostRender,
+} from "~/useHydrated";
 
 export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
@@ -53,8 +57,9 @@ export default function App() {
           id="portal"
           style={{ position: "fixed", left: 0, top: 0, zIndex: 9999 }}
         />
+        <HydrationUtilsPreRender />
         <Outlet />
-        <HydrationUtils />
+        <HydrationUtilsPostRender />
         <ScrollRestoration />
         <script
           // load client side env vars
