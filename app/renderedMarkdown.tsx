@@ -31,8 +31,8 @@ export function RenderedMarkdown({
 
   return (
     <RenderedHTML
-      body={html}
       key={body}
+      body={html}
       lineClamp={lineClamp}
       className="gui-html-container gui-md-container"
       {...attrs}

@@ -1,35 +1,50 @@
-import React, { forwardRef, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import type { HTMLReactParserOptions } from "html-react-parser";
 import parse, {
   attributesToProps,
   domToReact,
   Element,
-  HTMLReactParserOptions,
   Text,
 } from "html-react-parser";
 import { useHydratedMemo } from "~/useHydrated";
 import { Link } from "@remix-run/react";
 
-export const RenderedHTML = forwardRef<
-  HTMLSpanElement,
-  {
-    body: string;
-    lineClamp?: number;
-    [attr: string]: any;
+export function RenderedHTML({
+  body,
+  lineClamp,
+  ...attrs
+}: {
+  body: string;
+  lineClamp?: number;
+  [attr: string]: any;
+}) {
+  if (attrs.renderLocalDt) {
+    return <RenderLocalDt body={body} {...attrs} />;
   }
->(function RenderedHTML({ body, lineClamp, ...attrs }, ref) {
-  const {
-    renderLocalDt,
-    renderLocalDtDateOptions,
-    renderLocalDtTimeOptions,
-    ...attrs2
-  } = attrs;
+
+  const parsedElements = parse(body, reactParserOptions);
+  return (
+    <LineClamp lines={lineClamp} key={body}>
+      <span className="gui-html-container" {...attrs}>
+        {parsedElements}
+      </span>
+    </LineClamp>
+  );
+}
+
+function RenderLocalDt({
+  body,
+  renderLocalDt,
+  renderLocalDtDateOptions,
+  renderLocalDtTimeOptions,
+  ...attrs
+}: {
+  body: string;
+  [attr: string]: any;
+}) {
   const [body2, setBody] = useState(body);
 
   useEffect(() => {
-    if (!renderLocalDt) {
-      if (body2 !== body) setBody(body);
-      return;
-    }
     const date = new Date(renderLocalDt);
     let yearToShow = "";
     if (date.getFullYear() != new Date().getFullYear()) {
@@ -47,13 +62,11 @@ export const RenderedHTML = forwardRef<
 
   const parsedElements = parse(body2, reactParserOptions);
   return (
-    <LineClamp lines={lineClamp} key={body2}>
-      <span ref={ref} className="gui-html-container" {...attrs2}>
-        {parsedElements}
-      </span>
-    </LineClamp>
+    <span className="gui-html-container" {...attrs}>
+      {parsedElements}
+    </span>
   );
-});
+}
 
 const reactParserOptions: HTMLReactParserOptions = {
   htmlparser2: {
