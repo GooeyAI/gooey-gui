@@ -99,6 +99,7 @@ const reactParserOptions: HTMLReactParserOptions = {
 
     for (const [attr, value] of Object.entries(domNode.attribs)) {
       if (!attr.startsWith("on")) continue;
+      delete domNode.attribs[attr];
       const reactAttrName = "on" + attr[2].toUpperCase() + attr.slice(3);
       // @ts-ignore
       domNode.attribs[reactAttrName] = (event: React.SyntheticEvent) => {
@@ -196,6 +197,7 @@ function LineClamp({
     </span>
   );
 }
+const SCRIPTS_LOADED: Record<string, boolean> = {};
 
 function InlineScript({
   attrs,
@@ -205,9 +207,13 @@ function InlineScript({
   body: string;
 }) {
   const hydrated = useHydratedMemo();
+  const oldRef = useRef<HTMLScriptElement>(null);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (oldRef.current) {
+      SCRIPTS_LOADED[oldRef.current.outerHTML] = true;
+    }
     if (!ref.current) return;
     // create script tag
     const script = document.createElement("script");
@@ -219,14 +225,19 @@ function InlineScript({
     if (body) {
       script.appendChild(document.createTextNode(body));
     }
+    // ensure that the script is only added once by checking if it is the same
+    if (SCRIPTS_LOADED[script.outerHTML]) return;
+    SCRIPTS_LOADED[script.outerHTML] = true;
+    // append script to div
     ref.current.replaceChildren(script);
-  }, []);
+  }, [body, attrs]);
 
   if (hydrated) {
-    return <div ref={ref} style={{ display: "none" }}></div>;
+    return <div ref={ref} className="d-none"></div>;
   } else {
     return (
       <script
+        ref={oldRef}
         {...attributesToProps(attrs ?? {}, "script")}
         dangerouslySetInnerHTML={{ __html: body }}
       />
