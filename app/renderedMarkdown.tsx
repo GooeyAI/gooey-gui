@@ -8,22 +8,23 @@ export function RenderedMarkdown({
   lineClamp,
   ...attrs
 }: // allowUnsafeHTML,
-{
-  body: string;
-  lineClamp?: number;
-  [attr: string]: any;
-  // allowUnsafeHTML?: boolean;
-}) {
+  {
+    body: string;
+    lineClamp?: number;
+    [attr: string]: any;
+    // allowUnsafeHTML?: boolean;
+  }) {
   if (!body) return <></>;
   let html = marked.parse(body, {
     gfm: true,
     headerIds: false,
     mangle: false,
+    breaks: true,
     highlight(code, lang) {
       if (lang && hljs.getLanguage(lang)) {
         try {
           return hljs.highlight(code, { language: lang }).value;
-        } catch (_) {}
+        } catch (_) { }
       }
       return hljs.highlightAuto(code).value;
     },
