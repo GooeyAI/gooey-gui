@@ -1,27 +1,13 @@
-import { LinksFunction } from "@remix-run/node";
+import Audio from "@uppy/audio";
 import Uppy, { UppyFile } from "@uppy/core";
 import { Dashboard } from "@uppy/react";
+import Url from "@uppy/url";
 import Webcam from "@uppy/webcam";
+import XHR from "@uppy/xhr-upload";
+import mime from "mime-types";
+import path from "path";
 import React, { useEffect, useState } from "react";
 import { RenderedMarkdown } from "~/renderedMarkdown";
-import XHR from "@uppy/xhr-upload";
-import Audio from "@uppy/audio";
-import mime from "mime-types";
-import coreStyle from "@uppy/core/dist/style.min.css";
-import dashboardStyle from "@uppy/dashboard/dist/style.min.css";
-import webcamStyle from "@uppy/webcam/dist/style.min.css";
-import audioStyle from "@uppy/audio/dist/style.min.css";
-import path from "path";
-import Url from "@uppy/url";
-
-export const links: LinksFunction = () => {
-  return [
-    { rel: "stylesheet", href: coreStyle },
-    { rel: "stylesheet", href: dashboardStyle },
-    { rel: "stylesheet", href: webcamStyle },
-    { rel: "stylesheet", href: audioStyle },
-  ];
-};
 
 export function GooeyFileInput({
   name,
@@ -57,7 +43,7 @@ export function GooeyFileInput({
       element.value =
         JSON.stringify(multiple ? uploadUrls : uploadUrls[0]) || "";
       setShowClearAll(
-        uploadUrls.length > 0 && _uppy.getState().totalProgress >= 100,
+        uploadUrls.length > 0 && _uppy.getState().totalProgress >= 100
       );
       onChange();
     };
@@ -129,7 +115,7 @@ export function GooeyFileInput({
       !accept ||
       accept.some(
         (a) =>
-          a.startsWith("image") || a.startsWith("video") || a.startsWith("*"),
+          a.startsWith("image") || a.startsWith("video") || a.startsWith("*")
       )
     ) {
       _uppy.use(Webcam);
@@ -208,7 +194,7 @@ export function GooeyFileInput({
 
 function initUppy(
   defaultValue: string | string[] | undefined,
-  uppy: Uppy,
+  uppy: Uppy
 ): boolean {
   for (const file of uppy.getFiles()) {
     uppy.removeFile(file.id);

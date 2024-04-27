@@ -4,15 +4,9 @@ import {
   GridCellKind,
   GridColumnIcon,
 } from "@glideapps/glide-data-grid";
-import glideappsStyles from "@glideapps/glide-data-grid/dist/index.css";
-import type { LinksFunction } from "@remix-run/node";
 import { useCallback, useEffect, useState } from "react";
 import XLSX from "xlsx";
 import LoadingFallback from "./loadingfallback";
-
-export const links: LinksFunction = () => {
-  return [{ rel: "stylesheet", href: glideappsStyles }];
-};
 
 const maxColWidth = 300;
 

@@ -1,12 +1,12 @@
 import type { ReactNode } from "react";
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import type { OptionProps, SingleValueProps } from "react-select";
-import Select, { components } from "react-select";
 import { RenderedMarkdown } from "~/renderedMarkdown";
 
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from "@reach/tabs";
 import { Link } from "@remix-run/react";
 import { JsonViewer } from "@textea/json-viewer";
+import Select, { components } from "react-select";
 import { DownloadButton } from "~/downloadButton";
 import {
   GooeyCheckbox,
@@ -17,21 +17,15 @@ import {
 import { useJsonFormInput } from "~/jsonFormInput";
 import { RenderedHTML } from "~/renderedHTML";
 import CountdownTimer from "./components/countdown";
-import { ClientOnlySuspense } from "./lazyImports";
+import { lazyImport } from "./lazyImports";
 
-const DataTable = React.lazy(() =>
-  import("~/dataTable").then((mod) => ({ default: mod.DataTable }))
-);
-const DataTableRaw = React.lazy(() =>
-  import("~/dataTable").then((mod) => ({ default: mod.DataTableRaw }))
-);
-const GooeyFileInput = React.lazy(() =>
-  import("~/gooeyFileInput").then((mod) => ({ default: mod.GooeyFileInput }))
-);
-const Plot = React.lazy(() =>
+const { DataTable, DataTableRaw } = lazyImport(() => import("~/dataTable"));
+const { GooeyFileInput } = lazyImport(() => import("~/gooeyFileInput"));
+
+const Plot = lazyImport(
+  () => import("react-plotly.js").then((mod) => mod.default)
   // @ts-ignore
-  import("react-plotly.js").then((mod) => mod.default)
-);
+).default;
 
 type TreeNode = {
   name: string;
@@ -117,19 +111,11 @@ function RenderedTreeNode({
       );
     case "data-table": {
       const { fileUrl, ...tableProps } = props;
-      return (
-        <ClientOnlySuspense>
-          {() => <DataTable fileUrl={fileUrl}></DataTable>}
-        </ClientOnlySuspense>
-      );
+      return <DataTable fileUrl={fileUrl}></DataTable>;
     }
     case "data-table-raw": {
       const { cells, ...tableProps } = props;
-      return (
-        <ClientOnlySuspense>
-          {() => <DataTableRaw cells={cells}></DataTableRaw>}
-        </ClientOnlySuspense>
-      );
+      return <DataTableRaw cells={cells}></DataTableRaw>;
     }
     case "nav-tabs":
       return (
@@ -303,20 +289,16 @@ function RenderedTreeNode({
           );
         case "file":
           return (
-            <ClientOnlySuspense>
-              {() => (
-                <GooeyFileInput
-                  name={props.name}
-                  label={props.label}
-                  accept={props.accept}
-                  multiple={props.multiple}
-                  onChange={onChange}
-                  defaultValue={props.defaultValue}
-                  uploadMeta={props.uploadMeta}
-                  state={state}
-                />
-              )}
-            </ClientOnlySuspense>
+            <GooeyFileInput
+              name={props.name}
+              label={props.label}
+              accept={props.accept}
+              multiple={props.multiple}
+              onChange={onChange}
+              defaultValue={props.defaultValue}
+              uploadMeta={props.uploadMeta}
+              state={state}
+            />
           );
         case "checkbox":
           return (
@@ -430,7 +412,7 @@ function RenderedTreeNode({
     }
     case "plotly-chart": {
       const { chart, ...args } = props;
-      return <PlotlyPlot chart={chart} />;
+      return <Plot {...chart} style={{ width: "100%" }} />;
     }
     default:
       return (
@@ -441,14 +423,6 @@ function RenderedTreeNode({
         </div>
       );
   }
-}
-
-function PlotlyPlot({ chart }: { chart: Record<string, any> }) {
-  return (
-    <ClientOnlySuspense>
-      {() => <Plot {...chart} style={{ width: "100%" }} />}
-    </ClientOnlySuspense>
-  );
 }
 
 function ExecJs({ src, args }: { args: any; src: any }) {

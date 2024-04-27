@@ -51,8 +51,8 @@ export const links: LinksFunction = () => {
       crossOrigin: "anonymous",
       referrerPolicy: "no-referrer",
     },
-    ...require("~/dataTable").links(),
-    ...require("~/gooeyFileInput").links(),
+    ...require("~/dataTable.styles").links(),
+    ...require("~/gooeyFileInput.styles").links(),
     { rel: "stylesheet", href: customStyles },
     { rel: "stylesheet", href: appStyles },
   ];

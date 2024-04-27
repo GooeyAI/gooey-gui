@@ -1,4 +1,6 @@
-import { captureRemixErrorBoundaryError } from "@sentry/remix";
+import { cssBundleHref } from "@remix-run/css-bundle";
+import type { LinksFunction } from "@remix-run/node";
+import { json } from "@remix-run/node"; // Depends on the runtime you choose
 import {
   isRouteErrorResponse,
   Links,
@@ -10,14 +12,11 @@ import {
   useLoaderData,
   useRouteError,
 } from "@remix-run/react";
-import type { LinksFunction } from "@remix-run/node";
-import { json } from "@remix-run/node"; // Depends on the runtime you choose
-import { cssBundleHref } from "@remix-run/css-bundle";
-import React from "react";
+import { captureRemixErrorBoundaryError } from "@sentry/remix";
 import { globalProgressStyles, useGlobalProgress } from "~/global-progres-bar";
 import {
-  HydrationUtilsPreRender,
   HydrationUtilsPostRender,
+  HydrationUtilsPreRender,
 } from "~/useHydrated";
 
 export const links: LinksFunction = () => [
