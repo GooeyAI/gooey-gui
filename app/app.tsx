@@ -1,7 +1,9 @@
-import type { FormEvent } from "react";
-import React, { useEffect, useRef } from "react";
 import { withSentry } from "@sentry/remix";
+import type { FormEvent } from "react";
+import { useEffect, useRef } from "react";
 
+import type { ActionArgs, LinksFunction, LoaderArgs } from "@remix-run/node";
+import { redirect } from "@remix-run/node";
 import type {
   ShouldRevalidateFunction,
   V2_MetaFunction,
@@ -14,22 +16,15 @@ import {
   useSearchParams,
   useSubmit,
 } from "@remix-run/react";
-import {
-  applyTransform,
-  getTransforms,
-  links as baseLinks,
-  RenderedChildren,
-} from "~/base";
-import type { ActionArgs, LinksFunction, LoaderArgs } from "@remix-run/node";
-import { redirect } from "@remix-run/node";
-import process from "process";
 import path from "path";
-import { handleRedirectResponse } from "~/handleRedirect";
-import { useEventSourceNullOk } from "~/event-source";
+import process from "process";
 import { useDebouncedCallback } from "use-debounce";
+import { RenderedChildren, applyTransform, getTransforms } from "~/base";
+import { useEventSourceNullOk } from "~/event-source";
+import { handleRedirectResponse } from "~/handleRedirect";
 
-import customStyles from "~/styles/custom.css";
 import appStyles from "~/styles/app.css";
+import customStyles from "~/styles/custom.css";
 
 export const meta: V2_MetaFunction = ({ data }) => {
   return data.meta ?? [];
@@ -56,7 +51,8 @@ export const links: LinksFunction = () => {
       crossOrigin: "anonymous",
       referrerPolicy: "no-referrer",
     },
-    ...baseLinks(),
+    ...require("~/dataTable").links(),
+    ...require("~/gooeyFileInput").links(),
     { rel: "stylesheet", href: customStyles },
     { rel: "stylesheet", href: appStyles },
   ];
@@ -69,7 +65,7 @@ export async function loader({ params, request }: LoaderArgs) {
 export async function action({ params, request }: ActionArgs) {
   // parse form data
   const { __gooey_gui_request_body, ...inputs } = Object.fromEntries(
-    await request.formData(),
+    await request.formData()
   );
   // parse request body
   const {
@@ -184,7 +180,7 @@ function useRealtimeChannels({ channels }: { channels: string[] }) {
   let url;
   if (channels.length) {
     const params = new URLSearchParams(
-      channels.map((name) => ["channels", name]),
+      channels.map((name) => ["channels", name])
     );
     url = `/__/realtime/?${params}`;
   }
@@ -217,7 +213,10 @@ function App() {
     const form = event.currentTarget;
 
     // ignore elements that have `data-submit-disabled` set
-    if (target instanceof HTMLElement && target.hasAttribute("data-submit-disabled")) {
+    if (
+      target instanceof HTMLElement &&
+      target.hasAttribute("data-submit-disabled")
+    ) {
       return;
     }
 
@@ -243,7 +242,7 @@ function App() {
           form.removeAttribute("debounceInProgress");
           submit(form);
         },
-        { once: true },
+        { once: true }
       );
     } else {
       submit(form);

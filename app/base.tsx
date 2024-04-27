@@ -1,30 +1,37 @@
-import type { LinksFunction } from "@remix-run/node";
 import type { ReactNode } from "react";
 import React, { useEffect, useRef } from "react";
 import type { OptionProps, SingleValueProps } from "react-select";
 import Select, { components } from "react-select";
-import { GooeyFileInput, links as fileInputLinks } from "~/gooeyFileInput";
 import { RenderedMarkdown } from "~/renderedMarkdown";
 
-import { useJsonFormInput } from "~/jsonFormInput";
-import { JsonViewer } from "@textea/json-viewer";
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from "@reach/tabs";
 import { Link } from "@remix-run/react";
-import { RenderedHTML } from "~/renderedHTML";
-import CountdownTimer from "./components/countdown";
-import { DataTable, DataTableRaw, links as dataTableLinks } from "~/dataTable";
-import { ClientOnly } from "remix-utils";
+import { JsonViewer } from "@textea/json-viewer";
+import { DownloadButton } from "~/downloadButton";
 import {
   GooeyCheckbox,
   GooeyInput,
   GooeyRadio,
   GooeyTextarea,
 } from "~/gooeyInput";
-import { DownloadButton } from "~/downloadButton";
+import { useJsonFormInput } from "~/jsonFormInput";
+import { RenderedHTML } from "~/renderedHTML";
+import CountdownTimer from "./components/countdown";
+import { ClientOnlySuspense } from "./lazyImports";
 
-export const links: LinksFunction = () => {
-  return [...dataTableLinks(), ...fileInputLinks()];
-};
+const DataTable = React.lazy(() =>
+  import("~/dataTable").then((mod) => ({ default: mod.DataTable }))
+);
+const DataTableRaw = React.lazy(() =>
+  import("~/dataTable").then((mod) => ({ default: mod.DataTableRaw }))
+);
+const GooeyFileInput = React.lazy(() =>
+  import("~/gooeyFileInput").then((mod) => ({ default: mod.GooeyFileInput }))
+);
+const Plot = React.lazy(() =>
+  // @ts-ignore
+  import("react-plotly.js").then((mod) => mod.default)
+);
 
 type TreeNode = {
   name: string;
@@ -110,11 +117,19 @@ function RenderedTreeNode({
       );
     case "data-table": {
       const { fileUrl, ...tableProps } = props;
-      return <DataTable fileUrl={fileUrl}></DataTable>;
+      return (
+        <ClientOnlySuspense>
+          {() => <DataTable fileUrl={fileUrl}></DataTable>}
+        </ClientOnlySuspense>
+      );
     }
     case "data-table-raw": {
       const { cells, ...tableProps } = props;
-      return <DataTableRaw cells={cells}></DataTableRaw>;
+      return (
+        <ClientOnlySuspense>
+          {() => <DataTableRaw cells={cells}></DataTableRaw>}
+        </ClientOnlySuspense>
+      );
     }
     case "nav-tabs":
       return (
@@ -288,16 +303,20 @@ function RenderedTreeNode({
           );
         case "file":
           return (
-            <GooeyFileInput
-              name={props.name}
-              label={props.label}
-              accept={props.accept}
-              multiple={props.multiple}
-              onChange={onChange}
-              defaultValue={props.defaultValue}
-              uploadMeta={props.uploadMeta}
-              state={state}
-            />
+            <ClientOnlySuspense>
+              {() => (
+                <GooeyFileInput
+                  name={props.name}
+                  label={props.label}
+                  accept={props.accept}
+                  multiple={props.multiple}
+                  onChange={onChange}
+                  defaultValue={props.defaultValue}
+                  uploadMeta={props.uploadMeta}
+                  state={state}
+                />
+              )}
+            </ClientOnlySuspense>
           );
         case "checkbox":
           return (
@@ -411,14 +430,7 @@ function RenderedTreeNode({
     }
     case "plotly-chart": {
       const { chart, ...args } = props;
-      return (
-        <ClientOnly fallback={<p>Loading...</p>}>
-          {() => {
-            const Plot = require("react-plotly.js").default;
-            return <Plot {...chart} style={{ width: "100%" }} />;
-          }}
-        </ClientOnly>
-      );
+      return <PlotlyPlot chart={chart} />;
     }
     default:
       return (
@@ -429,6 +441,14 @@ function RenderedTreeNode({
         </div>
       );
   }
+}
+
+function PlotlyPlot({ chart }: { chart: Record<string, any> }) {
+  return (
+    <ClientOnlySuspense>
+      {() => <Plot {...chart} style={{ width: "100%" }} />}
+    </ClientOnlySuspense>
+  );
 }
 
 function ExecJs({ src, args }: { args: any; src: any }) {
@@ -504,7 +524,7 @@ function GuiSelect({
   };
 
   let selectValue = args.options.filter((opt: any) =>
-    args.isMulti ? value.includes(opt.value) : opt.value === value,
+    args.isMulti ? value.includes(opt.value) : opt.value === value
   );
   // if selectedValue is not in options, then set it to the first option
   useEffect(() => {

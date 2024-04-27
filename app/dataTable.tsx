@@ -1,14 +1,14 @@
-import React, { useCallback, useEffect, useState } from "react";
-import XLSX from "xlsx";
 import type { GridCell, Item } from "@glideapps/glide-data-grid";
 import {
   DataEditor,
   GridCellKind,
   GridColumnIcon,
 } from "@glideapps/glide-data-grid";
-import { ClientOnly } from "remix-utils";
-import type { LinksFunction } from "@remix-run/node";
 import glideappsStyles from "@glideapps/glide-data-grid/dist/index.css";
+import type { LinksFunction } from "@remix-run/node";
+import { useCallback, useEffect, useState } from "react";
+import XLSX from "xlsx";
+import LoadingFallback from "./loadingfallback";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: glideappsStyles }];
@@ -31,11 +31,11 @@ export function DataTableRaw({ cells }: { cells: Array<any> }) {
           const width = Math.min(
             Math.max(
               ...cells.map(
-                (row: any) => `${row[idx].data || row[idx] || ""}`.length * 8,
+                (row: any) => `${row[idx].data || row[idx] || ""}`.length * 8
               ),
-              colName.length * 20,
+              colName.length * 20
             ),
-            maxColWidth,
+            maxColWidth
           );
           return {
             title: colName,
@@ -43,8 +43,8 @@ export function DataTableRaw({ cells }: { cells: Array<any> }) {
             icon: GridColumnIcon.HeaderString,
             width: width,
           };
-        }),
-      ),
+        })
+      )
     );
   }, [cells]);
 
@@ -70,7 +70,7 @@ export function DataTableRaw({ cells }: { cells: Array<any> }) {
         ...cell,
       };
     },
-    [data],
+    [data]
   );
 
   return DataTableComponent(data, getContent, columns, setColumns, setData);
@@ -104,9 +104,9 @@ export function DataTable({ fileUrl }: { fileUrl: string }) {
             const width = Math.min(
               Math.max(
                 ...rows.map((row) => `${row[colName] || ""}`.length * 8),
-                colName.length * 20,
+                colName.length * 20
               ),
-              maxColWidth,
+              maxColWidth
             );
             return {
               title: colName,
@@ -114,8 +114,8 @@ export function DataTable({ fileUrl }: { fileUrl: string }) {
               icon: GridColumnIcon.HeaderString,
               width: width,
             };
-          }),
-        ),
+          })
+        )
       );
       setData(Array.from(rows));
     })();
@@ -140,7 +140,7 @@ export function DataTable({ fileUrl }: { fileUrl: string }) {
         data: displayData,
       };
     },
-    [columns, data],
+    [columns, data]
   );
 
   return DataTableComponent(data, getContent, columns, setColumns, setData);
@@ -151,47 +151,39 @@ function DataTableComponent(
   getContent: (cell: Item) => GridCell,
   columns: Array<any>,
   setColumns: (
-    value: ((prevState: Array<any>) => Array<any>) | Array<any>,
+    value: ((prevState: Array<any>) => Array<any>) | Array<any>
   ) => void,
-  setData: (
-    value: ((prevState: Array<any>) => Array<any>) | Array<any>,
-  ) => void,
+  setData: (value: ((prevState: Array<any>) => Array<any>) | Array<any>) => void
 ) {
-  return (
-    <ClientOnly fallback={<p>Loading...</p>}>
-      {() => {
-        return data.length ? (
-          <div style={{ border: "1px solid gray" }}>
-            <DataEditor
-              getCellContent={getContent}
-              keybindings={{ search: true }}
-              getCellsForSelection={true}
-              width={"100%"}
-              columns={columns}
-              smoothScrollX={true}
-              smoothScrollY={true}
-              overscrollX={200}
-              overscrollY={200}
-              rowMarkers={"both"}
-              verticalBorder={true}
-              rows={data.length}
-              height={"300px"}
-              onColumnResize={(col: any, width) => {
-                col.width = width;
-                setColumns([...columns]);
-              }}
-              onCellEdited={(cell, newValue) => {
-                const [col, row] = cell;
-                const dataRow = data[row];
-                dataRow[columns[col].title] = newValue.data;
-                setData([...data]);
-              }}
-            />
-          </div>
-        ) : (
-          <p>Loading...</p>
-        );
-      }}
-    </ClientOnly>
+  return data.length ? (
+    <div style={{ border: "1px solid gray" }}>
+      <DataEditor
+        getCellContent={getContent}
+        keybindings={{ search: true }}
+        getCellsForSelection={true}
+        width={"100%"}
+        columns={columns}
+        smoothScrollX={true}
+        smoothScrollY={true}
+        overscrollX={200}
+        overscrollY={200}
+        rowMarkers={"both"}
+        verticalBorder={true}
+        rows={data.length}
+        height={"300px"}
+        onColumnResize={(col: any, width) => {
+          col.width = width;
+          setColumns([...columns]);
+        }}
+        onCellEdited={(cell, newValue) => {
+          const [col, row] = cell;
+          const dataRow = data[row];
+          dataRow[columns[col].title] = newValue.data;
+          setData([...data]);
+        }}
+      />
+    </div>
+  ) : (
+    <LoadingFallback />
   );
 }

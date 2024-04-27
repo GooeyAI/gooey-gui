@@ -158,12 +158,12 @@ function LineClamp({
         ...(isExpanded
           ? {}
           : {
-              display: "-webkit-box",
-              WebkitLineClamp: lines,
-              WebkitBoxOrient: "vertical",
-              overflow: "hidden",
-              position: "relative",
-            }),
+            display: "-webkit-box",
+            WebkitLineClamp: lines,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
+            position: "relative",
+          }),
       }}
     >
       {children}
@@ -264,7 +264,7 @@ function RenderedPrismCode({
   domNode.children[0].attribs.ref = ref;
   return (
     <span className="gui-html-container">
-      <pre {...attributesToProps(domNode.attribs)}>
+      <pre key={body} {...attributesToProps(domNode.attribs)}>
         {domToReact(domNode.children, options)}
       </pre>
     </span>
