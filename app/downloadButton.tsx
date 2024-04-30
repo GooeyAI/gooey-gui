@@ -1,8 +1,6 @@
 import React from "react";
 import { RenderedMarkdown } from "~/renderedMarkdown";
-import { lazyImport } from "./lazyImports";
-
-const { urlToFilename } = lazyImport(() => import("~/gooeyFileInput"));
+import { urlToFilename } from "./urlUtils";
 
 export function DownloadButton({
   label,

@@ -73,8 +73,32 @@ export default function App() {
   );
 }
 
+const reloadOnErrors = [
+  "TypeError: Failed to fetch",
+  "TypeError: Load failed",
+  "A network error",
+];
+
+const ignoreErrors = ["AbortError"];
+
 export function ErrorBoundary() {
   const error = useRouteError();
+
+  if (
+    ignoreErrors.some((msg) =>
+      `${error}`.toLowerCase().includes(msg.toLowerCase())
+    )
+  ) {
+    return <></>;
+  }
+  if (
+    reloadOnErrors.some((msg) =>
+      `${error}`.toLowerCase().includes(msg.toLowerCase())
+    )
+  ) {
+    window.location.reload();
+  }
+
   captureRemixErrorBoundaryError(error);
 
   // when true, this is what used to go to `CatchBoundary`
