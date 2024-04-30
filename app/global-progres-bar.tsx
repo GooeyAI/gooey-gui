@@ -8,15 +8,18 @@ export const globalProgressStyles: LinksFunction = () => {
   return [{ rel: "stylesheet", href: nProgressStyles }];
 };
 
+const parent = "body";
+
 export const useGlobalProgress = () => {
   const navigation = useNavigation();
   const fetchers = useFetchers();
 
   useEffect(() => {
-    NProgress.configure({ trickleSpeed: 100 });
+    NProgress.configure({ parent, trickleSpeed: 100 });
   }, []);
 
   useEffect(() => {
+    if (!document.querySelector(parent)) return;
     switch (navigation.state) {
       case "idle":
         NProgress.done();
