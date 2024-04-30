@@ -276,11 +276,13 @@ async function loadPreview({
       doc.querySelector('meta[property="og:image"]')?.getAttribute("content") ||
       preview;
 
+    if (!uppy.getFile(fileId)) return;
     uppy.setFileMeta(fileId, {
       name: filename,
     });
   }
 
+  if (!uppy.getFile(fileId)) return;
   uppy.setFileState(fileId, {
     size: contentLength ? parseInt(contentLength) : undefined,
     preview: preview,
