@@ -4,7 +4,7 @@ import type { OptionProps, SingleValueProps } from "react-select";
 import { RenderedMarkdown } from "~/renderedMarkdown";
 
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from "@reach/tabs";
-import { Link } from "@remix-run/react";
+import { Link, useSubmit } from "@remix-run/react";
 import { JsonViewer } from "@textea/json-viewer";
 import Select, { components } from "react-select";
 import { DownloadButton } from "~/downloadButton";
@@ -426,11 +426,19 @@ function RenderedTreeNode({
 }
 
 function ExecJs({ src, args }: { args: any; src: any }) {
+  const submit = useSubmit();
+
+  args.gooeyRefresh = () => {
+    const elem = document.getElementById("gooey-form");
+    if (elem) submit(elem as HTMLFormElement, ...arguments);
+  };
+
   useEffect(() => {
     // eslint-disable-next-line no-new-func
     const fn = new Function(...Object.keys(args), src);
     fn(...Object.values(args));
   }, [src, args]);
+
   return null;
 }
 
