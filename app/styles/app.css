@@ -287,6 +287,10 @@ div[id^="react-select-"][id$="-listbox"] {
   margin: 0 1rem;
 }
 
-.gui-input-number input {
-  padding: 0.5rem;
+.gui-input-smaller input {
+  width: 5rem;
+}
+
+.gui-input-smaller label {
+  display: none;
 }
