@@ -58,11 +58,11 @@ export const links: LinksFunction = () => {
   ];
 };
 
-export async function loader({ params, request }: LoaderArgs) {
-  return await callServer({ body: {}, params, request });
+export async function loader({ request }: LoaderArgs) {
+  return await callServer({ body: {}, request });
 }
 
-export async function action({ params, request }: ActionArgs) {
+export async function action({ request }: ActionArgs) {
   // parse form data
   const { __gooey_gui_request_body, ...inputs } = Object.fromEntries(
     await request.formData()
@@ -84,21 +84,19 @@ export async function action({ params, request }: ActionArgs) {
   }
   // update state with new form data
   body.state = { ...state, ...inputs };
-  return callServer({ body, params, request });
+  return callServer({ body, request });
 }
 
 async function callServer({
   body,
-  params,
   request,
 }: {
   body: Record<string, any>;
-  params: Record<string, any>;
   request: Request;
 }) {
   const requestUrl = new URL(request.url);
   const serverUrl = new URL(process.env["SERVER_HOST"]!);
-  serverUrl.pathname = path.join(serverUrl.pathname, params["*"] ?? "");
+  serverUrl.pathname = path.join(serverUrl.pathname, requestUrl.pathname ?? "");
   serverUrl.search = requestUrl.search;
 
   request.headers.set("Content-Type", "application/json");
