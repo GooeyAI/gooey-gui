@@ -754,3 +754,31 @@ a.text-primary:hover {
 .cm-lineNumbers .cm-gutterElement {
   min-width: 36px !important;
 }
+.gui_tooltip {
+  position: relative; 
+  font-size: 16px;
+}
+
+.gui_tooltip i {
+  vertical-align: bottom;
+  margin-left: 0.5ch;
+  margin-top: 0.9ch;
+}
+
+.gui-input label .gui_tooltip p, .gui_tooltip p {
+  margin: 0; padding: 0;
+  color: black;
+}
+
+.gui_tooltip span {
+  margin: 0; padding: 0;
+  display: inline-block;
+}
+
+.gui_tooltip dialog {
+  width: max-content; max-width: 50vw; z-index: 10000; border-radius: 16px; border: 2px solid whitesmoke; font-weight: lighter; line-height: normal; font-family: basiercircle, sans-serif; box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+}
+
+.gui_tooltip--left dialog {
+  top: 0; right: 0; transform: translateX(-100%);
+}
