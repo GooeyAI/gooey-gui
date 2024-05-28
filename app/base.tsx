@@ -13,7 +13,6 @@ import {
   GooeyInput,
   GooeyRadio,
   GooeyTextarea,
-  GooeyTooltip,
 } from "~/gooeyInput";
 import { useJsonFormInput } from "~/jsonFormInput";
 import { RenderedHTML } from "~/renderedHTML";
@@ -270,12 +269,8 @@ function RenderedTreeNode({
       return <RenderedHTML body={body} {...args} />;
     }
     case "markdown": {
-      const { body, lineClamp, ...args } = props;
-      return <RenderedMarkdown body={body} lineClamp={lineClamp} {...args} />;
-    }
-    case "tooltip": {
-      const { text, ...args } = props;
-      return <GooeyTooltip text={text} {...args} />;
+      const { body, lineClamp, tooltip, tooltip_direction, ...args } = props;
+      return <RenderedMarkdown body={body} lineClamp={lineClamp} tooltip={tooltip} tooltip_direction={tooltip_direction} {...args} />;
     }
     case "textarea": {
       return <GooeyTextarea props={props} state={state} />;

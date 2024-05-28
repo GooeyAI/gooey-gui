@@ -1,16 +1,33 @@
 import { marked } from "marked";
 import { RenderedHTML } from "~/renderedHTML";
 
+export function GooeyTooltip(props: {text: string, direction?: "left", iconStyle?: Record<string, string>}) {
+  return (
+    <span className={"gui_tooltip" + (props.direction ? " gui_tooltip--" + props.direction : "")}>
+        <i role="button" onClick={(event) => {(event.currentTarget.nextElementSibling as HTMLDialogElement).show(); event.preventDefault(); }} className="fa-regular fa-circle-info" style={props.iconStyle}></i>
+        <dialog onBlur={(event) => setTimeout(() => event.target.closest("dialog")!.close(), 200) }>
+            <input style={{width: "0", height: "0", minWidth: "0", border: "0", outline: "0", padding: "0", margin: "0"}}></input><RenderedMarkdown body={props.text} className=""/>
+        </dialog>
+    </span>
+  );
+}
+
 export function RenderedMarkdown({
   body,
   lineClamp,
   className,
+  tooltip,
+  tooltip_direction,
+  tooltip_iconStyle,
   ...attrs
 }: // allowUnsafeHTML,
   {
     body: string;
     lineClamp?: number;
     className?: string;
+    tooltip?: string;
+    tooltip_direction?: "left";
+    tooltip_iconStyle?: Record<string, string>;
     [attr: string]: any;
     // allowUnsafeHTML?: boolean;
   }) {
@@ -24,11 +41,13 @@ export function RenderedMarkdown({
 
   return (
     <RenderedHTML
-      key={body}
-      body={html}
-      lineClamp={lineClamp}
-      className={className ?? "gui-html-container gui-md-container"}
-      {...attrs}
-    />
+        key={body}
+        body={html}
+        lineClamp={lineClamp}
+        className={className ?? "gui-html-container gui-md-container"}
+        {...attrs}
+      >
+      {tooltip && <GooeyTooltip text={tooltip} direction={tooltip_direction} iconStyle={tooltip_iconStyle}/>}
+    </RenderedHTML>
   );
 }

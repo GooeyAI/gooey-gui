@@ -755,8 +755,12 @@ a.text-primary:hover {
   min-width: 36px !important;
 }
 .gui_tooltip {
-  position: relative; 
+  position: relative;
   font-size: 16px;
+}
+
+.gui-md-container:has(> .gui_tooltip) {
+  display: flex;
 }
 
 .gui_tooltip i {

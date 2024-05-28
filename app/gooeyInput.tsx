@@ -1,17 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { RenderedMarkdown } from "~/renderedMarkdown";
 
-export function GooeyTooltip(props: {text: string, direction?: "left", iconStyle?: Record<string, string>}) {
-  return (
-    <span className={"gui_tooltip" + (props.direction ? " gui_tooltip--" + props.direction : "")}>
-        <i role="button" onClick={(event) => {(event.currentTarget.nextElementSibling as HTMLDialogElement).show(); event.preventDefault(); }} className="fa-regular fa-circle-info" style={props.iconStyle}></i>
-        <dialog onBlur={(event) => setTimeout(() => event.target.closest("dialog")!.close(), 200) }>
-            <input style={{width: "0", height: "0", minWidth: "0", border: "0", outline: "0", padding: "0", margin: "0"}}></input><RenderedMarkdown body={props.text} className=""/>
-        </dialog>
-    </span>
-  );
-}
-
 export function GooeyTextarea({
   props,
   state,
@@ -28,9 +17,8 @@ export function GooeyTextarea({
   return (
     <div className="gui-input gui-input-textarea">
       {label && (
-        <label style={{display: "flex"}}>
-          <RenderedMarkdown body={label} />
-          {tooltip && <GooeyTooltip text={tooltip} direction={tooltip_direction} />}
+        <label>
+          <RenderedMarkdown body={label} tooltip={tooltip} tooltip_direction={tooltip_direction} />
         </label>
       )}
       <div>
@@ -65,9 +53,8 @@ export function GooeyInput({
   });
   return (
     <div className={className}>
-      <label htmlFor={id} style={{display: "flex"}}>
-        <RenderedMarkdown body={label} />
-        {tooltip && <GooeyTooltip text={tooltip} direction={tooltip_direction} />}
+      <label htmlFor={id}>
+        <RenderedMarkdown body={label} tooltip={tooltip} tooltip_direction={tooltip_direction} />
       </label>
       <input
         ref={inputRef}
@@ -146,9 +133,8 @@ export function GooeyCheckbox({
         {...args}
       />
       <label htmlFor={id}>
-        <span style={{display: "flex"}}>
-          <RenderedMarkdown body={label} />
-          {tooltip && <GooeyTooltip text={tooltip} direction={tooltip_direction} iconStyle={{marginTop: "0", verticalAlign: "baseline"}}/>}
+        <span>
+          <RenderedMarkdown body={label} tooltip={tooltip} tooltip_direction={tooltip_direction} tooltip_iconStyle={{marginTop: "0", verticalAlign: "baseline"}} />
         </span>
       </label>
     </div>
@@ -183,9 +169,8 @@ export function GooeyRadio({
         {...args}
       />
       <label htmlFor={id}>
-        <span style={{display: "flex"}}>
-          <RenderedMarkdown body={label} />
-          {tooltip && <GooeyTooltip text={tooltip} direction={tooltip_direction} iconStyle={{marginTop: "0", verticalAlign: "baseline"}}/>}
+        <span>
+          <RenderedMarkdown body={label} tooltip={tooltip} tooltip_direction={tooltip_direction} tooltip_iconStyle={{marginTop: "0", verticalAlign: "baseline"}} />
         </span>
       </label>
     </div>
