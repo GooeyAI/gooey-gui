@@ -4,11 +4,13 @@ import { RenderedHTML } from "~/renderedHTML";
 export function RenderedMarkdown({
   body,
   lineClamp,
+  className,
   ...attrs
 }: // allowUnsafeHTML,
   {
     body: string;
     lineClamp?: number;
+    className?: string;
     [attr: string]: any;
     // allowUnsafeHTML?: boolean;
   }) {
@@ -25,7 +27,7 @@ export function RenderedMarkdown({
       key={body}
       body={html}
       lineClamp={lineClamp}
-      className="gui-html-container gui-md-container"
+      className={className ?? "gui-html-container gui-md-container"}
       {...attrs}
     />
   );
