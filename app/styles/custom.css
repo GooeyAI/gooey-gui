@@ -698,8 +698,12 @@ a.text-primary:hover {
 }
 
 .gui_tooltip {
-  position: relative; 
+  position: relative;
   font-size: 16px;
+}
+
+.gui-md-container:has(> .gui_tooltip) {
+  display: flex;
 }
 
 .gui_tooltip i {
