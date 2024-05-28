@@ -54,14 +54,28 @@
 }
 
 .btn.btn-theme.btn-link {
+  color: inherit;
   background: none;
   border: 0;
-  color: black;
   padding: 0;
+  text-decoration: underline;
+  text-decoration-color: rgba(0, 0, 0, 0.45);
+  text-decoration-thickness: 0.6px;
+  text-underline-offset: 0.15em;
 }
 
 .btn.btn-theme.btn-link:hover {
-  background-color: white;
+  border: 0;
+  padding: 0;
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: black;
+  text-decoration-thickness: 2px;
+  background-color: transparent;
+}
+
+.btn.btn-theme.btn-link:active {
+  outline: none;
 }
 
 .gooey-spinner {
