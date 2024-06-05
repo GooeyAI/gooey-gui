@@ -22,7 +22,10 @@ const proxyUrls = [
   "/sitemap.xml/",
   "/2/*",
   "/__/*",
+  "/chat/*",
 ];
+
+const appRoutes = ["*", "/chat"];
 
 /** @type {import('@remix-run/dev').AppConfig} */
 module.exports = {
@@ -63,7 +66,9 @@ module.exports = {
         route(path, "gitbook.tsx", { id: path });
       }
       route("/__/realtime/*", "realtime.tsx");
-      route("*", "app.tsx");
+      for (const path of appRoutes) {
+        route(path, "app.tsx", { id: path });
+      }
     });
   },
 };

@@ -53,9 +53,11 @@ export function GooeyInput({
   });
   return (
     <div className={className}>
-      <label htmlFor={id}>
-        <RenderedMarkdown body={label} />
-      </label>
+      {label && (
+        <label htmlFor={id}>
+          <RenderedMarkdown body={label} />
+        </label>
+      )}
       <input
         ref={inputRef}
         id={id}
