@@ -54,10 +54,15 @@ function RenderLocalDt({
       "en-IN",
       renderLocalDtDateOptions,
     );
-    const localTimeString = date
-      .toLocaleTimeString("en-IN", renderLocalDtTimeOptions)
-      .toUpperCase();
-    setBody(localeDateString + yearToShow + ", " + localTimeString);
+    let result = localeDateString + yearToShow;
+    if (renderLocalDtTimeOptions) {
+      console.log(renderLocalDtTimeOptions);
+      const localTimeString = date
+        .toLocaleTimeString("en-IN", renderLocalDtTimeOptions)
+        .toUpperCase();
+      result += ", " + localTimeString;
+    }
+    setBody(result);
   }, [body, renderLocalDt, renderLocalDtDateOptions, renderLocalDtTimeOptions]);
 
   const parsedElements = parse(body2, reactParserOptions);

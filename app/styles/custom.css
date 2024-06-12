@@ -4,6 +4,10 @@
 
 /* avenir-lt-w01_85-heavy1475544,avenir-lt-w05_85-heavy,sans-serif */
 
+.no-margin * {
+  margin: unset;
+}
+
 .streamlit-like-btn,
 .streamlit-like-btn:visited,
 .streamlit-like-btn:hover,
