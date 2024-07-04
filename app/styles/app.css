@@ -37,7 +37,8 @@ html {
   white-space: pre-wrap;
 }
 
-input[type="text"],
+input[type="text"], 
+input[type="password"],
 textarea {
   resize: vertical;
   width: 100%;
@@ -110,7 +111,8 @@ div.code-toolbar {
   color: inherit;
 }
 
-.gui-input-text input {
+.gui-input-text input, 
+.gui-input-password input {
   padding: 0.8rem;
 }
 
