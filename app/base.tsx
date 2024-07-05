@@ -23,7 +23,7 @@ const { DataTable, DataTableRaw } = lazyImport(() => import("~/dataTable"));
 const { GooeyFileInput } = lazyImport(() => import("~/gooeyFileInput"));
 
 const Plot = lazyImport(
-  () => import("react-plotly.js").then((mod) => mod.default)
+  () => import("react-plotly.js").then((mod) => mod.default),
   // @ts-ignore
 ).default;
 
@@ -209,9 +209,8 @@ function RenderedTreeNode({
         </Tabs>
       );
     case "expander": {
-      const { label, open, ...args } = props;
       return (
-        <GuiExpander open={open} label={label} {...args}>
+        <GuiExpander onChange={onChange} {...props}>
           <RenderedChildren
             children={children}
             onChange={onChange}
@@ -506,7 +505,7 @@ function GuiSelect({
   };
 
   let selectValue = args.options.filter((opt: any) =>
-    args.isMulti ? value.includes(opt.value) : opt.value === value
+    args.isMulti ? value.includes(opt.value) : opt.value === value,
   );
   // if selectedValue is not in options, then set it to the first option
   useEffect(() => {
@@ -607,20 +606,22 @@ function GooeySlider({
 }
 
 export function GuiExpander({
-  open,
-  label,
   children,
+  onChange,
   ...props
 }: {
-  open?: boolean;
-  label: string;
+  onChange: () => void;
   children: ReactNode;
   [key: string]: any;
 }) {
+  const { open, name, label } = props;
+
   const [JsonFormInput, isOpen, setIsOpen] = useJsonFormInput({
     defaultValue: open,
-    name: `gui-expander-${label}`,
+    name,
+    onChange,
   });
+
   return (
     <div className="gui-expander accordion">
       <JsonFormInput />
@@ -629,7 +630,10 @@ export function GuiExpander({
         className={`gui-expander-header accordion-header accordion-button ${
           isOpen ? "" : "collapsed"
         }`}
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => {
+          setIsOpen(!isOpen);
+          onChange();
+        }}
         {...props}
       >
         <RenderedMarkdown body={label} />
