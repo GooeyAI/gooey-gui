@@ -12,6 +12,7 @@ import { Link } from "@remix-run/react";
 export function RenderedHTML({
   body,
   lineClamp,
+  children,
   ...attrs
 }: {
   body: string;
@@ -27,6 +28,7 @@ export function RenderedHTML({
     <LineClamp lines={lineClamp} key={body}>
       <span className="gui-html-container" {...attrs}>
         {parsedElements}
+        {children}
       </span>
     </LineClamp>
   );
