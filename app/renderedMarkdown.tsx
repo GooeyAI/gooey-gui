@@ -1,12 +1,13 @@
 import { marked } from "marked";
 import { RenderedHTML } from "~/renderedHTML";
-import { TooltipPlacement } from "./components/GooeyTooltip";
+import type { TooltipPlacement } from "./components/GooeyTooltip";
 
 export function RenderedMarkdown({
   body,
   lineClamp,
   help,
   tooltipPlacement,
+  lineClampExpand,
   ...attrs
 }: // allowUnsafeHTML,
 {
@@ -30,6 +31,7 @@ export function RenderedMarkdown({
       key={body}
       body={html}
       lineClamp={lineClamp}
+      lineClampExpand={lineClampExpand}
       className="gui-html-container gui-md-container"
       help={help}
       tooltipPlacement={tooltipPlacement}
