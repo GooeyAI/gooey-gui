@@ -18,6 +18,7 @@ import { useJsonFormInput } from "~/jsonFormInput";
 import { RenderedHTML } from "~/renderedHTML";
 import CountdownTimer from "./components/countdown";
 import { lazyImport } from "./lazyImports";
+import CodeEditor from "./components/CodeEditor";
 
 const { DataTable, DataTableRaw } = lazyImport(() => import("~/dataTable"));
 const { GooeyFileInput } = lazyImport(() => import("~/gooeyFileInput"));
@@ -272,6 +273,11 @@ function RenderedTreeNode({
     }
     case "textarea": {
       return <GooeyTextarea props={props} state={state} />;
+    }
+    case "code-editor": {
+      return (
+        <CodeEditor props={props} state={state} />
+      )
     }
     case "input": {
       const className = `gui-input gui-input-${props.type}`;
