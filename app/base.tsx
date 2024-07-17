@@ -276,7 +276,7 @@ function RenderedTreeNode({
     }
     case "code-editor": {
       return (
-        <CodeEditor props={props} state={state} />
+        <CodeEditor props={props} state={state} onChange={onChange} />
       )
     }
     case "input": {
