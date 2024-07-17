@@ -206,11 +206,11 @@ function App() {
     submit(form);
   }, 500);
 
-  const handleChange = (event: FormEvent<HTMLFormElement>) => {
-    const target = event.target;
-    const form = event.currentTarget;
-    console.log(target, '>>')
-    
+  const handleChange = (event?: FormEvent<HTMLFormElement>) => {
+    const target = event?.target;
+    const form = event?.currentTarget || formRef?.current;
+    if(!form) return;
+
     // ignore elements that have `data-submit-disabled` set
     if (
       target instanceof HTMLElement &&
@@ -262,9 +262,7 @@ function App() {
       >
         <RenderedChildren
           children={children}
-          onChange={() => {
-            if (formRef.current) submit(formRef.current);
-          }}
+          onChange={handleChange}
           state={state}
         />
         <input
