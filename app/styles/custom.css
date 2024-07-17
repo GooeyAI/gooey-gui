@@ -714,3 +714,8 @@ a.text-primary:hover {
 .footer p {
   font-size: 14px;
 }
+
+#gooey-code-editor {
+  border-radius: 0.25rem;
+  overflow: hidden;
+}

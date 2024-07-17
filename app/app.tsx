@@ -209,7 +209,8 @@ function App() {
   const handleChange = (event: FormEvent<HTMLFormElement>) => {
     const target = event.target;
     const form = event.currentTarget;
-
+    console.log(target, '>>')
+    
     // ignore elements that have `data-submit-disabled` set
     if (
       target instanceof HTMLElement &&
