@@ -715,7 +715,10 @@ a.text-primary:hover {
   font-size: 14px;
 }
 
-#gooey-code-editor {
+.code-editor-wrapper textarea {
+  display: none;
+}
+
+#gooey-code-editor :first-child {
   border-radius: 0.25rem;
-  overflow: hidden;
 }

@@ -3,6 +3,7 @@ import CodeMirror from "@uiw/react-codemirror";
 import { javascript } from "@codemirror/lang-javascript";
 import { useGooeyStringInput } from "~/gooeyInput";
 import { dracula } from "@uiw/codemirror-theme-dracula";
+import { RenderedMarkdown } from "~/renderedMarkdown";
 
 const CodeEditor = ({
   props,
@@ -13,7 +14,7 @@ const CodeEditor = ({
   onChange: (e: any) => void;
   state: Record<string, any>;
 }) => {
-  const { name, defaultValue, height, ...restProps } = props;
+  const { name, defaultValue, height, label, ...restProps } = props;
   const [inputRef, value, setValue] = useGooeyStringInput<HTMLTextAreaElement>({
     state,
     name,
@@ -28,11 +29,18 @@ const CodeEditor = ({
   };
 
   return (
-    <div className='mb-4'>
+    <div
+      className="mb-4 code-editor-wrapper position-relative"
+      style={{ minHeight: height + 80 + "px" }}
+    >
+      {label && (
+        <label>
+          <RenderedMarkdown body={label} />
+        </label>
+      )}
       <textarea
         ref={inputRef}
         name={name}
-        style={{ display: 'none' }}
         value={value}
         onChange={(e) => {
           setValue(e.target.value);
