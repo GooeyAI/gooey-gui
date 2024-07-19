@@ -1,9 +1,37 @@
-import React from "react";
 import CodeMirror from "@uiw/react-codemirror";
-import { javascript } from "@codemirror/lang-javascript";
+import { esLint, javascript } from "@codemirror/lang-javascript";
 import { useGooeyStringInput } from "~/gooeyInput";
 import { dracula } from "@uiw/codemirror-theme-dracula";
 import { RenderedMarkdown } from "~/renderedMarkdown";
+import { linter, lintGutter } from "@codemirror/lint";
+import { Linter } from "eslint-linter-browserify";
+import type esLintType from "eslint";
+
+const LintConfig: esLintType.Linter.Config = {
+  parserOptions: {
+    ecmaVersion: 2019,
+    sourceType: "module",
+  },
+  env: {
+    browser: true,
+    node: true,
+  },
+  extends: "eslint:recommended",
+  rules: {
+    // enable additional rules
+    indent: ["off"],
+    "linebreak-style": ["error", "unix"],
+    "no-debugger": ["error"],
+    quotes: ["error", "double"],
+    semi: ["error", "always"],
+    // override configuration set by extending "eslint:recommended"
+    "no-empty": "warn",
+    "no-undef": ["error"],
+    "no-cond-assign": ["error", "always"],
+    // disable rules from base configurations
+    "for-direction": "off",
+  },
+};
 
 const CodeEditor = ({
   props,
@@ -49,9 +77,20 @@ const CodeEditor = ({
       <CodeMirror
         theme={dracula}
         value={value}
-        id='gooey-code-editor'
+        id="gooey-code-editor"
         onChange={handleChange}
-        extensions={[javascript()]}
+        extensions={[
+          javascript(),
+          lintGutter(),
+          linter(
+            esLint(
+              new Linter({
+                configType: "eslintrc",
+              }),
+              LintConfig
+            )
+          ),
+        ]}
         height={`${height}px` || "200px"}
         {...restProps}
       />
