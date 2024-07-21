@@ -57,10 +57,7 @@ const CodeEditor = ({
   };
 
   return (
-    <div
-      className="mb-4 code-editor-wrapper position-relative"
-      style={{ minHeight: height + 80 + "px" }}
-    >
+    <div className="mb-4 code-editor-wrapper position-relative">
       {label && (
         <label>
           <RenderedMarkdown body={label} />

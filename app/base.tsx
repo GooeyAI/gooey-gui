@@ -18,7 +18,6 @@ import { useJsonFormInput } from "~/jsonFormInput";
 import { RenderedHTML } from "~/renderedHTML";
 import CountdownTimer from "./components/countdown";
 import { lazyImport } from "./lazyImports";
-import CodeEditor from "./components/CodeEditor";
 
 const { DataTable, DataTableRaw } = lazyImport(() => import("~/dataTable"));
 const { GooeyFileInput } = lazyImport(() => import("~/gooeyFileInput"));
@@ -27,6 +26,7 @@ const Plot = lazyImport(
   () => import("react-plotly.js").then((mod) => mod.default),
   // @ts-ignore
 ).default;
+const CodeEditor = lazyImport(() => import("./components/CodeEditor")).default;
 
 type TreeNode = {
   name: string;
@@ -276,8 +276,12 @@ function RenderedTreeNode({
     }
     case "code-editor": {
       return (
-        <CodeEditor props={props} state={state} onChange={onChange} />
+        // pre fill height to avoid ui jump
+        <div style={{ minHeight: props?.height + 100 + "px" }}>
+          <CodeEditor props={props} state={state} onChange={onChange} />
+        </div>
       )
+      
     }
     case "input": {
       const className = `gui-input gui-input-${props.type}`;
