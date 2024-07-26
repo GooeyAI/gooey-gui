@@ -1,5 +1,4 @@
 import { withSentry } from "@sentry/remix";
-import type { FormEvent } from "react";
 import { useEffect, useRef } from "react";
 
 import type { ActionArgs, LinksFunction, LoaderArgs } from "@remix-run/node";
@@ -25,6 +24,7 @@ import { handleRedirectResponse } from "~/handleRedirect";
 
 import appStyles from "~/styles/app.css";
 import customStyles from "~/styles/custom.css";
+import { gooeyGuiRouteHeader } from "~/consts";
 
 export const meta: V2_MetaFunction = ({ data }) => {
   return data.meta ?? [];
@@ -122,7 +122,19 @@ async function callServer({
     return await handleErrorResponse({ request, response });
   }
 
-  return response;
+  if (response.headers.get(gooeyGuiRouteHeader)) {
+    return response;
+  } else {
+    return new Response(
+      // because remix doesn't like non-utf8 responses
+      Buffer.from(await response.arrayBuffer()).toString("base64"),
+      {
+        headers: response.headers,
+        status: response.status,
+        statusText: response.statusText,
+      }
+    );
+  }
 }
 
 async function handleErrorResponse({
