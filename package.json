@@ -1,4 +1,5 @@
 {
+  "name": "gooey-gui",
   "private": true,
   "sideEffects": false,
   "scripts": {
