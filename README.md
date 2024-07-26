@@ -36,4 +36,9 @@ npm run dev
 
 - `app.css` -> Our css styles
 
-- `app.tsx` -> Business logic for calling python APIs, and rendering components  
+- `app.tsx` -> Business logic for calling python APIs, and rendering components
+
+## Remix Routing
+
+<img width="890" alt="image" src="https://github.com/user-attachments/assets/6dc96840-3845-4180-9f09-0aaff3e0b05d">
+
