@@ -185,6 +185,11 @@ function useRealtimeChannels({ channels }: { channels: string[] }) {
   return useEventSourceNullOk(url);
 }
 
+export type OnChange = (event?: {
+  target: EventTarget | HTMLElement | null | undefined;
+  currentTarget: EventTarget | HTMLElement | null | undefined;
+}) => void;
+
 function App() {
   const [searchParams] = useSearchParams();
   const loaderData = useLoaderData<typeof loader>();
@@ -206,10 +211,10 @@ function App() {
     submit(form);
   }, 500);
 
-  const handleChange = (event?: FormEvent<HTMLFormElement>) => {
+  const onChange: OnChange = (event) => {
     const target = event?.target;
     const form = event?.currentTarget || formRef?.current;
-    if(!form) return;
+    if (!(form && form instanceof HTMLFormElement)) return;
 
     // ignore elements that have `data-submit-disabled` set
     if (
@@ -257,12 +262,12 @@ function App() {
         id={"gooey-form"}
         action={"?" + searchParams}
         method="POST"
-        onChange={handleChange}
+        onChange={onChange}
         noValidate
       >
         <RenderedChildren
           children={children}
-          onChange={handleChange}
+          onChange={onChange}
           state={state}
         />
         <input
