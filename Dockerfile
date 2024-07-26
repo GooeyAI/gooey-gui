@@ -18,7 +18,7 @@ RUN apt-get update \
 WORKDIR /app
 
 COPY package.json package-lock.json ./
-RUN npm ci
+RUN npm ci --verbose
 
 ARG SENTRY_ORG
 ENV SENTRY_ORG=$SENTRY_ORG
