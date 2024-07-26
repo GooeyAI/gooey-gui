@@ -1,5 +1,5 @@
 # base node image
-FROM node:20-bullseye-slim
+FROM node:20-bookworm-slim
 
 # Copied from https://github.com/puppeteer/puppeteer/blob/aefbde60d7993c37ca5289e034f3ca90945c20ff/docker/Dockerfile#L6
 #
@@ -18,7 +18,7 @@ RUN apt-get update \
 WORKDIR /app
 
 COPY package.json package-lock.json ./
-RUN npm i -g npm@latest && npm ci --verbose
+RUN npm i -g npm@latest && npm ci --verbose --no-audit
 
 ARG SENTRY_ORG
 ENV SENTRY_ORG=$SENTRY_ORG
