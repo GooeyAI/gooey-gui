@@ -1,5 +1,5 @@
 # base node image
-FROM node:18-bullseye-slim
+FROM node:20-bullseye-slim
 
 # Copied from https://github.com/puppeteer/puppeteer/blob/aefbde60d7993c37ca5289e034f3ca90945c20ff/docker/Dockerfile#L6
 #
