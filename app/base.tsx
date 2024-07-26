@@ -1,12 +1,12 @@
 import type { ReactNode } from "react";
 import { useEffect, useRef } from "react";
 import type { OptionProps, SingleValueProps } from "react-select";
+import Select, { components } from "react-select";
 import { RenderedMarkdown } from "~/renderedMarkdown";
 
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from "@reach/tabs";
 import { Link, useSubmit } from "@remix-run/react";
 import { JsonViewer } from "@textea/json-viewer";
-import Select, { components } from "react-select";
 import { DownloadButton } from "~/downloadButton";
 import {
   GooeyCheckbox,
@@ -18,12 +18,13 @@ import { useJsonFormInput } from "~/jsonFormInput";
 import { RenderedHTML } from "~/renderedHTML";
 import CountdownTimer from "./components/countdown";
 import { lazyImport } from "./lazyImports";
+import { OnChange } from "./app";
 
 const { DataTable, DataTableRaw } = lazyImport(() => import("~/dataTable"));
 const { GooeyFileInput } = lazyImport(() => import("~/gooeyFileInput"));
 
 const Plot = lazyImport(
-  () => import("react-plotly.js").then((mod) => mod.default),
+  () => import("react-plotly.js").then((mod) => mod.default)
   // @ts-ignore
 ).default;
 const CodeEditor = lazyImport(() => import("./components/CodeEditor")).default;
@@ -84,7 +85,7 @@ function RenderedTreeNode({
   state,
 }: {
   node: TreeNode;
-  onChange: () => void;
+  onChange: OnChange;
   state: Record<string, any>;
 }) {
   const { name, props, children } = node;
@@ -280,8 +281,7 @@ function RenderedTreeNode({
         <div style={{ minHeight: props?.height + 100 + "px" }}>
           <CodeEditor props={props} state={state} onChange={onChange} />
         </div>
-      )
-      
+      );
     }
     case "input": {
       const className = `gui-input gui-input-${props.type}`;
@@ -457,7 +457,7 @@ export function RenderedChildren({
   state,
 }: {
   children: Array<TreeNode>;
-  onChange: () => void;
+  onChange: OnChange;
   state: Record<string, any>;
 }) {
   let elements = children.map((node, idx) => {
@@ -515,7 +515,7 @@ function GuiSelect({
   };
 
   let selectValue = args.options.filter((opt: any) =>
-    args.isMulti ? value.includes(opt.value) : opt.value === value,
+    args.isMulti ? value.includes(opt.value) : opt.value === value
   );
   // if selectedValue is not in options, then set it to the first option
   useEffect(() => {

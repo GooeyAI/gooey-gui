@@ -6,6 +6,7 @@ import { RenderedMarkdown } from "~/renderedMarkdown";
 import { linter, lintGutter } from "@codemirror/lint";
 import { Linter } from "eslint-linter-browserify";
 import type esLintType from "eslint";
+import { OnChange } from "~/app";
 
 const LintConfig: esLintType.Linter.Config = {
   parserOptions: {
@@ -39,7 +40,7 @@ const CodeEditor = ({
   onChange,
 }: {
   props: Record<string, any>;
-  onChange: (e: any) => void;
+  onChange: OnChange;
   state: Record<string, any>;
 }) => {
   const { name, defaultValue, height, label, ...restProps } = props;
