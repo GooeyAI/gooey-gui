@@ -27,7 +27,7 @@ export default function handleDocumentRequestFunction(
 ) {
   let staticHandlerContext = remixContext.staticHandlerContext;
   let loaderHeaders = staticHandlerContext.loaderHeaders["*"];
-  if (loaderHeaders.get(gooeyGuiRouteHeader)) {
+  if (!loaderHeaders || loaderHeaders.get(gooeyGuiRouteHeader)) {
     let markup = renderToString(
       <RemixServer context={remixContext} url={request.url} />
     );
@@ -40,7 +40,7 @@ export default function handleDocumentRequestFunction(
     });
   } else {
     let loaderData = staticHandlerContext.loaderData["*"];
-    let originalData = Buffer.from(loaderData, "base64");
+    let originalData = loaderData && Buffer.from(loaderData, "base64");
     return new Response(originalData, {
       status: responseStatusCode,
       headers: loaderHeaders,
