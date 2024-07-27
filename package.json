@@ -1,14 +1,22 @@
 {
   "name": "gooey-gui",
-  "private": true,
+  "version": "0.1.1",
   "sideEffects": false,
   "scripts": {
     "build": "remix build",
     "build-prod": "remix build --sourcemap && sentry-upload-sourcemaps",
     "dev": "remix dev",
     "start": "remix-serve build",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "prepack": "npm run build"
   },
+  "bin": {
+    "gooey-gui-serve": "scripts/gooey-gui-serve.js"
+  },
+  "files": [
+    "build",
+    "public"
+  ],
   "dependencies": {
     "@codemirror/lang-javascript": "^6.2.2",
     "@codemirror/lint": "^6.8.1",

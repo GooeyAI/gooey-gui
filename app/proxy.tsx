@@ -3,6 +3,7 @@ import type { LoaderArgs } from "@remix-run/node";
 import path from "path";
 import { Params } from "@remix-run/react";
 import { handleRedirectResponse } from "~/handleRedirect";
+import settings from "./settings";
 
 export async function loader({ request, params }: LoaderArgs) {
   return await _proxy({ request, params });
@@ -20,7 +21,7 @@ async function _proxy({
   request: Request;
 }) {
   const requestUrl = new URL(request.url);
-  const backendUrl = new URL(process.env["SERVER_HOST"]!);
+  const backendUrl = new URL(settings.SERVER_HOST!);
   backendUrl.pathname = path.join(backendUrl.pathname, requestUrl.pathname);
   backendUrl.search = requestUrl.search;
   request.headers.delete("Host");

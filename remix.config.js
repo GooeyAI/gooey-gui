@@ -1,31 +1,9 @@
-const wixUrls = [
-  "/",
-  "/faq",
-  "/pricing",
-  "/privacy",
-  "/terms",
-  "/team/",
-  "/jobs/",
-  "/farmerchat/",
-  "/arc-test", // temporary
-];
+require("dotenv/config");
 
-const gitbookUrls = ["/docs/*", "/blog/*"];
-
-const proxyUrls = [
-  "/static/*",
-  "/login/",
-  "/logout/",
-  "/payment-success/",
-  "/favicon",
-  "/favicon.ico",
-  "/sitemap.xml/",
-  "/2/*",
-  "/__/*",
-  "/chat/*",
-];
-
-const appRoutes = ["*", "/chat"];
+const wixUrls =
+  process.env.WIX_URLS?.trim()
+    .split(/\s+/)
+    .filter((it) => it) || [];
 
 /** @type {import('@remix-run/dev').AppConfig} */
 module.exports = {
@@ -49,6 +27,8 @@ module.exports = {
     /firebase-admin/,
     /glideapps/,
     /p-retry/,
+    /p-queue/,
+    /p-timeout/,
     /is-network-error/,
   ],
   routes(defineRoutes) {
@@ -57,18 +37,12 @@ module.exports = {
       // - The first argument is the React Router path to match against
       // - The second is the relative filename of the route handler
       for (const path of wixUrls) {
-        route(path, "wix.tsx", { id: path });
+        route(path, "wix.tsx", { id: "wix-" + path });
       }
-      for (const path of proxyUrls) {
-        route(path, "proxy.tsx", { id: path });
-      }
-      for (const path of gitbookUrls) {
-        route(path, "gitbook.tsx", { id: path });
-      }
+      route("/__/*", "proxy.tsx");
       route("/__/realtime/*", "realtime.tsx");
-      for (const path of appRoutes) {
-        route(path, "app.tsx", { id: path });
-      }
+      route("*", "app.tsx", { id: "app" });
+      route("/", "app.tsx", { id: "home" });
     });
   },
 };

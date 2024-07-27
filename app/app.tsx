@@ -1,8 +1,13 @@
 import { withSentry } from "@sentry/remix";
 import { useEffect, useRef } from "react";
 
-import type { ActionArgs, LinksFunction, LoaderArgs } from "@remix-run/node";
-import { redirect } from "@remix-run/node";
+import {
+  ActionArgs,
+  json,
+  LinksFunction,
+  LoaderArgs,
+  redirect,
+} from "@remix-run/node";
 import type {
   ShouldRevalidateFunction,
   V2_MetaFunction,
@@ -16,15 +21,15 @@ import {
   useSubmit,
 } from "@remix-run/react";
 import path from "path";
-import process from "process";
 import { useDebouncedCallback } from "use-debounce";
-import { RenderedChildren, applyTransform, getTransforms } from "~/base";
+import { applyTransform, getTransforms, RenderedChildren } from "~/base";
 import { useEventSourceNullOk } from "~/event-source";
 import { handleRedirectResponse } from "~/handleRedirect";
 
+import { gooeyGuiRouteHeader } from "~/consts";
 import appStyles from "~/styles/app.css";
 import customStyles from "~/styles/custom.css";
-import { gooeyGuiRouteHeader } from "~/consts";
+import settings from "./settings";
 
 export const meta: V2_MetaFunction = ({ data }) => {
   return data.meta ?? [];
@@ -59,19 +64,29 @@ export const links: LinksFunction = () => {
 };
 
 export async function loader({ request }: LoaderArgs) {
-  return await callServer({ body: {}, request });
+  return await callServer({ request });
 }
 
 export async function action({ request }: ActionArgs) {
-  // parse form data
-  const { __gooey_gui_request_body, ...inputs } = Object.fromEntries(
-    await request.formData()
-  );
+  // proxy
+  let contentType = request.headers.get("Content-Type");
+  if (!contentType?.startsWith("application/x-www-form-urlencoded")) {
+    let body = await request.arrayBuffer();
+    return callServer({ request, body });
+  }
+  // proxy
+  let body = await request.text();
+  let formData = new URLSearchParams(body);
+  if (!formData.has("__gooey_gui_request_body")) {
+    return callServer({ request, body });
+  }
+
   // parse request body
+  let { __gooey_gui_request_body, ...inputs } = Object.fromEntries(formData);
   const {
     transforms,
     state,
-    ...body
+    ...jsonBody
   }: {
     transforms: Record<string, string>;
     state: Record<string, any>;
@@ -83,29 +98,29 @@ export async function action({ request }: ActionArgs) {
     inputs[field] = toJson(inputs[field]);
   }
   // update state with new form data
-  body.state = { ...state, ...inputs };
-  return callServer({ body, request });
+  jsonBody.state = { ...state, ...inputs };
+  request.headers.set("Content-Type", "application/json");
+  return callServer({ request, body: JSON.stringify(jsonBody) });
 }
 
 async function callServer({
-  body,
   request,
+  body,
 }: {
-  body: Record<string, any>;
   request: Request;
+  body?: BodyInit | null;
 }) {
   const requestUrl = new URL(request.url);
-  const serverUrl = new URL(process.env["SERVER_HOST"]!);
+  const serverUrl = new URL(settings.SERVER_HOST!);
   serverUrl.pathname = path.join(serverUrl.pathname, requestUrl.pathname ?? "");
   serverUrl.search = requestUrl.search;
 
-  request.headers.set("Content-Type", "application/json");
   request.headers.delete("Host");
 
-  const response = await fetch(serverUrl, {
-    method: "POST",
+  let response = await fetch(serverUrl, {
+    method: request.method,
     redirect: "manual",
-    body: JSON.stringify(body),
+    body: body,
     headers: request.headers,
   });
 
@@ -118,58 +133,16 @@ async function callServer({
     });
   }
 
-  if (!response.ok) {
-    return await handleErrorResponse({ request, response });
-  }
-
   if (response.headers.get(gooeyGuiRouteHeader)) {
     return response;
   } else {
-    return new Response(
-      // because remix doesn't like non-utf8 responses
-      Buffer.from(await response.arrayBuffer()).toString("base64"),
-      {
-        headers: response.headers,
-        status: response.status,
-        statusText: response.statusText,
-      }
-    );
-  }
-}
-
-async function handleErrorResponse({
-  request,
-  response,
-}: {
-  request: Request;
-  response: Response;
-}) {
-  const serverUrl = new URL(process.env["SERVER_HOST"]!);
-  serverUrl.pathname = path.join(serverUrl.pathname, "/handleError/");
-
-  let errorResponse = await fetch(serverUrl, {
-    method: "POST",
-    body: JSON.stringify({
+    return json({
+      body: Buffer.from(await response.arrayBuffer()).toString("base64"),
+      headers: Object.fromEntries(response.headers),
       status: response.status,
       statusText: response.statusText,
-    }),
-    headers: request.headers,
-  });
-
-  const redirectUrl = handleRedirectResponse({ response: errorResponse });
-  if (redirectUrl) {
-    return redirect(redirectUrl, {
-      headers: errorResponse.headers,
-      status: errorResponse.status,
-      statusText: errorResponse.statusText,
     });
   }
-
-  return new Response(errorResponse.body, {
-    headers: errorResponse.headers,
-    status: response.status,
-    statusText: errorResponse.statusText,
-  });
 }
 
 export const shouldRevalidate: ShouldRevalidateFunction = (args) => {
@@ -186,9 +159,13 @@ export const shouldRevalidate: ShouldRevalidateFunction = (args) => {
   return args.defaultShouldRevalidate;
 };
 
-function useRealtimeChannels({ channels }: { channels: string[] }) {
+function useRealtimeChannels({
+  channels,
+}: {
+  channels: string[] | undefined | null;
+}) {
   let url;
-  if (channels.length) {
+  if (channels && channels.length) {
     const params = new URLSearchParams(
       channels.map((name) => ["channels", name])
     );
@@ -264,6 +241,8 @@ function App() {
       submit(form);
     }
   };
+
+  if (!children) return <></>;
 
   const transforms = getTransforms({ children });
 

@@ -1,4 +1,5 @@
 import process from "process";
+import settings from "./settings";
 
 const redirectStatuses = [301, 302, 303, 307, 308];
 
@@ -10,7 +11,7 @@ export function handleRedirectResponse({
   // if the response is not a redirect, return null
   if (!redirectStatuses.includes(response.status)) return null;
   // get the redirect target
-  const backendUrl = new URL(process.env["SERVER_HOST"]!);
+  const backendUrl = new URL(settings.SERVER_HOST!);
   const redirectUrl = new URL(response.headers.get("location") ?? "/");
   let newLocation;
   if (redirectUrl.host == backendUrl.host) {

@@ -15,6 +15,7 @@ export async function loader({ params, request }: LoaderArgs) {
       send({ data: Date.now().toString() });
     }
     const subscriber = createSubscriber(channels, onMsg);
+    if (!subscriber) return () => {};
     return async () => {
       closed = true;
       await subscriber.unsubscribe();
@@ -25,12 +26,18 @@ export async function loader({ params, request }: LoaderArgs) {
 }
 
 function createSubscriber(channels: string[], onMsg: () => void) {
+  if (!redis) {
+    console.error(
+      "Redis not connected. You must run redis to enable realtime features."
+    );
+    return;
+  }
   const subscriber = redis.duplicate();
   subscriber.on("error", (err) => console.error(err));
   subscriber.on("connect", async () => {
     console.log("Redis Connected:", ...channels);
     // attempt to fix the slow joiner syndrome
-    if (await redis.exists(channels)) onMsg();
+    if (await redis?.exists(channels)) onMsg();
   });
   subscriber.connect();
   subscriber.subscribe(channels, (msg, channel) => {
