@@ -18,13 +18,7 @@ Check out all available components at [gooey.ai/GuiComponents](https://gooey.ai/
 
 ### Installation
 
-1. Clone this repo
-
-```bash
-git clone https://github.com/GooeyAI/gooey-gui
-```
-
-2. Install python dependencies
+1. Install python package
 
 ```bash
 pip install gooey-gui
