@@ -1,4 +1,4 @@
-## GooeyGUI - Write production grade web apps in pure Python
+# GooeyGUI - Write production grade web apps in pure Python
 
 GooeyGUI is an alternative to Streamlit, Dash, and other Python UI frameworks. See what it's capable of at [gooey.ai/explore](https://gooey.ai/explore).
 
@@ -10,13 +10,13 @@ It also takes full advantage of SSR which means you get static HTML rendering an
 
 Check out all available components at [gooey.ai/GuiComponents](https://gooey.ai/GuiComponents/).
 
-### Prerequisites
+## Prerequisites
 
 1. Install Node v20 (We recommend using [nvm](https://github.com/nvm-sh/nvm))
 
 2. Install Python 3.10+ (We recommend using [pyenv](https://github.com/pyenv/pyenv))
 
-### Installation
+## Installation
 
 1. Install python package
 
@@ -37,7 +37,7 @@ npm i gooey-gui
 npm exec gooey-gui-serve
 ```
 
-### Usage
+## Usage
 
 ```python
 from fastapi import FastAPI
@@ -66,6 +66,8 @@ Open the browser at [localhost:3000](http://localhost:3000/3000) and you should 
 
 <img width="444" alt="image" src="https://github.com/user-attachments/assets/09741704-9d3d-43c1-8fcf-f3e5b0f82b06">
 
+---
+
 ### Adding interactivity
 
 ```py
@@ -76,6 +78,8 @@ def root():
 ```
 
 <img width="994" alt="image" src="https://github.com/user-attachments/assets/5432431d-98f4-4088-a224-b2b2b807a303">
+
+---
 
 ### Sending realtime updates to frontend
 
@@ -89,6 +93,7 @@ brew services start redis
 ```
 
 Here's a simple counter that updates every second:
+
 
 ```py
 from time import sleep
@@ -107,7 +112,7 @@ def poems():
     gui.write(f"### Count: {count}")
 ```
 
-<img width="517" alt="image" src="https://github.com/user-attachments/assets/ac4638bf-cbd2-4c97-b30c-aec2d0bc0533">
+<img width="393" alt="image" src="https://github.com/user-attachments/assets/cc1c7365-c52a-465b-8677-6c2314ac3b1a">
 
 Let's break this down:
 
@@ -139,7 +144,7 @@ Finally, we render the count using `gui.write()`
 gui.write(f"### Count: {count}")
 ```
 
-### GooeyUI is always interactive
+#### GooeyUI is always interactive
 
 Unlike other UI frameworks that block the main loop of your app, GooeyUI always keeps your app interactive.
 
@@ -164,13 +169,15 @@ def poems():
     gui.write("**You typed:** " + text)
 ```
 
-<img width="636" alt="image" src="https://github.com/user-attachments/assets/c3a4aaad-779d-44ef-9a2e-2d76445fa5f4">
+<img width="517" alt="image" src="https://github.com/user-attachments/assets/ac4638bf-cbd2-4c97-b30c-aec2d0bc0533">
 
 This works because by default fastapi uses a thread pool.
 So while that counter is running, the other threads are free to handle requests from the frontend.
 
 In production, you can scale horizontally by running multiple instances of your server behind a load balancer,
 and using a task queue like celery to handle long-running tasks, or using [BackgroundTasks](https://fastapi.tiangolo.com/tutorial/background-tasks/) in FastAPI.
+
+---
 
 ### OpenAI Streaming
 
@@ -213,6 +220,10 @@ def generate_poem(prompt, set_text):
     set_text(text) # final result
 ```
 
+<img width="548" alt="image" src="https://github.com/user-attachments/assets/0cd5cb1d-ebdc-4815-821d-ac6118d9e6fe">
+
+---
+
 ### File uploads
 
 ```py
@@ -246,4 +257,6 @@ def upload():
         gui.image(uploaded_file)
 ```
 
-<img width="548" alt="image" src="https://github.com/user-attachments/assets/0cd5cb1d-ebdc-4815-821d-ac6118d9e6fe">
+<img width="636" alt="image" src="https://github.com/user-attachments/assets/c3a4aaad-779d-44ef-9a2e-2d76445fa5f4">
+
+
