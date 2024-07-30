@@ -59,7 +59,7 @@ Run the python server:
 
 ```bash
 cd your-python-project
-uvicorn main:app --port 8080 --reload
+uvicorn main:app --port 8000 --reload
 ```
 
 Open the browser at [localhost:3000](http://localhost:3000/3000) and you should see the following 🎉
@@ -202,22 +202,22 @@ def poems():
 def generate_poem(prompt, set_text):
     openai.api_key = os.getenv("OPENAI_API_KEY")
 
-    completion = openai.ChatCompletion.create(
-      model="gpt-3.5-turbo",
-      messages=[
-        {"role": "system", "content": "You are a brilliant poem writer."},
-        {"role": "user", "content": prompt}
-      ],
-      stream=True,
+    completion = openai.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": "You are a brilliant poem writer."},
+            {"role": "user", "content": prompt},
+        ],
+        stream=True,
     )
 
     text = ""
     for i, chunk in enumerate(completion):
-        text += chunk.choices[0].delta.get("content", "")
-        if i % 50 == 1: # stream to user every 50 chunks
+        text += chunk.choices[0].delta.content or ""
+        if i % 50 == 1:  # stream to user every 50 chunks
             set_text(text + "...")
 
-    set_text(text) # final result
+    set_text(text)  # final result
 ```
 
 <img width="548" alt="image" src="https://github.com/user-attachments/assets/0cd5cb1d-ebdc-4815-821d-ac6118d9e6fe">
