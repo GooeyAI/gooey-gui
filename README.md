@@ -59,7 +59,7 @@ Run the python server:
 
 ```bash
 cd your-python-project
-uvicorn main:app --port 8000 --reload
+uvicorn main:app --port 8080 --reload
 ```
 
 Open the browser at [localhost:3000](http://localhost:3000/3000) and you should see the following 🎉
@@ -93,7 +93,6 @@ brew services start redis
 ```
 
 Here's a simple counter that updates every second:
-
 
 ```py
 from time import sleep
@@ -258,5 +257,3 @@ def upload():
 ```
 
 <img width="636" alt="image" src="https://github.com/user-attachments/assets/c3a4aaad-779d-44ef-9a2e-2d76445fa5f4">
-
-
