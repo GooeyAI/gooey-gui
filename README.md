@@ -92,6 +92,12 @@ brew install redis
 brew services start redis
 ```
 
+Set shell env var to point to redis
+
+```bash
+export REDIS_URL=redis://
+```
+
 Here's a simple counter that updates every second:
 
 ```py
