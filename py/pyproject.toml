@@ -1,10 +1,9 @@
 [tool.poetry]
 name = "gooey-gui"
-version = "0.1.0"
+version = "0.1.1"
 description = ""
 authors = ["Dev Aggarwal <devxpy@gmail.com>"]
-license = "FSL-1.1-Apache-2.0"
-readme = "README.md"
+license = "Apache-2.0"
 
 [tool.poetry.dependencies]
 python = "^3.10"
