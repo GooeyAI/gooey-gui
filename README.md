@@ -37,6 +37,24 @@ npm i gooey-gui
 npm exec gooey-gui-serve
 ```
 
+---
+
+(Optional) To enable realtime updates, install & start redis.
+
+E.g. on Mac - https://redis.io/docs/getting-started/installation/install-redis-on-mac-os/
+
+```bash
+brew install redis
+brew services start redis
+```
+
+Set shell env var to point to redis
+
+```bash
+export REDIS_URL=redis://
+```
+
+
 ## Usage
 
 ```python
@@ -83,20 +101,6 @@ def root():
 
 ### Sending realtime updates to frontend
 
-To enable realtime updates, install & start redis.
-
-E.g. on Mac - https://redis.io/docs/getting-started/installation/install-redis-on-mac-os/
-
-```bash
-brew install redis
-brew services start redis
-```
-
-Set shell env var to point to redis
-
-```bash
-export REDIS_URL=redis://
-```
 
 Here's a simple counter that updates every second:
 
