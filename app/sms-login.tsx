@@ -1,4 +1,3 @@
-import React from "react";
 import "./styles/custom.css";
 
 const GOOEY_LOGO =
@@ -18,12 +17,12 @@ const App = () => {
         alertBox.innerText = "❌ Please enter your phone number";
       } else if (checkbox.checked && phone.value) {
         alertBox.innerText = "✅ Thanks for joining!";
+        phone.value = "";
       }
       setTimeout(() => {
         alertBox.innerText = "";
       }, 3000);
     }
-    phone.value = "";
   };
 
   return (
@@ -107,7 +106,6 @@ const App = () => {
           >
             <input
               type="checkbox"
-              defaultChecked={true}
               id="check-box-terms"
               name="isAgreed"
             />
