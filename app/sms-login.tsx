@@ -8,20 +8,22 @@ const App = () => {
   const handleSubmit = (e: any) => {
     // show success text below input and clear input
     const phone = document.getElementById("phone") as HTMLInputElement;
+    const checkbox = document.getElementById(
+      "check-box-terms"
+    ) as HTMLInputElement;
     e.preventDefault();
-    if (!phone.value) {
-      const alertBox = document.getElementById("alert-box");
-      if (alertBox) {
-        alertBox.innerText = "❌ Please enter your phone number";
-      }
-      return;
-    }
-    // show success message
     const alertBox = document.getElementById("alert-box");
     if (alertBox) {
-      phone.value = "";
-      alertBox.innerText = "✅ Thanks for joining!";
+      if (!phone.value) {
+        alertBox.innerText = "❌ Please enter your phone number";
+      } else if (checkbox.checked && phone.value) {
+        alertBox.innerText = "✅ Thanks for joining!";
+      }
+      setTimeout(() => {
+        alertBox.innerText = "";
+      }, 3000);
     }
+    phone.value = "";
   };
 
   return (
@@ -105,6 +107,7 @@ const App = () => {
           >
             <input
               type="checkbox"
+              defaultChecked={true}
               id="check-box-terms"
               name="isAgreed"
             />
