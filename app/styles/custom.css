@@ -722,3 +722,35 @@ a.text-primary:hover {
 #gooey-code-editor :first-child {
   border-radius: 0.25rem;
 }
+
+.cm-gutter-lint {
+  width: 0 !important;
+}
+
+.ͼ1 .cm-lint-marker-error {
+  position: absolute !important;
+  content: none !important;
+  left: 0px !important;
+  width: 100% !important;
+  height: 22.39px !important;
+  background-color: red !important;
+  opacity: 0.5 !important;
+  border-radius: 0 !important;
+  transform: translateY(-3.39px) !important;
+}
+
+.cm-foldGutter span {
+  display: inline-block !important;
+  transform: translate(-1.5px, -3px) !important;
+}
+.cm-gutterElement {
+  text-align: center;
+  overflow: hidden !important;
+}
+.ͼ1 .cm-lineNumbers .cm-gutterElement {
+  text-align: center !important;
+  padding: 0px !important;
+}
+.cm-lineNumbers .cm-gutterElement {
+  min-width: 36px !important;
+}
