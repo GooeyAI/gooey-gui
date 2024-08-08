@@ -1,37 +1,36 @@
-import CodeMirror from "@uiw/react-codemirror";
-import { esLint, javascript } from "@codemirror/lang-javascript";
+import CodeMirror, { useCodeMirror } from "@uiw/react-codemirror";
+import { javascript } from "@codemirror/lang-javascript";
 import { useGooeyStringInput } from "~/gooeyInput";
 import { dracula } from "@uiw/codemirror-theme-dracula";
 import { RenderedMarkdown } from "~/renderedMarkdown";
-import { linter, lintGutter } from "@codemirror/lint";
-import { Linter } from "eslint-linter-browserify";
-import type esLintType from "eslint";
-import { OnChange } from "~/app";
+import { lintGutter, linter } from "@codemirror/lint";
+import type { OnChange } from "~/app";
+import type { LintOptions } from "jshint";
+import { JSHINT as jshint } from 'jshint';
 
-const LintConfig: esLintType.Linter.Config = {
-  parserOptions: {
-    ecmaVersion: 2019,
-    sourceType: "module",
-  },
-  env: {
-    browser: true,
-    node: true,
-  },
-  extends: "eslint:recommended",
-  rules: {
-    // enable additional rules
-    indent: ["off"],
-    "linebreak-style": ["error", "unix"],
-    "no-debugger": ["error"],
-    quotes: ["error", "double"],
-    semi: ["error", "always"],
-    // override configuration set by extending "eslint:recommended"
-    "no-empty": "warn",
-    "no-undef": ["error"],
-    "no-cond-assign": ["error", "always"],
-    // disable rules from base configurations
-    "for-direction": "off",
-  },
+const jsLinter = (lintOptions: LintOptions) => {
+  return linter((view) => {
+    const diagnostics: any = [];
+    const codeText = view.state.doc.toJSON();
+    jshint(codeText, lintOptions);
+    const errors = jshint?.data()?.errors;
+
+    if (errors && errors.length > 0) {
+      errors.forEach((error) => {
+        const selectedLine = view.state.doc.line(error.line);
+
+        const diagnostic = {
+          from: selectedLine.from,
+          to: selectedLine.to,
+          severity: 'error',
+          message: error.reason,
+        };
+
+        diagnostics.push(diagnostic);
+      });
+    }
+    return diagnostics;
+  });
 };
 
 const CodeEditor = ({
@@ -49,12 +48,21 @@ const CodeEditor = ({
     name,
     defaultValue,
   });
-
   const handleChange = (val: string) => {
     setValue(val);
     // trigger the onChange event for Root Form
     // imitate the textarea onChange
-    onChange({ target: inputRef.current });
+    onChange({
+      target: inputRef.current as HTMLElement,
+    });
+  };
+
+  const lintOptions: LintOptions = {
+    esversion: 11,
+    browser: true,
+    lastsemic: true,
+    asi: true,
+    expr: true,
   };
 
   return (
@@ -65,6 +73,9 @@ const CodeEditor = ({
         </label>
       )}
       <textarea
+        data-gramm="false"
+        data-gramm_editor="false"
+        data-enable-grammarly="false"
         ref={inputRef}
         name={name}
         value={value}
@@ -73,22 +84,14 @@ const CodeEditor = ({
         }}
       />
       <CodeMirror
+        data-gramm="false"
+        data-gramm_editor="false"
+        data-enable-grammarly="false"
         theme={dracula}
         value={value}
         id="gooey-code-editor"
         onChange={handleChange}
-        extensions={[
-          javascript(),
-          lintGutter(),
-          linter(
-            esLint(
-              new Linter({
-                configType: "eslintrc",
-              }),
-              LintConfig
-            )
-          ),
-        ]}
+        extensions={[javascript(), lintGutter(), jsLinter(lintOptions)]}
         height={`${height}px` || "200px"}
         {...restProps}
       />
