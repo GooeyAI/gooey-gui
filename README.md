@@ -267,3 +267,9 @@ def upload():
 ```
 
 <img width="636" alt="image" src="https://github.com/user-attachments/assets/c3a4aaad-779d-44ef-9a2e-2d76445fa5f4">
+
+### 💣 Secret Scanning
+
+Gitleaks will automatically run pre-commit (see `pre-commit-config.yaml` for details) to prevent commits with secrets in the first place. To test this without committing, run `pre-commit` from the terminal. To skip this check, use `SKIP=gitleaks git commit -m "message"` to commit changes. Preferably, label false positives with the `#gitleaks:allow` comment instead of skipping the check.
+
+Gitleaks will also run in the CI pipeline as a GitHub action on push and pull request (can also be manually triggered in the actions tab on GitHub). To update the baseline of ignored secrets, run `python ./scripts/create_gitleaks_baseline.py` from the venv and commit the changes to `.gitleaksignore`.
