@@ -162,7 +162,7 @@ export function GooeyFileInput({
         defaultValue={JSON.stringify(defaultValue)}
       />
       {uppy ? (
-        <div className="w-100 position-relative">
+        <div className="w-100 position-relative" style={{ zIndex: 0 }}>
           <Dashboard
             showRemoveButtonAfterComplete
             showLinkToFileUploadResult
