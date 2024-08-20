@@ -42,6 +42,10 @@ export default function handleDocumentRequestFunction(
         <RemixServer context={remixContext} url={request.url} />
       );
 
+      for (let [key, value] of loaderHeaders.entries()) {
+        responseHeaders.set(key, value);
+      }
+      responseHeaders.delete("Content-Length");
       responseHeaders.set("Content-Type", "text/html");
 
       return new Response("<!DOCTYPE html>" + markup, {
@@ -49,8 +53,8 @@ export default function handleDocumentRequestFunction(
         headers: responseHeaders,
       });
     } else {
-      let { body, ...options } = loaderData;
-      let buffer = body && Buffer.from(body, "base64");
+      let { base64Body, ...options } = loaderData;
+      let buffer = base64Body && Buffer.from(base64Body, "base64");
       return new Response(buffer, options);
     }
   } catch (error) {

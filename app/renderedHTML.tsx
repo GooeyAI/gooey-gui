@@ -52,11 +52,10 @@ function RenderLocalDt({
     }
     const localeDateString = date.toLocaleDateString(
       "en-IN",
-      renderLocalDtDateOptions,
+      renderLocalDtDateOptions
     );
     let result = localeDateString + yearToShow;
     if (renderLocalDtTimeOptions) {
-      console.log(renderLocalDtTimeOptions);
       const localTimeString = date
         .toLocaleTimeString("en-IN", renderLocalDtTimeOptions)
         .toUpperCase();
@@ -138,7 +137,7 @@ function LineClamp({
     function handleResize() {
       if (contentRef && contentRef.current) {
         setClamped(
-          contentRef.current.scrollHeight > contentRef.current.clientHeight,
+          contentRef.current.scrollHeight > contentRef.current.clientHeight
         );
       }
     }
@@ -163,12 +162,12 @@ function LineClamp({
         ...(isExpanded
           ? {}
           : {
-            display: "-webkit-box",
-            WebkitLineClamp: lines,
-            WebkitBoxOrient: "vertical",
-            overflow: "hidden",
-            position: "relative",
-          }),
+              display: "-webkit-box",
+              WebkitLineClamp: lines,
+              WebkitBoxOrient: "vertical",
+              overflow: "hidden",
+              position: "relative",
+            }),
       }}
     >
       {children}

@@ -116,6 +116,7 @@ async function callServer({
   serverUrl.search = requestUrl.search;
 
   request.headers.delete("Host");
+  request.headers.set(gooeyGuiRouteHeader, "1");
 
   let response = await fetch(serverUrl, {
     method: request.method,
@@ -137,7 +138,7 @@ async function callServer({
     return response;
   } else {
     return json({
-      body: Buffer.from(await response.arrayBuffer()).toString("base64"),
+      base64Body: Buffer.from(await response.arrayBuffer()).toString("base64"),
       headers: Object.fromEntries(response.headers),
       status: response.status,
       statusText: response.statusText,
@@ -184,10 +185,15 @@ function App() {
   const loaderData = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const submit = useSubmit();
-  const { children, state, channels } = actionData ?? loaderData;
+  const { base64Body, children, state, channels } = actionData ?? loaderData;
   const formRef = useRef<HTMLFormElement>(null);
   const realtimeEvent = useRealtimeChannels({ channels });
   const fetcher = useFetcher();
+
+  useEffect(() => {
+    if (!base64Body) return;
+    document.documentElement.innerHTML = atob(base64Body);
+  }, [base64Body]);
 
   useEffect(() => {
     if (realtimeEvent && fetcher.state === "idle" && formRef.current) {
