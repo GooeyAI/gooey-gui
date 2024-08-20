@@ -348,6 +348,8 @@ def text_area(
     placeholder: str = None,
     disabled: bool = False,
     label_visibility: LabelVisibility = "visible",
+    tooltip: str | None = None,
+    tooltip_direction: typing.Literal["left", "right"] = "right",
     **props,
 ) -> str:
     style = props.setdefault("style", {})
@@ -384,6 +386,8 @@ def text_area(
             help=help,
             placeholder=placeholder,
             disabled=disabled,
+            tooltip=tooltip,
+            tooltip_direction=tooltip_direction,
             **props,
         ),
     ).mount()
@@ -935,6 +939,7 @@ def checkbox(
     key: str = None,
     help: str = None,
     *,
+    tooltip: str | None = None,
     disabled: bool = False,
     label_visibility: LabelVisibility = "visible",
     **props,
@@ -948,6 +953,7 @@ def checkbox(
         disabled=disabled,
         label_visibility=label_visibility,
         default_value_attr="defaultChecked",
+        tooltip=tooltip,
         **props,
     )
     return bool(value)
@@ -963,6 +969,7 @@ def _input_widget(
     disabled: bool = False,
     label_visibility: LabelVisibility = "visible",
     default_value_attr: str = "defaultValue",
+    tooltip: str | None = None,
     **kwargs,
 ) -> typing.Any:
     # if key:
@@ -982,6 +989,7 @@ def _input_widget(
             default_value_attr: value,
             "help": help,
             "disabled": disabled,
+            "tooltip": tooltip,
             **kwargs,
         },
     ).mount()
