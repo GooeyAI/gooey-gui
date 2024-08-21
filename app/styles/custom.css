@@ -13,7 +13,8 @@
 .streamlit-like-btn:hover,
 .streamlit-like-btn:active {
   cursor: pointer;
-  font-family: avenir-lt-w01_85-heavy1475544,avenir-lt-w05_85-heavy,"Space Grotesk", sans-serif;
+  font-family: avenir-lt-w01_85-heavy1475544, avenir-lt-w05_85-heavy,
+    "Space Grotesk", sans-serif;
   font-size: 15px;
   text-decoration: none !important;
   color: white !important;
@@ -52,7 +53,8 @@
 }
 
 .btn.btn-theme.replicate-nav.active:hover {
-  background:  #a5ffee; /* mint */;
+  background: #a5ffee;
+  /* mint */
   color: black;
   border: 1px solid transparent;
 }
@@ -138,7 +140,8 @@ body {
   color: #000;
 }
 
-.semobold, .semibold {
+.semobold,
+.semibold {
   font-weight: 600;
 }
 
@@ -166,8 +169,14 @@ a:hover {
   text-decoration-thickness: 2px;
 }
 
-h1, h2, h3, h4, h5, h6 {
-    font-family: avenir-lt-w01_85-heavy1475544,avenir-lt-w05_85-heavy,"avenir-lt-w05_85-heavy","Space Grotesk", sans-serif;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: avenir-lt-w01_85-heavy1475544, avenir-lt-w05_85-heavy,
+    "avenir-lt-w05_85-heavy", "Space Grotesk", sans-serif;
 }
 h1 {
   font-size: 32px;
@@ -511,7 +520,7 @@ textarea:disabled {
 .btn {
   margin: 0 0 0 1px;
   border-radius: 6px;
- /* font-weight: 800; */
+  /* font-weight: 800; */
 }
 
 .btn.btn-theme {
@@ -537,10 +546,10 @@ textarea:disabled {
   background-color: #fff0f5;
   color: #000;
   */
-    border: 1px solid #c9c9c9;
-    transition: all .2s ease-in;
-    background-color: #fff;
-    color: black;
+  border: 1px solid #c9c9c9;
+  transition: all 0.2s ease-in;
+  background-color: #fff;
+  color: black;
 }
 .btn-theme.btn-secondary:hover {
   background-color: #fff0f5; /* #a5ffee; mint */
@@ -560,10 +569,6 @@ textarea:disabled {
   color: black;
   border: 1px solid transparent;
 }
-
-
-
-
 
 .bg-light {
   padding: 15px 20px;
@@ -754,6 +759,8 @@ a.text-primary:hover {
 .cm-lineNumbers .cm-gutterElement {
   min-width: 36px !important;
 }
+
+/* Tooltip hide/show */
 .gui_tooltip {
   position: relative;
   font-size: 16px;
@@ -765,24 +772,80 @@ a.text-primary:hover {
 
 .gui_tooltip i {
   vertical-align: bottom;
-  margin-left: 0.5ch;
-  margin-top: 0.9ch;
+  transform: translate(4px, 2.5px);
 }
 
-.gui-input label .gui_tooltip p, .gui_tooltip p {
-  margin: 0; padding: 0;
+.gui-input label .gui_tooltip p,
+.gui_tooltip p {
+  margin: 0;
+  padding: 0;
   color: black;
 }
 
-.gui_tooltip span {
-  margin: 0; padding: 0;
-  display: inline-block;
+.gui_tooltip .tooltip_text {
+  margin: 0;
+  padding: 0;
 }
 
-.gui_tooltip dialog {
-  width: max-content; max-width: 40vw; z-index: 10000; border-radius: 16px; border: 2px solid whitesmoke; font-weight: lighter; line-height: normal; font-family: basiercircle, sans-serif; box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+.gui_tooltip .tooltip_text {
+  position: absolute;
+  width: max-content;
+  max-width: 70vw;
+  visibility: hidden;
+  background-color: white;
+  border: 1px solid whitesmoke;
+  padding: 10px;
+  border-radius: 8px;
+  z-index: 99999;
+  font-weight: lighter;
+  line-height: normal;
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+  inset: 0px auto auto 0px;
 }
 
-.gui_tooltip--left dialog {
-  top: 0; right: 0; transform: translateX(-100%);
+.gui_tooltip:hover .tooltip_text {
+  visibility: visible;
+}
+
+.tooltip_text .gui_tooltip--overflown  {
+  top: 100%;
+  left: 50%;
+  margin-left: -100px;
+}
+
+/* Tooltip positions */
+@media (max-width: 768px) {
+  .gui_tooltip .tooltip_text {
+    top: 100%;
+    left: 50%;
+    margin-left: -100px;
+  }
+}
+
+@media (min-width: 768px) {
+  .gui_tooltip .tooltip_text {
+    max-width: 40vw;
+  }
+
+  .gui_tooltip--right .tooltip_text {
+    top: -5px;
+    left: 150%;
+  }
+
+  .gui_tooltip--left .tooltip_text {
+    top: -5px;
+    right: 105%;
+  }
+
+  .gui_tooltip--top .tooltip_text {
+    bottom: 100%;
+    left: 50%;
+    margin-left: -60px;
+  }
+
+  .gui_tooltip--bottom .tooltip_text {
+    top: 100%;
+    left: 50%;
+    margin-left: -60px;
+  }
 }
