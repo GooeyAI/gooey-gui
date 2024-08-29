@@ -148,6 +148,8 @@ async function callServer({
 
 export const shouldRevalidate: ShouldRevalidateFunction = (args) => {
   if (
+    // don't revalidate if its a form submit with successful response
+    args.actionResult &&
     args.formMethod === "POST" &&
     args.currentUrl.toString() === args.nextUrl.toString()
   ) {
