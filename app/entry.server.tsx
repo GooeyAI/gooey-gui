@@ -8,6 +8,7 @@ import settings from "./settings";
 if (settings.SENTRY_DSN) {
   Sentry.init({
     dsn: settings.SENTRY_DSN,
+    environment: "server",
     // Integrations:
     //    e.g. new Sentry.Integrations.Prisma({ client: prisma })
     // Performance Monitoring:
@@ -42,8 +43,10 @@ export default function handleDocumentRequestFunction(
         <RemixServer context={remixContext} url={request.url} />
       );
 
-      for (let [key, value] of loaderHeaders.entries()) {
-        responseHeaders.set(key, value);
+      if (loaderHeaders) {
+        for (let [key, value] of loaderHeaders.entries()) {
+          responseHeaders.set(key, value);
+        }
       }
       responseHeaders.delete("Content-Length");
       responseHeaders.set("Content-Type", "text/html");

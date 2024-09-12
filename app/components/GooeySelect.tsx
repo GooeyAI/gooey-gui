@@ -61,7 +61,7 @@ export default function GooeySelect({
       <ClientOnlySuspense
         fallback={
           <div
-            className="d-flex align-items-center justify-content-center"
+            className="d-flex align-items-center justify-content-center border rounded"
             style={{ height: "38px" }}
           >
             Loading...

@@ -15,6 +15,7 @@ export const useGlobalProgress = () => {
   const fetchers = useFetchers();
 
   useEffect(() => {
+    if (!document.querySelector(parent)) return;
     NProgress.configure({ parent, trickleSpeed: 100 });
   }, []);
 

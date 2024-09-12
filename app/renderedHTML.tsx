@@ -22,7 +22,10 @@ export function RenderedHTML({
     return <RenderLocalDt body={body} {...attrs} />;
   }
 
-  const parsedElements = parse(body, reactParserOptions);
+  if (typeof body !== "string") {
+    body = JSON.stringify(body);
+  }
+  const parsedElements = parse(body || "", reactParserOptions);
   return (
     <LineClamp lines={lineClamp} key={body}>
       <span className="gui-html-container" {...attrs}>

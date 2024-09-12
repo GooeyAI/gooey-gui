@@ -754,3 +754,29 @@ a.text-primary:hover {
 .cm-lineNumbers .cm-gutterElement {
   min-width: 36px !important;
 }
+
+/* Modal animations */
+@keyframes popOut {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+.modal-dialog {
+  animation: popOut 0.2s forwards;
+}
+@keyframes fadeInBackground {
+  0% {
+    background-color: rgba(0, 0, 0, 0);
+  }
+  100% {
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+}
+.modal {
+  animation: fadeInBackground 1s forwards;
+}

@@ -4,7 +4,9 @@ import LoadingFallback from "./loadingfallback";
 
 export function lazyImport<T>(
   loader: () => Promise<T>,
-  { fallback }: { fallback?: React.ReactNode } = {}
+  {
+    fallback,
+  }: { fallback?: (props: Record<string, any>) => React.ReactNode } = {}
 ): T {
   return new Proxy(
     {},
@@ -22,7 +24,7 @@ export function lazyImport<T>(
 
         return (props: any) => {
           return (
-            <ClientOnlySuspense fallback={fallback}>
+            <ClientOnlySuspense fallback={fallback && fallback(props)}>
               {() => <Component {...props} />}
             </ClientOnlySuspense>
           );
