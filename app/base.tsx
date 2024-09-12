@@ -22,12 +22,15 @@ import { lazyImport } from "./lazyImports";
 const { DataTable, DataTableRaw } = lazyImport(() => import("~/dataTable"));
 
 const { GooeyFileInput } = lazyImport(() => import("~/gooeyFileInput"), {
-  fallback: (
-    <div
-      className="gui-input d-flex align-items-center justify-content-center"
-      style={{ height: "250px" }}
-    >
-      Loading...
+  fallback: ({ label }) => (
+    <div className="gui-input">
+      {label && <RenderedMarkdown body={label} />}
+      <div
+        className="d-flex align-items-center justify-content-center bg-light"
+        style={{ height: "250px" }}
+      >
+        Loading...
+      </div>
     </div>
   ),
 });

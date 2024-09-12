@@ -19,6 +19,10 @@ Style = dict[str, str | None]
 ReactHTMLProps = dict[str, typing.Any]
 
 
+def current_root_ctx() -> "NestingCtx":
+    return threadlocal.root_ctx
+
+
 class RenderTreeNode(BaseModel):
     name: str
     props: ReactHTMLProps = {}
@@ -107,13 +111,14 @@ def renderer(
     while True:
         try:
             root = RenderTreeNode(name="root")
-            try:
-                with NestingCtx(root):
+            threadlocal.root_ctx = NestingCtx(root)
+            with threadlocal.root_ctx:
+                try:
                     ret = render()
-            except StopException:
-                ret = None
-            except RedirectException as e:
-                return RedirectResponse(e.url, status_code=e.status_code)
+                except StopException:
+                    ret = None
+                except RedirectException as e:
+                    return RedirectResponse(e.url, status_code=e.status_code)
             if isinstance(ret, Response):
                 return ret
             return JSONResponse(

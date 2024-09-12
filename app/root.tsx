@@ -77,7 +77,8 @@ export default function App() {
 const reloadOnErrors = [
   "TypeError: Failed to fetch",
   "TypeError: Load failed",
-  "A network error",
+  "Network Error",
+  "NetworkError",
 ];
 
 const ignoreErrors = ["AbortError"];
