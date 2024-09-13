@@ -8,7 +8,7 @@ export function GooeyTextarea({
   props: Record<string, any>;
   state: Record<string, any>;
 }) {
-  const { label, name, defaultValue, ...args } = props;
+  const { label, name, defaultValue, tooltip, tooltip_direction, ...args } = props;
   const [inputRef, value, setValue] = useGooeyStringInput<HTMLTextAreaElement>({
     state,
     name,
@@ -18,7 +18,7 @@ export function GooeyTextarea({
     <div className="gui-input gui-input-textarea">
       {label && (
         <label>
-          <RenderedMarkdown body={label} />
+          <RenderedMarkdown body={label} tooltip={tooltip} tooltip_direction={tooltip_direction} />
         </label>
       )}
       <div>
@@ -45,7 +45,7 @@ export function GooeyInput({
   state: Record<string, any>;
   className: string;
 }) {
-  const { label, name, defaultValue, ...args } = props;
+  const { label, name, defaultValue, tooltip, tooltip_direction, ...args } = props;
   const [inputRef, value, setValue] = useGooeyStringInput<HTMLInputElement>({
     state,
     name,
@@ -53,11 +53,9 @@ export function GooeyInput({
   });
   return (
     <div className={className}>
-      {label && (
-        <label htmlFor={id}>
-          <RenderedMarkdown body={label} />
-        </label>
-      )}
+      <label htmlFor={id}>
+        <RenderedMarkdown body={label} tooltip={tooltip} tooltip_direction={tooltip_direction} />
+      </label>
       <input
         ref={inputRef}
         id={id}
@@ -120,7 +118,7 @@ export function GooeyCheckbox({
   state: Record<string, any>;
   className: string;
 }) {
-  const { label, name, defaultChecked, ...args } = props;
+  const { label, name, defaultChecked, tooltip, tooltip_direction, ...args } = props;
   const inputRef = useGooeyCheckedInput({
     stateChecked: state[name],
     defaultChecked,
@@ -135,7 +133,9 @@ export function GooeyCheckbox({
         {...args}
       />
       <label htmlFor={id}>
-        <RenderedMarkdown body={label} />
+        <span>
+          <RenderedMarkdown body={label} tooltip={tooltip} tooltip_direction={tooltip_direction} tooltip_iconStyle={{marginTop: "0", verticalAlign: "baseline"}} />
+        </span>
       </label>
     </div>
   );
@@ -152,7 +152,7 @@ export function GooeyRadio({
   state: Record<string, any>;
   className: string;
 }) {
-  const { label, name, value, defaultChecked, ...args } = props;
+  const { label, name, value, defaultChecked, tooltip, tooltip_direction, ...args } = props;
   const inputRef = useGooeyCheckedInput({
     stateChecked: state[name] == value,
     defaultChecked,
@@ -169,7 +169,9 @@ export function GooeyRadio({
         {...args}
       />
       <label htmlFor={id}>
-        <RenderedMarkdown body={label} />
+        <span>
+          <RenderedMarkdown body={label} tooltip={tooltip} tooltip_direction={tooltip_direction} tooltip_iconStyle={{marginTop: "0", verticalAlign: "baseline"}} />
+        </span>
       </label>
     </div>
   );
