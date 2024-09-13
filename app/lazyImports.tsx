@@ -2,7 +2,10 @@ import React, { lazy } from "react";
 import { ClientOnly } from "remix-utils";
 import LoadingFallback from "./loadingfallback";
 
-export function lazyImport<T>(loader: () => Promise<T>): T {
+export function lazyImport<T>(
+  loader: () => Promise<T>,
+  { fallback }: { fallback?: React.ReactNode } = {}
+): T {
   return new Proxy(
     {},
     {
@@ -19,7 +22,7 @@ export function lazyImport<T>(loader: () => Promise<T>): T {
 
         return (props: any) => {
           return (
-            <ClientOnlySuspense>
+            <ClientOnlySuspense fallback={fallback}>
               {() => <Component {...props} />}
             </ClientOnlySuspense>
           );
@@ -31,14 +34,16 @@ export function lazyImport<T>(loader: () => Promise<T>): T {
 
 export function ClientOnlySuspense({
   children,
+  fallback,
 }: {
   children: () => React.ReactNode;
+  fallback?: React.ReactNode;
 }) {
   return (
-    <ClientOnly fallback={<LoadingFallback />}>
+    <ClientOnly fallback={fallback ?? <LoadingFallback />}>
       {() => {
         return (
-          <React.Suspense fallback={<LoadingFallback />}>
+          <React.Suspense fallback={fallback ?? <LoadingFallback />}>
             {children()}
           </React.Suspense>
         );
