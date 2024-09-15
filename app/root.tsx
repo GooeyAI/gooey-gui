@@ -19,6 +19,7 @@ import {
   HydrationUtilsPreRender,
 } from "~/useHydrated";
 import settings from "./settings";
+import { ReactNode } from "react";
 
 export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
@@ -37,8 +38,29 @@ export async function loader() {
 }
 
 export default function App() {
-  useGlobalProgress();
   const data = useLoaderData<typeof loader>();
+  return (
+    <Scaffold>
+      <div
+        id="portal"
+        style={{ position: "fixed", left: 0, top: 0, zIndex: 9999 }}
+      />
+      <script
+        // load client side env vars
+        dangerouslySetInnerHTML={{
+          __html: `window.ENV = ${JSON.stringify(data.ENV)};`,
+        }}
+      />
+      <HydrationUtilsPreRender />
+      <Outlet />
+      <HydrationUtilsPostRender />
+      <ScrollRestoration />
+    </Scaffold>
+  );
+}
+
+function Scaffold({ children }: { children?: ReactNode }) {
+  useGlobalProgress();
 
   return (
     <html lang="en">
@@ -53,20 +75,7 @@ export default function App() {
         ></script>
       </head>
       <body>
-        <div
-          id="portal"
-          style={{ position: "fixed", left: 0, top: 0, zIndex: 9999 }}
-        />
-        <HydrationUtilsPreRender />
-        <Outlet />
-        <HydrationUtilsPostRender />
-        <ScrollRestoration />
-        <script
-          // load client side env vars
-          dangerouslySetInnerHTML={{
-            __html: `window.ENV = ${JSON.stringify(data.ENV)};`,
-          }}
-        />
+        {children}
         <Scripts />
         <LiveReload />
       </body>
@@ -81,18 +90,9 @@ const reloadOnErrors = [
   "NetworkError",
 ];
 
-const ignoreErrors = ["AbortError"];
-
 export function ErrorBoundary() {
   const error = useRouteError();
 
-  if (
-    ignoreErrors.some((msg) =>
-      `${error}`.toLowerCase().includes(msg.toLowerCase())
-    )
-  ) {
-    return <></>;
-  }
   if (
     reloadOnErrors.some((msg) =>
       `${error}`.toLowerCase().includes(msg.toLowerCase())
@@ -106,18 +106,18 @@ export function ErrorBoundary() {
   // when true, this is what used to go to `CatchBoundary`
   if (isRouteErrorResponse(error)) {
     return (
-      <div>
+      <Scaffold>
         <p>Status: {error.status}</p>
         <pre>{JSON.stringify(error.data)}</pre>
-      </div>
+      </Scaffold>
     );
   }
 
   return (
-    <div>
+    <Scaffold>
       <h1>Uh oh ...</h1>
       <p>Something went wrong.</p>
       <pre>{`${error}`}</pre>
-    </div>
+    </Scaffold>
   );
 }
