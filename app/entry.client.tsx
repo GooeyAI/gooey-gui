@@ -32,6 +32,7 @@ Sentry.init({
     /TypeError: Load failed/i,
     /(network)(\s+)(error)/i,
     /AbortError/i,
+    /Detected popup close/i,
   ],
 });
 
