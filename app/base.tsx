@@ -79,7 +79,10 @@ export const applyTransform: Record<string, (val: FormDataEntryValue) => any> =
     file: (val) => (val ? JSON.parse(`${val}`) : null),
   };
 
-function parseIntFloat(val: FormDataEntryValue): number {
+function parseIntFloat(
+  val: FormDataEntryValue | undefined | null
+): number | undefined {
+  if (!val) return undefined;
   let strVal = val.toString();
   const intVal = parseInt(strVal);
   const floatVal = parseFloat(strVal);
