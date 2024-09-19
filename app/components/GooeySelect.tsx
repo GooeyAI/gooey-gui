@@ -1,5 +1,9 @@
 import { useEffect } from "react";
-import type { OptionProps, SingleValueProps } from "react-select";
+import type {
+  CSSObjectWithLabel,
+  OptionProps,
+  SingleValueProps,
+} from "react-select";
 import Select, { components } from "react-select";
 import { useJsonFormInput } from "~/jsonFormInput";
 import { ClientOnlySuspense } from "~/lazyImports";
@@ -14,8 +18,8 @@ export default function GooeySelect({
   onChange: () => void;
   state: Record<string, any>;
 }) {
-  const { defaultValue, name, label, ...args } = props;
-  const [JsonFormInput, value, setValue] = useJsonFormInput({
+  let { defaultValue, name, label, styles, ...args } = props;
+  let [JsonFormInput, value, setValue] = useJsonFormInput({
     defaultValue,
     name,
     onChange,
@@ -28,7 +32,7 @@ export default function GooeySelect({
     }
   }, [state, name]);
 
-  const onSelectChange = (newValue: any) => {
+  let onSelectChange = (newValue: any) => {
     if (newValue === undefined) return;
     if (!newValue) {
       setValue(newValue);
@@ -51,7 +55,7 @@ export default function GooeySelect({
   }, [args.isMulti, args.options, selectValue, setValue]);
 
   return (
-    <div className="gui-input gui-input-select">
+    <div className={`gui-input gui-input-select ${args.className ?? ""}`}>
       {label && (
         <label htmlFor={name}>
           <RenderedMarkdown body={label} />
@@ -60,11 +64,15 @@ export default function GooeySelect({
       <JsonFormInput />
       <ClientOnlySuspense
         fallback={
-          <div
-            className="d-flex align-items-center justify-content-center border rounded"
-            style={{ height: "38px" }}
-          >
-            Loading...
+          <div className="d-flex align-items-center" style={{ height: "38px" }}>
+            <RenderedMarkdown
+              body={
+                (selectValue &&
+                  selectValue.map((it: any) => it.label).join(" | ")) ||
+                "Loading..."
+              }
+              className="container-margin-reset"
+            />
           </div>
         }
       >
@@ -73,6 +81,17 @@ export default function GooeySelect({
             value={selectValue}
             onChange={onSelectChange}
             components={{ Option, SingleValue }}
+            styles={{
+              ...Object.fromEntries(
+                Object.entries(styles ?? {}).map(([key, style]) => {
+                  if (!style) return [key, undefined];
+                  return [
+                    key,
+                    (base: CSSObjectWithLabel) => ({ ...base, ...style }),
+                  ];
+                })
+              ),
+            }}
             {...args}
           />
         )}
