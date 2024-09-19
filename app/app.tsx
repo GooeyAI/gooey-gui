@@ -22,7 +22,7 @@ import {
 } from "@remix-run/react";
 import path from "path";
 import { useDebouncedCallback } from "use-debounce";
-import { applyTransform, getTransforms, RenderedChildren } from "~/base";
+import { applyTransform, getTransforms, RenderedChildren } from "~/renderer";
 import { useEventSourceNullOk } from "~/event-source";
 import { handleRedirectResponse } from "~/handleRedirect";
 
