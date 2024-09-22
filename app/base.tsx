@@ -300,7 +300,7 @@ function RenderedTreeNode({
       );
     }
     case "input": {
-      const className = `gui-input gui-input-${props.type}`;
+      const className = `gui-input gui-input-${props.type} ${props.className ?? ""}`;
       const id = inputId(props);
       switch (props.type) {
         case "range":
