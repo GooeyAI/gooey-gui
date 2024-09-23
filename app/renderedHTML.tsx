@@ -12,6 +12,7 @@ import { Link } from "@remix-run/react";
 export function RenderedHTML({
   body,
   lineClamp,
+  lineClampExpand,
   ...attrs
 }: {
   body: string;
@@ -27,7 +28,7 @@ export function RenderedHTML({
   }
   const parsedElements = parse(body || "", reactParserOptions);
   return (
-    <LineClamp lines={lineClamp} key={body}>
+    <LineClamp lines={lineClamp} key={body} expandable={lineClampExpand}>
       <span className="gui-html-container" {...attrs}>
         {parsedElements}
       </span>
@@ -126,9 +127,11 @@ const reactParserOptions: HTMLReactParserOptions = {
 function LineClamp({
   lines,
   children,
+  expandable = true,
 }: {
   lines?: number;
   children: React.ReactNode;
+  expandable: boolean;
 }) {
   const contentRef = useRef<HTMLSpanElement>(null);
 
@@ -186,19 +189,21 @@ function LineClamp({
             lineHeight: "130%",
           }}
         >
-          <button
-            style={{
-              border: "none",
-              backgroundColor: "white",
-              color: "rgba(0, 0, 0, 0.6)",
-            }}
-            type={"button"}
-            onClick={() => {
-              setExpanded(true);
-            }}
-          >
-            …more
-          </button>
+          {expandable && (
+            <button
+              style={{
+                border: "none",
+                backgroundColor: "white",
+                color: "rgba(0, 0, 0, 0.6)",
+              }}
+              type={"button"}
+              onClick={() => {
+                setExpanded(true);
+              }}
+            >
+              …more
+            </button>
+          )}
         </span>
       )}
     </span>
