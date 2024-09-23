@@ -780,3 +780,6 @@ a.text-primary:hover {
 .modal {
   animation: fadeInBackground 1s forwards;
 }
+.modal-header {
+  align-items: start;
+}

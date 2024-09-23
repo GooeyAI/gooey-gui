@@ -62,7 +62,7 @@ def alert_dialog(
             '<i class="fa fa-times fa-xl">',
             key=ref.close_btn_key,
             type="tertiary",
-            className="py-1 px-2 mb-1",
+            className="m-0 py-1 px-2",
         )
     return body
 
