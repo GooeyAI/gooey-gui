@@ -292,3 +292,7 @@ div[id^="react-select-"][id$="-listbox"] {
 .gui-input-number input {
   padding: 0.5rem;
 }
+
+.bg-hover-light:hover {
+  background-color: var(--bs-gray-200) !important;
+}

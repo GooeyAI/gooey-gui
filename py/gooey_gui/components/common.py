@@ -115,8 +115,8 @@ def markdown(
     )
 
 
-def _node(name: str, **props):
-    node = core.RenderTreeNode(name=name, props=props)
+def _node(nodename: str, **props):
+    node = core.RenderTreeNode(name=nodename, props=props)
     node.mount()
     return core.NestingCtx(node)
 
@@ -556,7 +556,7 @@ def button(
     """
     if not key:
         key = core.md5_values("button", label, help, type, props)
-    className = f"btn-{type} " + props.pop("className", "")
+    className = f"btn btn-theme btn-{type} " + props.pop("className", "")
     core.RenderTreeNode(
         name=component,
         props=dict(
@@ -1017,6 +1017,17 @@ def plotly_chart(figure_or_data, **kwargs):
             args=kwargs,
         ),
     ).mount()
+
+
+def popover(**props) -> tuple[core.NestingCtx, core.NestingCtx]:
+    content = core.RenderTreeNode(name="content")
+
+    popover = core.RenderTreeNode(
+        name="popover", props=props | dict(content=content.children)
+    )
+    popover.mount()
+
+    return core.NestingCtx(popover), core.NestingCtx(content)
 
 
 def dedent(text: str | None) -> str | None:

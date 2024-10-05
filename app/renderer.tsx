@@ -18,6 +18,8 @@ import { OnChange } from "./app";
 import CountdownTimer from "./components/countdown";
 import GooeySelect from "./components/GooeySelect";
 import { lazyImport } from "./lazyImports";
+import Tippy from "@tippyjs/react";
+import GooeyPopover from "./components/GooeyPopover";
 
 const { DataTable, DataTableRaw } = lazyImport(() => import("~/dataTable"));
 
@@ -42,7 +44,7 @@ const Plot = lazyImport(
 
 const CodeEditor = lazyImport(() => import("./components/CodeEditor")).default;
 
-type TreeNode = {
+export type TreeNode = {
   name: string;
   props: Record<string, any>;
   children: Array<TreeNode>;
@@ -355,27 +357,16 @@ function RenderedTreeNode({
       }
     }
     case "gui-button": {
-      const { label, className, ...args } = props;
+      const { label, ...args } = props;
       return (
-        <button
-          type="button"
-          className={`btn btn-theme ${className ?? ""}`}
-          {...args}
-        >
+        <button type="button" {...args}>
           <RenderedMarkdown body={label} />
         </button>
       );
     }
     case "download-button": {
-      const { label, className, url, ...args } = props;
-      return (
-        <DownloadButton
-          label={label}
-          className={className}
-          url={url}
-          {...args}
-        />
-      );
+      const { label, url, ...args } = props;
+      return <DownloadButton label={label} url={url} {...args} />;
     }
     case "select":
       return <GooeySelect props={props} onChange={onChange} state={state} />;
@@ -438,6 +429,18 @@ function RenderedTreeNode({
     case "plotly-chart": {
       const { chart, ...args } = props;
       return <Plot {...chart} style={{ width: "100%" }} />;
+    }
+    case "popover": {
+      const { content, ...args } = props;
+      return (
+        <GooeyPopover
+          content={content}
+          children={children}
+          onChange={onChange}
+          state={state}
+          {...args}
+        />
+      );
     }
     default:
       return (

@@ -58,6 +58,7 @@ export const links: LinksFunction = () => {
     },
     ...require("~/dataTable.styles").links(),
     ...require("~/gooeyFileInput.styles").links(),
+    ...require("~/components/GooeyPopover.styles").links(),
     { rel: "stylesheet", href: customStyles },
     { rel: "stylesheet", href: appStyles },
   ];

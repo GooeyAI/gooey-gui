@@ -1,6 +1,6 @@
 {
   "name": "gooey-gui",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "sideEffects": false,
   "scripts": {
     "build": "remix build",
@@ -29,6 +29,7 @@
     "@sentry/integrations": "^7.73.0",
     "@sentry/remix": "^7.73.0",
     "@textea/json-viewer": "^3.0.0",
+    "@tippyjs/react": "^4.2.6",
     "@uiw/codemirror-theme-dracula": "^4.23.0",
     "@uiw/react-codemirror": "^4.23.0",
     "@uppy/audio": "^1.1.1",
