@@ -33,11 +33,7 @@ export default function GooeyPopover({
       animation="scale"
       {...props}
     >
-      <button
-        type="button"
-        className="border-0 bg-transparent"
-        onClick={() => setVisible(!visible)}
-      >
+      <button type="button" onClick={() => setVisible(!visible)}>
         <RenderedChildren
           children={children}
           onChange={onChange}
