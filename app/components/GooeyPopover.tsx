@@ -21,6 +21,7 @@ export default function GooeyPopover({
     <Tippy
       visible={visible}
       onClickOutside={() => setVisible(false)}
+      maxWidth={"90vw"}
       content={
         <div onClick={() => setVisible(false)}>
           <RenderedChildren
