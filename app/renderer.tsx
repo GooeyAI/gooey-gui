@@ -401,15 +401,19 @@ function RenderedTreeNode({
       );
     case "tag": {
       const { __reactjsxelement, ...args } = props;
-      return (
-        <__reactjsxelement {...args}>
-          <RenderedChildren
-            children={children}
-            onChange={onChange}
-            state={state}
-          />
-        </__reactjsxelement>
-      );
+      if (children.length) {
+        return (
+          <__reactjsxelement {...args}>
+            <RenderedChildren
+              children={children}
+              onChange={onChange}
+              state={state}
+            />
+          </__reactjsxelement>
+        );
+      } else {
+        return <__reactjsxelement {...args} />;
+      }
     }
     case "countdown-timer": {
       return (
