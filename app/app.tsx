@@ -183,6 +183,12 @@ export type OnChange = (event?: {
   currentTarget: EventTarget | HTMLElement | null | undefined;
 }) => void;
 
+function base64Decode(base64EncodedString: string): string {
+  return new TextDecoder().decode(
+    Uint8Array.from(atob(base64EncodedString), (m) => m.charCodeAt(0))
+  );
+}
+
 function App() {
   const [searchParams] = useSearchParams();
   const loaderData = useLoaderData<typeof loader>();
@@ -195,7 +201,10 @@ function App() {
 
   useEffect(() => {
     if (!base64Body) return;
-    document.documentElement.innerHTML = atob(base64Body);
+    let body = base64Decode(base64Body);
+    let frag = document.createRange().createContextualFragment(body);
+    document.documentElement.innerHTML = "";
+    document.documentElement.appendChild(frag);
   }, [base64Body]);
 
   useEffect(() => {
