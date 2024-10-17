@@ -18,8 +18,8 @@ import { OnChange } from "./app";
 import CountdownTimer from "./components/countdown";
 import GooeySelect from "./components/GooeySelect";
 import { lazyImport } from "./lazyImports";
-import Tippy from "@tippyjs/react";
 import GooeyPopover from "./components/GooeyPopover";
+import GooeySwitch from "./components/GooeySwitch";
 
 const { DataTable, DataTableRaw } = lazyImport(() => import("~/dataTable"));
 
@@ -344,6 +344,15 @@ function RenderedTreeNode({
               state={state}
               className={className}
             ></GooeyRadio>
+          );
+        case "switch":
+          return (
+            <GooeySwitch
+              props={props}
+              id={id}
+              state={state}
+              className={className}
+            ></GooeySwitch>
           );
         default:
           return (
