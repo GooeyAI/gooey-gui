@@ -969,7 +969,7 @@ def _input_widget(
     #     assert not value, "only one of value or key can be provided"
     # else:
     if not key:
-        key = core.md5_values("input", input_type, label, help, label_visibility)
+        key = core.md5_values("input", 'checkbox' if input_type == 'switch' else input_type, label, help, label_visibility)
     value = core.session_state.setdefault(key, value)
     if label_visibility != "visible":
         label = None
@@ -1044,3 +1044,27 @@ def js(src: str, **kwargs):
             args=kwargs,
         ),
     ).mount()
+
+
+def switch(
+    label: str,
+    value: bool = False,
+    key: str = None,
+    help: str = None,
+    *,
+    disabled: bool = False,
+    label_visibility: LabelVisibility = "visible",
+    **props,
+) -> bool:
+    value = _input_widget(
+        input_type="switch",
+        label=label,
+        value=value,
+        key=key,
+        help=help,
+        disabled=disabled,
+        label_visibility=label_visibility,
+        default_value_attr="defaultChecked",
+        **props,
+    )
+    return bool(value)
