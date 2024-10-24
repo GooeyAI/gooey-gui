@@ -1044,3 +1044,33 @@ def js(src: str, **kwargs):
             args=kwargs,
         ),
     ).mount()
+
+def switch(
+    label: str,
+    value: bool = False,
+    key: str = None,
+    help: str = None,
+    *,
+    disabled: bool = False,
+    size: str = "large",
+    label_visibility: LabelVisibility = "visible",
+    **props,
+) -> bool:
+    if not key:
+        key = core.md5_values("input", 'switch', label, help, label_visibility)
+    value = core.session_state.setdefault(key, value)
+    if label_visibility != "visible":
+        label = None
+    core.RenderTreeNode(
+        name="switch",
+        props={
+            "name": key,
+            "label": dedent(label),
+            "defaultChecked": value,
+            "help": help,
+            "disabled": disabled,
+            "size": size,
+            **props,
+        },
+    ).mount()
+    return bool(value)

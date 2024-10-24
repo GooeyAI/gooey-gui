@@ -14,12 +14,12 @@ import {
 } from "~/gooeyInput";
 import { useJsonFormInput } from "~/jsonFormInput";
 import { RenderedHTML } from "~/renderedHTML";
-import { OnChange } from "./app";
+import type { OnChange } from "./app";
 import CountdownTimer from "./components/countdown";
 import GooeySelect from "./components/GooeySelect";
 import { lazyImport } from "./lazyImports";
-import Tippy from "@tippyjs/react";
 import GooeyPopover from "./components/GooeyPopover";
+import GooeySwitch from "./components/GooeySwitch";
 
 const { DataTable, DataTableRaw } = lazyImport(() => import("~/dataTable"));
 
@@ -79,6 +79,7 @@ export const applyTransform: Record<string, (val: FormDataEntryValue) => any> =
     range: parseIntFloat,
     select: (val) => (val ? JSON.parse(`${val}`) : null),
     file: (val) => (val ? JSON.parse(`${val}`) : null),
+    switch: Boolean,
   };
 
 function parseIntFloat(
@@ -301,6 +302,13 @@ function RenderedTreeNode({
         </div>
       );
     }
+    case "switch":
+      return (
+        <GooeySwitch
+          props={props}
+          state={state}
+        />
+      );
     case "input": {
       const className = `gui-input gui-input-${props.type}`;
       const id = inputId(props);
