@@ -224,8 +224,6 @@ h5 {
   color: #000000;
   word-wrap: break-word;
   display: inline-block;
-  background-color: rgba(0, 0, 0, 0.05);
-  padding: 0.25rem 0.5rem;
   letter-spacing: 1px;
 }
 
@@ -795,4 +793,58 @@ button {
   border: none;
   color: inherit;
   font: inherit;
+}
+
+.gooey-switch-container h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+}
+
+.gooey-switch {
+  visibility: hidden;
+  position: absolute;
+  margin-left: -9999px;
+}
+
+.gooey-switch + label {
+  display: block;
+  position: relative;
+  cursor: pointer;
+  outline: none;
+  user-select: none;
+}
+
+.gooey-switch--shadow + label {
+  padding: 2px;
+  width: 48px;
+  height: 24px;
+  background-color: #dddddd;
+  border-radius: 60px;
+}
+.gooey-switch--shadow + label:before,
+.gooey-switch--shadow + label:after {
+  display: block;
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  bottom: 1px;
+  content: "";
+}
+.gooey-switch--shadow + label:before {
+  right: 1px;
+  background-color: #f1f1f1;
+  border-radius: 24px;
+  transition: background 0.4s;
+}
+.gooey-switch--shadow + label:after {
+  width: 22px;
+  background-color: #fff;
+  border-radius: 100%;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s;
+}
+.gooey-switch--shadow:checked + label:before {
+  background-color: #02c4c8 !important;
+}
+.gooey-switch--shadow:checked + label:after {
+  transform: translateX(24px);
 }
