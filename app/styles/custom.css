@@ -892,3 +892,16 @@ button {
   -o-transition: all 0.2s ease;
   transition: all 0.2s ease;
 }
+
+.gooey-tooltip .tippy-box {
+  width: max-content;
+  max-width: 80vw !important;
+  color: #82878b !important
+}
+
+@media (min-width: 768px) {
+  .gooey-tooltip .tippy-box {
+    width: max-content;
+    max-width: 50vw !important;
+  }
+}
