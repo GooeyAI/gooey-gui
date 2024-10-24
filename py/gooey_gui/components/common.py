@@ -1052,6 +1052,7 @@ def switch(
     help: str = None,
     *,
     disabled: bool = False,
+    size: str = "large",
     label_visibility: LabelVisibility = "visible",
     **props,
 ) -> bool:
@@ -1068,6 +1069,7 @@ def switch(
             "defaultChecked": value,
             "help": help,
             "disabled": disabled,
+            "size": size,
             **props,
         },
     ).mount()
