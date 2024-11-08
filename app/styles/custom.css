@@ -720,6 +720,9 @@ a.text-primary:hover {
 }
 .modal {
   animation: fadeInBackground 1s forwards;
+
+  --bs-modal-header-padding: 1.5rem 1.5rem 0rem 1.5rem;
+  --bs-modal-padding: 1.5rem;
 }
 .modal-header {
   align-items: start;
