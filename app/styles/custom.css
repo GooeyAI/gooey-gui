@@ -224,8 +224,6 @@ h5 {
   color: #000000;
   word-wrap: break-word;
   display: inline-block;
-  background-color: rgba(0, 0, 0, 0.05);
-  padding: 0.25rem 0.5rem;
   letter-spacing: 1px;
 }
 
@@ -795,4 +793,102 @@ button {
   border: none;
   color: inherit;
   font: inherit;
+}
+
+/* Reset heading margins */
+.gooey-switch-container p,
+.gooey-switch-container h6,
+.gooey-switch-container h5,
+.gooey-switch-container h4,
+.gooey-switch-container h3,
+.gooey-switch-container h2,
+.gooey-switch-container h1 {
+  margin: 0;
+}
+
+/* Hide the actual switch input */
+.gooey-switch {
+  visibility: hidden;
+}
+
+/* Label for the switch */
+.gooey-switch + label {
+  display: block;
+  position: relative;
+  cursor: pointer;
+  outline: none;
+  user-select: none;
+}
+
+/* Track (background) styles */
+.gooey-switch + label:before {
+  content: "";
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  bottom: 1px;
+  right: 1px;
+  background-color: #f1f1f1;
+  border-radius: inherit;
+  transition: background 0.4s;
+}
+
+/* Ball (knob) styles */
+.gooey-switch + label:after {
+  content: "";
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  background-color: #fff;
+  border-radius: 50%;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s;
+}
+
+/* Checked state */
+.gooey-switch:checked + label:before {
+  background-color: #02c4c8;
+}
+
+/* Large Variant */
+.gooey-switch--shadow--large + label {
+  width: 48px;
+  height: 24px;
+  background-color: #ddd;
+  border-radius: 60px;
+  padding: 2px;
+}
+.gooey-switch--shadow--large + label:after {
+  width: 22px;
+  height: 22px;
+  transition: transform 0.2s ease;
+}
+.gooey-switch--shadow--large:checked + label:after {
+  transform: translateX(24px);
+}
+
+/* Small Variant */
+.gooey-switch--shadow--small + label {
+  width: 36px;
+  height: 20px;
+  background-color: #ddd;
+  border-radius: 30px;
+  padding: 1px;
+}
+.gooey-switch--shadow--small + label:after {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.2s ease;
+}
+.gooey-switch--shadow--small:checked + label:after {
+  transform: translateX(16px);
+}
+
+/* Cross-browser support (vendor prefixes) */
+.gooey-switch + label:before, 
+.gooey-switch + label:after {
+  -webkit-transition: all 0.2s ease;
+  -moz-transition: all 0.2s ease;
+  -o-transition: all 0.2s ease;
+  transition: all 0.2s ease;
 }
