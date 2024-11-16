@@ -11,6 +11,8 @@ from .state import threadlocal
 
 T = typing.TypeVar("T")
 
+_extra_subscriptions = set()
+
 
 @lru_cache
 def get_redis():
@@ -21,20 +23,23 @@ def get_redis():
 
 
 def realtime_clear_subs():
-    threadlocal.channels = []
+    threadlocal.channels = set()
 
 
-def get_subscriptions() -> list[str]:
+def get_subscriptions() -> set[str]:
     try:
-        return threadlocal.channels
+        channels = threadlocal.channels
     except AttributeError:
-        threadlocal.channels = []
-        return threadlocal.channels
+        channels = threadlocal.channels = set()
+    for channel in _extra_subscriptions:
+        channels.add(f"gooey-gui/state/{channel}")
+    return channels
 
 
 def realtime_pull(channels: list[str]) -> list[typing.Any]:
     channels = [f"gooey-gui/state/{channel}" for channel in channels]
-    threadlocal.channels = channels
+    for channel in channels:
+        threadlocal.channels.add(channel)
     r = get_redis()
     out = [
         json.loads(value) if (value := r.get(channel)) else None for channel in channels
@@ -49,12 +54,13 @@ def realtime_push(channel: str, value: typing.Any = "ping", ex=None):
     msg = json.dumps(jsonable_encoder(value))
     r = get_redis()
     r.set(channel, msg, ex=ex)
-    r.publish(channel, json.dumps(time()))
+    t = json.dumps(time())
+    r.publish(channel, t)
     if isinstance(value, dict):
         run_status = value.get("__run_status")
-        logger.info(f"publish {channel=} {run_status=}")
+        logger.info(f"publish {t} {channel=} {run_status=}")
     else:
-        logger.info(f"publish {channel=}")
+        logger.info(f"publish {t} {channel=}")
 
 
 @contextmanager

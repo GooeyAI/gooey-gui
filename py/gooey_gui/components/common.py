@@ -667,13 +667,14 @@ def file_uploader(
     return value
 
 
-def json(value: typing.Any, expanded: bool = False, depth: int = 1):
+def json(value: typing.Any, expanded: bool = False, depth: int = 1, **props):
     core.RenderTreeNode(
         name="json",
         props=dict(
             value=value,
             expanded=expanded,
             defaultInspectDepth=3 if expanded else depth,
+            **props,
         ),
     ).mount()
 
