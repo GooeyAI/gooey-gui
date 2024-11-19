@@ -4,6 +4,7 @@ import { RenderedHTML } from "~/renderedHTML";
 export function RenderedMarkdown({
   body,
   lineClamp,
+  lineClampExpand,
   ...attrs
 }: // allowUnsafeHTML,
   {
@@ -25,6 +26,7 @@ export function RenderedMarkdown({
       key={body}
       body={html}
       lineClamp={lineClamp}
+      lineClampExpand={lineClampExpand}
       className="gui-html-container gui-md-container"
       {...attrs}
     />
