@@ -1053,7 +1053,7 @@ def switch(
     help: str = None,
     *,
     disabled: bool = False,
-    size: str = "large",
+    size: typing.Literal["small", "large"] = "large",
     label_visibility: LabelVisibility = "visible",
     **props,
 ) -> bool:
