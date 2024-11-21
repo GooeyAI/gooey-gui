@@ -1075,3 +1075,24 @@ def switch(
         },
     ).mount()
     return bool(value)
+
+def tooltip(
+    content: str = "",
+    placement: str = None,
+    help: str = None,
+    *,
+    disabled: bool = False,
+    **props,
+) -> core.NestingCtx:
+    tooltip = core.RenderTreeNode(
+        name="tooltip",
+        props={
+            "content": content,
+            "placement": placement,
+            "help": help,
+            "disabled": disabled,
+            **props,
+        },
+    )
+    tooltip.mount()
+    return core.NestingCtx(tooltip)

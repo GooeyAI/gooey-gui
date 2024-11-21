@@ -20,6 +20,7 @@ import GooeySelect from "./components/GooeySelect";
 import { lazyImport } from "./lazyImports";
 import GooeyPopover from "./components/GooeyPopover";
 import GooeySwitch from "./components/GooeySwitch";
+import GooeyTooltip, { HelpTooltip } from "./components/GooeyTooltip";
 
 const { DataTable, DataTableRaw } = lazyImport(() => import("~/dataTable"));
 
@@ -303,12 +304,7 @@ function RenderedTreeNode({
       );
     }
     case "switch":
-      return (
-        <GooeySwitch
-          props={props}
-          state={state}
-        />
-      );
+      return <GooeySwitch props={props} state={state} />;
     case "input": {
       const className = `gui-input gui-input-${props.type}`;
       const id = inputId(props);
@@ -439,9 +435,34 @@ function RenderedTreeNode({
       return <ExecJs src={src} args={args}></ExecJs>;
     }
     case "plotly-chart": {
-      const { chart, ...args } = props;
+      const { chart } = props;
       return <Plot {...chart} style={{ width: "100%" }} />;
     }
+    case "tooltip":
+      const { content, help, ...args } = props;
+      if (help) {
+        return (
+          <div className="d-inline-block position-relative">
+            {children && (
+              <RenderedChildren
+                children={children}
+                onChange={onChange}
+                state={state}
+              />
+            )}
+            <HelpTooltip content={content} {...args} />
+          </div>
+        );
+      }
+      return (
+        <GooeyTooltip content={content} {...args}>
+          <RenderedChildren
+            children={children}
+            onChange={onChange}
+            state={state}
+          />
+        </GooeyTooltip>
+      );
     case "popover": {
       const { content, ...args } = props;
       return (
