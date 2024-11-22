@@ -1046,6 +1046,7 @@ def js(src: str, **kwargs):
         ),
     ).mount()
 
+
 def switch(
     label: str,
     value: bool = False,
@@ -1058,7 +1059,7 @@ def switch(
     **props,
 ) -> bool:
     if not key:
-        key = core.md5_values("input", 'switch', label, help, label_visibility)
+        key = core.md5_values("input", "switch", label, help, label_visibility)
     value = core.session_state.setdefault(key, value)
     if label_visibility != "visible":
         label = None
@@ -1076,9 +1077,10 @@ def switch(
     ).mount()
     return bool(value)
 
+
 def tooltip(
     content: str = "",
-    placement: str = None,
+    placement: typing.Literal["left", "right", "top", "bottom", "auto"] = "auto",
     help: str = None,
     *,
     disabled: bool = False,
