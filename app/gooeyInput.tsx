@@ -2,6 +2,24 @@ import React, { useEffect, useRef, useState } from "react";
 import { RenderedMarkdown } from "~/renderedMarkdown";
 import { HelpTooltip } from "./components/GooeyTooltip";
 
+function TooltipLabel({
+  label,
+  help,
+  tooltip_placement,
+}: {
+  label: string;
+  help: string;
+  tooltip_placement: string;
+}) {
+  return (
+    <span className="d-inline-block position-relative">
+      <label>
+        <RenderedMarkdown body={label} />
+      </label>
+      {help && <HelpTooltip content={help} placement={tooltip_placement} />}
+    </span>
+  );
+}
 export function GooeyTextarea({
   props,
   state,
@@ -18,14 +36,11 @@ export function GooeyTextarea({
   return (
     <div className="gui-input gui-input-textarea">
       {label && (
-        <span className="d-inline-block position-relative">
-          <label>
-            <RenderedMarkdown body={label} />
-          </label>
-          {help && (
-            <HelpTooltip content={help as string} placement={tooltip_placement} />
-          )}
-        </span>
+        <TooltipLabel
+          label={label}
+          help={help}
+          tooltip_placement={tooltip_placement}
+        />
       )}
       <div>
         <textarea
@@ -60,14 +75,11 @@ export function GooeyInput({
   return (
     <div className={className}>
       {label && (
-        <span className="d-inline-block position-relative">
-          <label htmlFor={id}>
-            <RenderedMarkdown body={label} />
-          </label>
-          {help && (
-            <HelpTooltip content={help as string} placement={tooltip_placement} />
-          )}
-        </span>
+        <TooltipLabel
+          label={label}
+          help={help}
+          tooltip_placement={tooltip_placement}
+        />
       )}
       <input
         ref={inputRef}
@@ -131,7 +143,8 @@ export function GooeyCheckbox({
   state: Record<string, any>;
   className: string;
 }) {
-  const { label, name, defaultChecked, help, tooltip_placement, ...args } = props;
+  const { label, name, defaultChecked, help, tooltip_placement, ...args } =
+    props;
   const inputRef = useGooeyCheckedInput({
     stateChecked: state[name],
     defaultChecked,
@@ -145,14 +158,13 @@ export function GooeyCheckbox({
         defaultChecked={defaultChecked}
         {...args}
       />
-      <span className="d-inline-block position-relative">
-        <label htmlFor={id}>
-          <RenderedMarkdown body={label} />
-        </label>
-        {help && (
-          <HelpTooltip content={help as string} placement={tooltip_placement} />
-        )}
-      </span>
+      {label && (
+        <TooltipLabel
+          label={label}
+          help={help}
+          tooltip_placement={tooltip_placement}
+        />
+      )}
     </div>
   );
 }
@@ -168,7 +180,15 @@ export function GooeyRadio({
   state: Record<string, any>;
   className: string;
 }) {
-  const { label, name, value, defaultChecked, help, tooltip_placement, ...args } = props;
+  const {
+    label,
+    name,
+    value,
+    defaultChecked,
+    help,
+    tooltip_placement,
+    ...args
+  } = props;
   const inputRef = useGooeyCheckedInput({
     stateChecked: state[name] == value,
     defaultChecked,
@@ -184,14 +204,13 @@ export function GooeyRadio({
         defaultChecked={defaultChecked}
         {...args}
       />
-      <span className="d-inline-block position-relative">
-        <label htmlFor={id}>
-          <RenderedMarkdown body={label} />
-        </label>
-        {help && (
-          <HelpTooltip content={help as string} placement={tooltip_placement} />
-        )}
-      </span>
+      {label && (
+        <TooltipLabel
+          label={label}
+          help={help}
+          tooltip_placement={tooltip_placement}
+        />
+      )}
     </div>
   );
 }
