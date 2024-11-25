@@ -1,12 +1,11 @@
-import CodeMirror, { useCodeMirror } from "@uiw/react-codemirror";
 import { javascript } from "@codemirror/lang-javascript";
-import { useGooeyStringInput } from "~/gooeyInput";
-import { dracula } from "@uiw/codemirror-theme-dracula";
-import { RenderedMarkdown } from "~/renderedMarkdown";
 import { lintGutter, linter } from "@codemirror/lint";
-import type { OnChange } from "~/app";
+import { dracula } from "@uiw/codemirror-theme-dracula";
+import CodeMirror from "@uiw/react-codemirror";
 import type { LintOptions } from "jshint";
-import { JSHINT as jshint } from 'jshint';
+import { JSHINT as jshint } from "jshint";
+import type { OnChange } from "~/app";
+import { InputLabel, useGooeyStringInput } from "~/gooeyInput";
 
 const jsLinter = (lintOptions: LintOptions) => {
   return linter((view) => {
@@ -22,7 +21,7 @@ const jsLinter = (lintOptions: LintOptions) => {
         const diagnostic = {
           from: selectedLine.from,
           to: selectedLine.to,
-          severity: 'error',
+          severity: "error",
           message: error.reason,
         };
 
@@ -42,7 +41,15 @@ const CodeEditor = ({
   onChange: OnChange;
   state: Record<string, any>;
 }) => {
-  const { name, defaultValue, height, label, ...restProps } = props;
+  const {
+    name,
+    defaultValue,
+    height,
+    label,
+    help,
+    tooltipPlacement,
+    ...restProps
+  } = props;
   const [inputRef, value, setValue] = useGooeyStringInput<HTMLTextAreaElement>({
     state,
     name,
@@ -67,11 +74,11 @@ const CodeEditor = ({
 
   return (
     <div className="mb-4 code-editor-wrapper position-relative">
-      {label && (
-        <label>
-          <RenderedMarkdown body={label} />
-        </label>
-      )}
+      <InputLabel
+        label={label}
+        help={help}
+        tooltipPlacement={tooltipPlacement}
+      />
       <textarea
         data-gramm="false"
         data-gramm_editor="false"

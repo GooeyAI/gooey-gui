@@ -1,25 +1,30 @@
 import React, { useEffect, useRef, useState } from "react";
 import { RenderedMarkdown } from "~/renderedMarkdown";
-import { HelpTooltip } from "./components/GooeyTooltip";
+import { TooltipPlacement } from "./components/GooeyTooltip";
 
-function TooltipLabel({
+export function InputLabel({
   label,
+  htmlFor,
   help,
-  tooltip_placement,
+  tooltipPlacement,
 }: {
   label: string;
-  help: string;
-  tooltip_placement: string;
+  htmlFor?: string;
+  help?: string;
+  tooltipPlacement?: TooltipPlacement;
 }) {
+  if (!label) return null;
   return (
-    <span className="d-inline-block position-relative">
-      <label>
-        <RenderedMarkdown body={label} />
-      </label>
-      {help && <HelpTooltip content={help} placement={tooltip_placement} />}
-    </span>
+    <label htmlFor={htmlFor}>
+      <RenderedMarkdown
+        body={label}
+        help={help}
+        tooltipPlacement={tooltipPlacement}
+      />
+    </label>
   );
 }
+
 export function GooeyTextarea({
   props,
   state,
@@ -27,7 +32,7 @@ export function GooeyTextarea({
   props: Record<string, any>;
   state: Record<string, any>;
 }) {
-  const { label, name, defaultValue, help, tooltip_placement, ...args } = props;
+  const { label, name, defaultValue, help, tooltipPlacement, ...args } = props;
   const [inputRef, value, setValue] = useGooeyStringInput<HTMLTextAreaElement>({
     state,
     name,
@@ -35,13 +40,11 @@ export function GooeyTextarea({
   });
   return (
     <div className="gui-input gui-input-textarea">
-      {label && (
-        <TooltipLabel
-          label={label}
-          help={help}
-          tooltip_placement={tooltip_placement}
-        />
-      )}
+      <InputLabel
+        label={label}
+        help={help}
+        tooltipPlacement={tooltipPlacement}
+      />
       <div>
         <textarea
           ref={inputRef}
@@ -66,7 +69,7 @@ export function GooeyInput({
   state: Record<string, any>;
   className: string;
 }) {
-  const { label, name, defaultValue, help, tooltip_placement, ...args } = props;
+  const { label, name, defaultValue, help, tooltipPlacement, ...args } = props;
   const [inputRef, value, setValue] = useGooeyStringInput<HTMLInputElement>({
     state,
     name,
@@ -74,13 +77,11 @@ export function GooeyInput({
   });
   return (
     <div className={className}>
-      {label && (
-        <TooltipLabel
-          label={label}
-          help={help}
-          tooltip_placement={tooltip_placement}
-        />
-      )}
+      <InputLabel
+        label={label}
+        help={help}
+        tooltipPlacement={tooltipPlacement}
+      />
       <input
         ref={inputRef}
         id={id}
@@ -143,7 +144,7 @@ export function GooeyCheckbox({
   state: Record<string, any>;
   className: string;
 }) {
-  const { label, name, defaultChecked, help, tooltip_placement, ...args } =
+  const { label, name, defaultChecked, help, tooltipPlacement, ...args } =
     props;
   const inputRef = useGooeyCheckedInput({
     stateChecked: state[name],
@@ -158,13 +159,12 @@ export function GooeyCheckbox({
         defaultChecked={defaultChecked}
         {...args}
       />
-      {label && (
-        <TooltipLabel
-          label={label}
-          help={help}
-          tooltip_placement={tooltip_placement}
-        />
-      )}
+      <InputLabel
+        htmlFor={id}
+        label={label}
+        help={help}
+        tooltipPlacement={tooltipPlacement}
+      />
     </div>
   );
 }
@@ -186,7 +186,7 @@ export function GooeyRadio({
     value,
     defaultChecked,
     help,
-    tooltip_placement,
+    tooltipPlacement,
     ...args
   } = props;
   const inputRef = useGooeyCheckedInput({
@@ -204,13 +204,11 @@ export function GooeyRadio({
         defaultChecked={defaultChecked}
         {...args}
       />
-      {label && (
-        <TooltipLabel
-          label={label}
-          help={help}
-          tooltip_placement={tooltip_placement}
-        />
-      )}
+      <InputLabel
+        label={label}
+        help={help}
+        tooltipPlacement={tooltipPlacement}
+      />
     </div>
   );
 }

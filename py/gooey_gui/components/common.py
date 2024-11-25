@@ -1080,10 +1080,8 @@ def switch(
 
 def tooltip(
     content: str = "",
-    placement: typing.Literal["left", "right", "top", "bottom", "auto"] = "auto",
-    help: str = None,
     *,
-    disabled: bool = False,
+    placement: typing.Literal["left", "right", "top", "bottom", "auto"] = "auto",
     **props,
 ) -> core.NestingCtx:
     tooltip = core.RenderTreeNode(
@@ -1091,8 +1089,6 @@ def tooltip(
         props={
             "content": content,
             "placement": placement,
-            "help": help,
-            "disabled": disabled,
             **props,
         },
     )

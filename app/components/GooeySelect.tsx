@@ -5,6 +5,7 @@ import type {
   SingleValueProps,
 } from "react-select";
 import Select, { components } from "react-select";
+import { InputLabel } from "~/gooeyInput";
 import { useJsonFormInput } from "~/jsonFormInput";
 import { ClientOnlySuspense } from "~/lazyImports";
 import { RenderedMarkdown } from "~/renderedMarkdown";
@@ -18,7 +19,8 @@ export default function GooeySelect({
   onChange: () => void;
   state: Record<string, any>;
 }) {
-  let { defaultValue, name, label, styles, ...args } = props;
+  let { defaultValue, name, label, styles, help, tooltipPlacement, ...args } =
+    props;
   let [JsonFormInput, value, setValue] = useJsonFormInput({
     defaultValue,
     name,
@@ -56,11 +58,11 @@ export default function GooeySelect({
 
   return (
     <div className={`gui-input gui-input-select ${args.className ?? ""}`}>
-      {label && (
-        <label htmlFor={name}>
-          <RenderedMarkdown body={label} />
-        </label>
-      )}
+      <InputLabel
+        label={label}
+        help={help}
+        tooltipPlacement={tooltipPlacement}
+      />
       <JsonFormInput />
       <ClientOnlySuspense
         fallback={

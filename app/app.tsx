@@ -180,7 +180,7 @@ function useRealtimeChannels({
 
 export type OnChange = (event?: {
   target: EventTarget | HTMLElement | null | undefined;
-  currentTarget: EventTarget | HTMLElement | null | undefined;
+  currentTarget?: EventTarget | HTMLElement | null | undefined;
 }) => void;
 
 function base64Decode(base64EncodedString: string): string {
