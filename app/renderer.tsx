@@ -11,16 +11,17 @@ import {
   GooeyInput,
   GooeyRadio,
   GooeyTextarea,
+  InputLabel,
 } from "~/gooeyInput";
 import { useJsonFormInput } from "~/jsonFormInput";
 import { RenderedHTML } from "~/renderedHTML";
 import type { OnChange } from "./app";
 import CountdownTimer from "./components/countdown";
-import GooeySelect from "./components/GooeySelect";
-import { lazyImport } from "./lazyImports";
 import GooeyPopover from "./components/GooeyPopover";
+import GooeySelect from "./components/GooeySelect";
 import GooeySwitch from "./components/GooeySwitch";
-import GooeyTooltip, { HelpTooltip } from "./components/GooeyTooltip";
+import { GooeyTooltip } from "./components/GooeyTooltip";
+import { lazyImport } from "./lazyImports";
 
 const { DataTable, DataTableRaw } = lazyImport(() => import("~/dataTable"));
 
@@ -285,12 +286,27 @@ function RenderedTreeNode({
       );
     }
     case "html": {
-      const { body, ...args } = props;
-      return <RenderedHTML body={body} {...args} />;
+      const { body, help, tooltipPlacement, ...args } = props;
+      return (
+        <RenderedHTML
+          body={body}
+          help={help}
+          tooltipPlacement={tooltipPlacement}
+          {...args}
+        />
+      );
     }
     case "markdown": {
-      const { body, lineClamp, ...args } = props;
-      return <RenderedMarkdown body={body} lineClamp={lineClamp} {...args} />;
+      const { body, lineClamp, help, tooltipPlacement, ...args } = props;
+      return (
+        <RenderedMarkdown
+          body={body}
+          lineClamp={lineClamp}
+          help={help}
+          tooltipPlacement={tooltipPlacement}
+          {...args}
+        />
+      );
     }
     case "textarea": {
       return <GooeyTextarea props={props} state={state} />;
@@ -329,6 +345,8 @@ function RenderedTreeNode({
               defaultValue={props.defaultValue}
               uploadMeta={props.uploadMeta}
               state={state}
+              help={props.help}
+              tooltipPlacement={props.tooltipPlacement}
             />
           );
         case "checkbox":
@@ -439,28 +457,16 @@ function RenderedTreeNode({
       return <Plot {...chart} style={{ width: "100%" }} />;
     }
     case "tooltip":
-      const { content, help, ...args } = props;
-      if (help) {
-        return (
-          <div className="d-inline-block position-relative">
-            {children && (
-              <RenderedChildren
-                children={children}
-                onChange={onChange}
-                state={state}
-              />
-            )}
-            <HelpTooltip content={content} {...args} />
-          </div>
-        );
-      }
+      const { content, placement } = props;
       return (
-        <GooeyTooltip content={content} {...args}>
-          <RenderedChildren
-            children={children}
-            onChange={onChange}
-            state={state}
-          />
+        <GooeyTooltip content={content} placement={placement}>
+          <button>
+            <RenderedChildren
+              children={children}
+              onChange={onChange}
+              state={state}
+            />
+          </button>
         </GooeyTooltip>
       );
     case "popover": {
@@ -542,7 +548,7 @@ function GooeySlider({
   props: Record<string, any>;
   state: Record<string, any>;
 }) {
-  const { label, name, type, ...args } = props;
+  const { label, name, type, help, tooltipPlacement, ...args } = props;
   const ref1 = useRef<HTMLInputElement>(null);
   const ref2 = useRef<HTMLInputElement>(null);
 
@@ -557,9 +563,12 @@ function GooeySlider({
   }, [state, props.name]);
   return (
     <div className={className}>
-      <label htmlFor={id}>
-        <RenderedMarkdown className="flex-grow-1" body={label} />
-      </label>
+      <InputLabel
+        htmlFor={id}
+        label={label}
+        help={help}
+        tooltipPlacement={tooltipPlacement}
+      />
       <div className="d-flex justify-content-between align-items-center">
         <input
           ref={ref1}

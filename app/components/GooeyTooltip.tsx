@@ -2,17 +2,38 @@ import React from "react";
 import Tippy, { useSingleton } from "@tippyjs/react";
 import { RenderedMarkdown } from "~/renderedMarkdown";
 
-interface GooeyTooltipProps {
+export type TooltipPlacement = "left" | "right" | "top" | "bottom" | "auto";
+
+export function GooeyHelpIcon({
+  content,
+  placement,
+}: {
   content: string;
-  children?: React.ReactElement<any>;
-  placement?: "left" | "right" | "top" | "bottom" | "auto";
+  placement?: TooltipPlacement;
+}) {
+  return (
+    <GooeyTooltip content={content} placement={placement}>
+      <i
+        role="button"
+        className="fa-regular fa-circle-info position-absolute text-muted"
+        style={{
+          right: "-1.5rem",
+          top: "1px",
+        }}
+      />
+    </GooeyTooltip>
+  );
 }
 
-const GooeyTooltip: React.FC<GooeyTooltipProps> = ({
+export function GooeyTooltip({
   content,
-  placement = "auto",
   children,
-}) => {
+  placement,
+}: {
+  content: string;
+  children: React.ReactElement;
+  placement?: TooltipPlacement;
+}) {
   const [source, target] = useSingleton({
     overrides: ["placement"],
   });
@@ -21,7 +42,7 @@ const GooeyTooltip: React.FC<GooeyTooltipProps> = ({
       <Tippy singleton={source} delay={100} interactive />
       <Tippy
         singleton={target}
-        placement={placement}
+        placement={placement || "auto"}
         animation="scale"
         arrow
         content={
@@ -34,23 +55,4 @@ const GooeyTooltip: React.FC<GooeyTooltipProps> = ({
       </Tippy>
     </>
   );
-};
-
-export const HelpTooltip = (props: Record<string, any>) => {
-  return (
-    <GooeyTooltip content={props?.content || ""}>
-      <i
-        role="button"
-        className="fa-regular fa-circle-info position-absolute"
-        style={{
-          height: "16px",
-          top: "50%",
-          right: "-20px",
-          transform: "translateY(calc(-50% - 3px))",
-        }}
-      />
-    </GooeyTooltip>
-  );
-};
-
-export default GooeyTooltip;
+}

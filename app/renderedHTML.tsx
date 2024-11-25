@@ -8,14 +8,19 @@ import parse, {
 } from "html-react-parser";
 import { useHydratedMemo } from "~/useHydrated";
 import { Link } from "@remix-run/react";
+import { GooeyHelpIcon, TooltipPlacement } from "./components/GooeyTooltip";
 
 export function RenderedHTML({
   body,
   lineClamp,
+  help,
+  tooltipPlacement,
   ...attrs
 }: {
   body: string;
   lineClamp?: number;
+  help?: string;
+  tooltipPlacement?: TooltipPlacement;
   [attr: string]: any;
 }) {
   if (attrs.renderLocalDt) {
@@ -25,7 +30,17 @@ export function RenderedHTML({
   if (typeof body !== "string") {
     body = JSON.stringify(body);
   }
-  const parsedElements = parse(body || "", reactParserOptions);
+  let parsedElements = parse(body || "", reactParserOptions);
+  if (help) {
+    parsedElements = (
+      <div>
+        <div className="d-inline-block position-relative">
+          {parsedElements}
+          <GooeyHelpIcon content={help} placement={tooltipPlacement} />
+        </div>
+      </div>
+    );
+  }
   return (
     <LineClamp lines={lineClamp} key={body}>
       <span className="gui-html-container" {...attrs}>

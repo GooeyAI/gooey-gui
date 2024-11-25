@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "gooey-gui"
-version = "0.4.1"
+version = "0.5.0"
 description = ""
 authors = ["Dev Aggarwal <devxpy@gmail.com>"]
 license = "Apache-2.0"

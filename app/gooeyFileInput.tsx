@@ -6,8 +6,9 @@ import Webcam from "@uppy/webcam";
 import XHR from "@uppy/xhr-upload";
 import mime from "mime-types";
 import React, { useEffect, useState } from "react";
-import { RenderedMarkdown } from "~/renderedMarkdown";
+import { InputLabel } from "./gooeyInput";
 import { textResponseHead, urlToFilename } from "./urlUtils";
+import { TooltipPlacement } from "./components/GooeyTooltip";
 
 export function GooeyFileInput({
   name,
@@ -18,6 +19,8 @@ export function GooeyFileInput({
   defaultValue,
   uploadMeta,
   state,
+  help,
+  tooltipPlacement,
 }: {
   name: string;
   label: string;
@@ -27,6 +30,8 @@ export function GooeyFileInput({
   defaultValue: string | string[] | undefined;
   uploadMeta: Record<string, string>;
   state: Record<string, any>;
+  help?: string;
+  tooltipPlacement?: TooltipPlacement;
 }) {
   const [uppy, setUppy] = useState<Uppy | null>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
@@ -150,11 +155,11 @@ export function GooeyFileInput({
 
   return (
     <div className="gui-input">
-      {label ? (
-        <label>
-          <RenderedMarkdown body={label} />
-        </label>
-      ) : null}
+      <InputLabel
+        label={label}
+        help={help}
+        tooltipPlacement={tooltipPlacement}
+      />
       <input
         hidden
         ref={inputRef}
