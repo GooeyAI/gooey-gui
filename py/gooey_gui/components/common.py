@@ -7,6 +7,9 @@ from datetime import datetime, timezone
 
 from furl import furl
 from gooey_gui import core
+from .input_widgets import (
+    checkbox,
+)
 
 T = typing.TypeVar("T")
 LabelVisibility = typing.Literal["visible", "collapsed"]
