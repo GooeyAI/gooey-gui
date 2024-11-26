@@ -9,5 +9,13 @@ from .modal import (
     confirm_dialog,
     button_with_confirm_dialog,
 )
+from .input_widgets import (
+    text_input,
+    date_input,
+    number_input,
+    password_input,
+    slider,
+    checkbox,
+)
 from .pills import pill
 from .url_button import url_button
