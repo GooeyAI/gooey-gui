@@ -634,6 +634,8 @@ def file_uploader(
     upload_meta: dict = None,
     optional: bool = False,
 ) -> str | list[str] | None:
+    from .input_widgets import checkbox
+
     if label_visibility != "visible":
         label = None
     key = upload_key or key
