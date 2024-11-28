@@ -13,14 +13,7 @@ export function GooeyHelpIcon({
 }) {
   return (
     <GooeyTooltip content={content} placement={placement}>
-      <i
-        role="button"
-        className="fa-regular fa-circle-info position-absolute text-muted"
-        style={{
-          right: "-1.5rem",
-          top: "1px",
-        }}
-      />
+      <i role="button" className="fa-regular fa-circle-info text-muted ms-1" />
     </GooeyTooltip>
   );
 }
@@ -39,14 +32,18 @@ export function GooeyTooltip({
   });
   return (
     <>
-      <Tippy singleton={source} delay={100} interactive />
+      <Tippy
+        singleton={source}
+        animation={"scale"}
+        duration={80}
+        delay={100}
+        interactive
+      />
       <Tippy
         singleton={target}
         placement={placement || "auto"}
-        animation="scale"
-        arrow
         content={
-          <div className="bg-white p-2 b-1 shadow rounded container-margin-reset gooey-tooltip-box">
+          <div className="bg-dark p-2 b-1 shadow rounded container-margin-reset gooey-tooltip-box">
             <RenderedMarkdown body={content} />
           </div>
         }

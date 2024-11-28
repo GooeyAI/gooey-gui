@@ -32,6 +32,7 @@ export default function GooeyPopover({
         </div>
       }
       animation="scale"
+      duration={100}
       {...props}
     >
       <button type="button" onClick={() => setVisible(!visible)}>
