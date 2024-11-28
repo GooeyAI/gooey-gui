@@ -896,7 +896,11 @@ button {
 .gooey-tooltip-box {
   width: max-content;
   max-width: 80vw !important;
-  color: #82878b !important
+}
+
+.gooey-tooltip-box * {
+  color: white !important;
+  text-decoration-color: #fff !important;
 }
 
 @media (min-width: 768px) {

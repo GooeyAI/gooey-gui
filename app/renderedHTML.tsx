@@ -34,8 +34,8 @@ export function RenderedHTML({
   if (help) {
     parsedElements = (
       <div>
-        <div className="d-inline-block position-relative">
-          {parsedElements}
+        <div className="d-flex align-items-baseline position-relative">
+          <div>{parsedElements}</div>
           <GooeyHelpIcon content={help} placement={tooltipPlacement} />
         </div>
       </div>
