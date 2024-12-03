@@ -650,7 +650,10 @@ def file_uploader(
         )
     if optional:
         if not checkbox(
-            label, value=bool(core.session_state.get(key, value)), disabled=disabled
+            label,
+            value=bool(core.session_state.get(key, value)),
+            disabled=disabled,
+            help=help,
         ):
             core.session_state.pop(key, None)
             return None
