@@ -206,7 +206,7 @@ export function GooeyRadio({
       />
       <InputLabel
         label={label}
-        htmlFor={name}
+        htmlFor={id}
         help={help}
         tooltipPlacement={tooltipPlacement}
       />
