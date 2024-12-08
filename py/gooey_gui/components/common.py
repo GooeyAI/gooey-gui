@@ -832,11 +832,14 @@ def plotly_chart(figure_or_data, **kwargs):
     ).mount()
 
 
-def popover(**props) -> tuple[core.NestingCtx, core.NestingCtx]:
+def popover(
+    *, placement: TooltipPlacement | None = None, **props
+) -> tuple[core.NestingCtx, core.NestingCtx]:
     content = core.RenderTreeNode(name="content")
 
     popover = core.RenderTreeNode(
-        name="popover", props=props | dict(content=content.children)
+        name="popover",
+        props=props | dict(content=content.children, placement=placement),
     )
     popover.mount()
 
