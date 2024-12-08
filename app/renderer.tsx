@@ -470,13 +470,14 @@ function RenderedTreeNode({
         </GooeyTooltip>
       );
     case "popover": {
-      const { content, ...args } = props;
+      const { content, placement, ...args } = props;
       return (
         <GooeyPopover
           content={content}
           children={children}
           onChange={onChange}
           state={state}
+          placement={placement}
           {...args}
         />
       );

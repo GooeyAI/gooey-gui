@@ -2,18 +2,21 @@ import Tippy from "@tippyjs/react";
 import { useState } from "react";
 import { OnChange } from "~/app";
 import { RenderedChildren, TreeNode } from "~/renderer";
+import { TooltipPlacement } from "./GooeyTooltip";
 
 export default function GooeyPopover({
   content,
   children,
   onChange,
   state,
+  placement,
   ...props
 }: {
   content: Array<TreeNode>;
   children: Array<TreeNode>;
   onChange: OnChange;
   state: Record<string, any>;
+  placement?: TooltipPlacement;
 }) {
   const [visible, setVisible] = useState(false);
 
@@ -33,6 +36,7 @@ export default function GooeyPopover({
       }
       animation="scale"
       duration={100}
+      placement={placement || "auto"}
       {...props}
     >
       <button type="button" onClick={() => setVisible(!visible)}>
