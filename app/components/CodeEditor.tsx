@@ -32,7 +32,7 @@ const jsLinter = (lintOptions: LintOptions) => {
   });
 };
 
-const CodeEditor = ({
+export default function CodeEditor({
   props,
   state,
   onChange,
@@ -40,7 +40,7 @@ const CodeEditor = ({
   props: Record<string, any>;
   onChange: OnChange;
   state: Record<string, any>;
-}) => {
+}) {
   const {
     name,
     defaultValue,
@@ -96,14 +96,10 @@ const CodeEditor = ({
         data-enable-grammarly="false"
         theme={dracula}
         value={value}
-        id="gooey-code-editor"
         onChange={handleChange}
         extensions={[javascript(), lintGutter(), jsLinter(lintOptions)]}
-        height={`${height}px` || "200px"}
         {...restProps}
       />
     </div>
   );
-};
-
-export default CodeEditor;
+}

@@ -717,7 +717,10 @@ a.text-primary:hover {
   display: none;
 }
 
-#gooey-code-editor :first-child {
+.cm-theme  {
+  overflow: auto;
+}
+.cm-theme :first-child {
   border-radius: 0.25rem;
 }
 

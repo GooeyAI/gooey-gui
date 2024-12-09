@@ -28,7 +28,7 @@ const { DataTable, DataTableRaw } = lazyImport(() => import("~/dataTable"));
 const { GooeyFileInput } = lazyImport(() => import("~/gooeyFileInput"), {
   fallback: ({ label }) => (
     <div className="gui-input">
-      {label && <RenderedMarkdown body={label} />}
+      <InputLabel label={label} />
       <div
         className="d-flex align-items-center justify-content-center bg-light"
         style={{ height: "250px" }}
@@ -44,7 +44,24 @@ const Plot = lazyImport(
   // @ts-ignore
 ).default;
 
-const CodeEditor = lazyImport(() => import("./components/CodeEditor")).default;
+const CodeEditor = lazyImport(() => import("./components/CodeEditor"), {
+  fallback: ({ props }) => {
+    return (
+      <div className="gui-input">
+        <InputLabel label={props.label} />
+        <div
+          className="d-flex align-items-center justify-content-center bg-dark text-white"
+          style={{
+            height: (props.defaultValue || "").split("\n").length * 1.5 + "rem",
+            ...props.style,
+          }}
+        >
+          Loading...
+        </div>
+      </div>
+    );
+  },
+}).default;
 
 export type TreeNode = {
   name: string;
@@ -312,12 +329,7 @@ function RenderedTreeNode({
       return <GooeyTextarea props={props} state={state} />;
     }
     case "code-editor": {
-      return (
-        // pre fill height to avoid ui jump
-        <div style={{ minHeight: props?.height + 100 + "px" }}>
-          <CodeEditor props={props} state={state} onChange={onChange} />
-        </div>
-      );
+      return <CodeEditor props={props} state={state} onChange={onChange} />;
     }
     case "switch":
       return <GooeySwitch props={props} state={state} />;
