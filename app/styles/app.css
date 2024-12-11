@@ -130,6 +130,11 @@ div.code-toolbar {
   user-select: none;
 }
 
+.inline-radio > .gui-input-radio {
+  display: inline;
+  margin-right: 1rem;
+}
+
 .btn {
   margin: 0 0 0.8rem 2px;
 }

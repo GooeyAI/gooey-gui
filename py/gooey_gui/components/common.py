@@ -772,6 +772,7 @@ def radio(
     disabled: bool = False,
     checked_by_default: bool = True,
     label_visibility: LabelVisibility = "visible",
+    **props,
 ) -> T | None:
     if not options:
         return None
@@ -796,6 +797,7 @@ def radio(
                 help=help,
                 tooltipPlacement=tooltip_placement,
                 disabled=disabled,
+                **props,
             ),
         ).mount()
     return value
