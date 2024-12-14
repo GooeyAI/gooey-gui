@@ -135,6 +135,7 @@ function RenderedTreeNode({
           children={children}
           onChange={onChange}
           state={state}
+          className={props.className}
         />
       );
     case "nav-tab-content":
@@ -526,10 +527,12 @@ export function RenderedChildren({
   children,
   onChange,
   state,
+  className,
 }: {
   children: Array<TreeNode>;
   onChange: OnChange;
   state: Record<string, any>;
+  className?: string;
 }) {
   let elements = children.map((node, idx) => {
     let key;
@@ -537,6 +540,10 @@ export function RenderedChildren({
       key = inputId(node.props);
     } else {
       key = `idx:${idx}`;
+    }
+    let prevClassName = node.props.className || "";
+    if (className && !prevClassName.includes(className)) {
+      node.props.className = `${className} ${prevClassName}`;
     }
     return (
       <RenderedTreeNode

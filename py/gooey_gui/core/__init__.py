@@ -16,7 +16,14 @@ from .pubsub import (
     realtime_clear_subs,
     md5_values,
 )
-from .renderer import RenderTreeNode, NestingCtx, renderer, route, current_root_ctx
+from .renderer import (
+    RenderTreeNode,
+    NestingCtx,
+    renderer,
+    route,
+    current_root_ctx,
+    add_styles,
+)
 from .state import (
     get_session_state,
     set_session_state,
