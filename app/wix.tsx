@@ -68,17 +68,20 @@ async function _loadPage(url: string, isMobile: boolean): Promise<string> {
     });
   }
   const page = await global.browser.newPage();
-  let ua;
-  if (isMobile) {
-    ua =
-      "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1";
-  } else {
-    ua =
-      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.79 Safari/537.36";
+  try {
+    page.setDefaultTimeout(60_000); // 1 minute
+    let ua;
+    if (isMobile) {
+      ua =
+        "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1";
+    } else {
+      ua =
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.79 Safari/537.36";
+    }
+    await page.setUserAgent(ua);
+    await page.goto(url, { waitUntil: "networkidle0" });
+    return await page.content();
+  } finally {
+    await page.close();
   }
-  await page.setUserAgent(ua);
-  await page.goto(url, { waitUntil: "networkidle0" });
-  const html = await page.content();
-  await page.close();
-  return html;
 }
