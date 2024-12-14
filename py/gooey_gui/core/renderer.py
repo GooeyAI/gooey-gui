@@ -23,6 +23,10 @@ def current_root_ctx() -> "NestingCtx":
     return threadlocal.root_ctx
 
 
+def add_styles(className: str, css: str):
+    threadlocal.styles[className] = css
+
+
 class RenderTreeNode(BaseModel):
     name: str
     props: ReactHTMLProps = {}
@@ -108,17 +112,26 @@ def renderer(
     set_query_params(query_params or {})
     realtime_clear_subs()
     threadlocal.use_state_count = 0
+    threadlocal.styles = {}
     while True:
         try:
             root = RenderTreeNode(name="root")
             threadlocal.root_ctx = NestingCtx(root)
             with threadlocal.root_ctx:
+                styles_node = RenderTreeNode(
+                    name="tag",
+                    props=dict(__reactjsxelement="style"),
+                ).mount()
                 try:
                     ret = render()
                 except StopException:
                     ret = None
                 except RedirectException as e:
                     return RedirectResponse(e.url, status_code=e.status_code)
+                if threadlocal.styles:
+                    styles_node.props["dangerouslySetInnerHTML"] = {
+                        "__html": "\n".join(threadlocal.styles.values())
+                    }
             if isinstance(ret, Response):
                 return ret
             return JSONResponse(

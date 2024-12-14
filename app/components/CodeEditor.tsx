@@ -67,7 +67,7 @@ export default function CodeEditor({
   };
 
   return (
-    <div className="mb-4 code-editor-wrapper position-relative">
+    <div className="gui-input code-editor-wrapper position-relative">
       <InputLabel
         label={label}
         help={help}
