@@ -621,6 +621,7 @@ export function GuiExpander({
     defaultValue: open,
     name,
     onChange,
+    args: props,
   });
 
   return (

@@ -25,6 +25,7 @@ export default function GooeySelect({
     defaultValue,
     name,
     onChange,
+    args,
   });
 
   // if the state value is changed by the server code, then update the value

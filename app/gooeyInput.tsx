@@ -37,6 +37,7 @@ export function GooeyTextarea({
     state,
     name,
     defaultValue,
+    args,
   });
   return (
     <div className="gui-input gui-input-textarea">
@@ -74,6 +75,7 @@ export function GooeyInput({
     state,
     name,
     defaultValue,
+    args,
   });
   return (
     <div className={className}>
@@ -100,10 +102,12 @@ export function useGooeyStringInput<
   state,
   name,
   defaultValue,
+  args,
 }: {
   state: Record<string, any>;
   name: string;
   defaultValue: string;
+  args?: Record<string, any>;
 }): [
   inputRef: React.RefObject<E>,
   value: string,
@@ -116,6 +120,8 @@ export function useGooeyStringInput<
   // instead the React way is to have a value and onChange handler (https://react.dev/reference/react-dom/components/textarea)
   // but to avoid reloading the page on every change with onChange (gets very annoying when typing), we need to use this extra state variable with a useEffect
   const [value, setValue] = useState<string>(state[name] || defaultValue);
+
+  loadEventHandlers(value, setValue, args);
 
   useEffect(() => {
     const element = inputRef.current;
@@ -233,4 +239,21 @@ export function useGooeyCheckedInput({
   }, [stateChecked]);
 
   return inputRef;
+}
+
+export function loadEventHandlers<T>(
+  value: T,
+  setValue: (value: T) => void,
+  args?: Record<string, any>
+) {
+  if (!args) return;
+  for (const [attr, body] of Object.entries(args)) {
+    if (!attr.startsWith("on")) continue;
+    args[attr] = (event: React.SyntheticEvent) => {
+      // new Function(...args, body)
+      const fn = new Function("event", "value", "setValue", body);
+      // fn.call(thisArg, ...args)
+      return fn.call(event.currentTarget, event.nativeEvent, value, setValue);
+    };
+  }
 }
