@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { loadEventHandlers } from "./gooeyInput";
 
 export function useJsonFormInput<T>({
   defaultValue,
@@ -6,15 +7,19 @@ export function useJsonFormInput<T>({
   onChange,
   encode = JSON.stringify,
   decode = JSON.parse,
+  args,
 }: {
   defaultValue: T;
   name: string;
   onChange?: () => void;
   encode?: (value: T) => string;
   decode?: (value: string) => T;
+  args?: Record<string, any>;
 }): [React.FunctionComponent, T, (value: T) => void] {
   const [value, setValue] = useState(defaultValue);
   const ref = useRef<HTMLInputElement>(null);
+
+  loadEventHandlers(value, setValue, args);
 
   useEffect(() => {
     if (!ref.current) return;

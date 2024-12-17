@@ -41,19 +41,13 @@ export default function CodeEditor({
   onChange: OnChange;
   state: Record<string, any>;
 }) {
-  const {
-    name,
-    defaultValue,
-    height,
-    label,
-    help,
-    tooltipPlacement,
-    ...restProps
-  } = props;
+  const { name, defaultValue, height, label, help, tooltipPlacement, ...args } =
+    props;
   const [inputRef, value, setValue] = useGooeyStringInput<HTMLTextAreaElement>({
     state,
     name,
     defaultValue,
+    args,
   });
   const handleChange = (val: string) => {
     setValue(val);
@@ -98,7 +92,7 @@ export default function CodeEditor({
         value={value}
         onChange={handleChange}
         extensions={[javascript(), lintGutter(), jsLinter(lintOptions)]}
-        {...restProps}
+        {...args}
       />
     </div>
   );
