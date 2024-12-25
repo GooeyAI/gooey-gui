@@ -15,6 +15,18 @@ TooltipPlacement = typing.Literal["left", "right", "top", "bottom", "auto"]
 BLANK_OPTION = "———"
 
 
+StyleProp = typing.Optional[
+    typing.TypedDict(
+        "StyleProp",
+        {
+            "selector": dict[str, dict[str, str]],
+            "@media": dict[str, dict[str, str]],
+        },
+        total=False,
+    )
+]
+
+
 def _default_format(value: typing.Any) -> str:
     if value is None:
         return BLANK_OPTION
@@ -54,17 +66,17 @@ def nav_tab_content():
     return _node("nav-tab-content")
 
 
-def div(**props) -> core.NestingCtx:
-    return tag("div", **props)
+def div(*, style: StyleProp = None, **props) -> core.NestingCtx:
+    return tag("div", style=style, **props)
 
 
 def link(*, to: str, **props) -> core.NestingCtx:
     return _node("Link", to=to, **props)
 
 
-def tag(tag_name: str, **props) -> core.NestingCtx:
+def tag(tag_name: str, *, style: StyleProp = None, **props) -> core.NestingCtx:
     props["__reactjsxelement"] = tag_name
-    return _node("tag", **props)
+    return _node("tag", style=style, **props)
 
 
 def html(body: str, **props):
@@ -115,9 +127,28 @@ def markdown(
 
 
 def _node(nodename: str, **props):
+    if style := props.get("style"):
+        selector = style.pop("selector", None)
+        if selector:
+            identifier = "." + core.md5_values(selector)
+            for s, rules in selector.items():
+                _node("css-in-js", selector=s.replace("&", identifier), rules=rules)
+            props["className"] = " ".join(
+                filter(None, (props.get("className"), identifier))
+            )
+        # media = style.pop("@media", None)
     node = core.RenderTreeNode(name=nodename, props=props)
     node.mount()
     return core.NestingCtx(node)
+
+
+def styled(css: str) -> core.RenderTreeNode:
+    css = dedent(css).strip()
+    className = "gui-" + core.md5_values(css)
+    selector = "." + className
+    css = css.replace("&", selector)
+    core.add_styles(className, css)
+    return _node("", className=className)
 
 
 def text(body: str, **props):
