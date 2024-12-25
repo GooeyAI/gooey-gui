@@ -1,6 +1,8 @@
 import asyncio
+import importlib
 import logging
 import sys
+from time import time
 import traceback
 from copy import copy
 from pathlib import Path
@@ -56,7 +58,11 @@ class HotReloadServer:
                     await self.wait_for_changes()
                 if not self.did_reload:
                     return
-                reload_modules(watcher)
+                try:
+                    reload_modules(watcher)
+                except:
+                    traceback.print_exc()
+                    await self.wait_for_changes()
         finally:
             logger.info("Stopping reloader")
             watcher.should_exit.set()
@@ -93,7 +99,7 @@ class HotReloadServer:
 
 
 def reload_modules(watcher: ChangeReload):
-    for name, module in list(sys.modules.items()):
+    for module in list(sys.modules.values()):
         try:
             if not module.__file__:
                 continue
@@ -106,4 +112,7 @@ def reload_modules(watcher: ChangeReload):
             modpath.is_relative_to(directory) for directory in watcher.reload_dirs
         ):
             continue
-        sys.modules.pop(name, None)
+        try:
+            importlib.reload(module)
+        except ModuleNotFoundError:
+            pass
