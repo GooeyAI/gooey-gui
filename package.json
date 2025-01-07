@@ -1,6 +1,6 @@
 {
   "name": "gooey-gui",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "sideEffects": false,
   "scripts": {
     "build": "remix build",
