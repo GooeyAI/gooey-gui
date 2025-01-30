@@ -1,5 +1,6 @@
 import Audio from "@uppy/audio";
-import Uppy, { UppyFile } from "@uppy/core";
+import type { UppyFile } from "@uppy/core";
+import Uppy from "@uppy/core";
 import { Dashboard } from "@uppy/react";
 import Url from "@uppy/url";
 import Webcam from "@uppy/webcam";
@@ -7,8 +8,8 @@ import XHR from "@uppy/xhr-upload";
 import mime from "mime-types";
 import React, { useEffect, useState } from "react";
 import { InputLabel } from "./gooeyInput";
-import { textResponseHead, urlToFilename } from "./urlUtils";
-import { TooltipPlacement } from "./components/GooeyTooltip";
+import { urlToFilename } from "./urlUtils";
+import type { TooltipPlacement } from "./components/GooeyTooltip";
 
 export function GooeyFileInput({
   name,
@@ -267,30 +268,13 @@ async function loadPreview({
 }) {
   if (uppy.getFile(fileId).meta.type?.startsWith("image/")) return;
 
-  const response = await fetch(url);
-  const contentType = response.headers.get("content-type") || "url/undefined";
+  const response = await fetch(
+    `https://metascraper.gooey.ai/fetchUrlMeta?url=${url}`
+  );
+  const data = await response.json();
+  const { content_type: contentType, image } = data;
   const contentLength = response.headers.get("content-length");
-  const text = await textResponseHead({ response });
-
-  preview = contentType?.startsWith("image/") ? url : preview;
-
-  if (text && contentType?.startsWith("text/html")) {
-    const doc = new DOMParser().parseFromString(text, "text/html");
-
-    filename =
-      doc.querySelector('meta[property="og:title"]')?.getAttribute("content") ||
-      doc.querySelector("title")?.textContent ||
-      filename;
-
-    preview =
-      doc.querySelector('meta[property="og:image"]')?.getAttribute("content") ||
-      preview;
-
-    if (!uppy.getFile(fileId)) return;
-    uppy.setFileMeta(fileId, {
-      name: filename,
-    });
-  }
+  preview = contentType?.startsWith("image/") ? url : preview ? preview : image;
 
   if (!uppy.getFile(fileId)) return;
   uppy.setFileState(fileId, {
