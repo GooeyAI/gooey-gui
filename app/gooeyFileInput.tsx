@@ -110,7 +110,12 @@ export function GooeyFileInput({
       autoProceed: true,
     })
       .use(Url, { companionUrl: "/__/file-upload/" })
-      .use(XHR, { endpoint: "/__/file-upload/" })
+      .use(XHR, {
+        endpoint: "/__/file-upload/",
+        shouldRetry(xhr: XMLHttpRequest) {
+          return [408, 429, 500, 502, 503].includes(xhr.status);
+        },
+      })
       .on("file-added", onFileAdded)
       .on("upload-success", onFileUploaded)
       .on("file-removed", onFilesChanged);
