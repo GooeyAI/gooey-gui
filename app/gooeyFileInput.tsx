@@ -173,8 +173,8 @@ export function GooeyFileInput({
             showLinkToFileUploadResult
             hideUploadButton
             uppy={uppy}
-            height={250}
-            width={576}
+            height={258}
+            width={"100%"}
             singleFileFullScreen={false}
             plugins={["Url", "Webcam", "Audio"]}
             // @ts-ignore
