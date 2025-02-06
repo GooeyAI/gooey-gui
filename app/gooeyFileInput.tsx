@@ -113,7 +113,7 @@ export function GooeyFileInput({
       .use(XHR, {
         endpoint: "/__/file-upload/",
         shouldRetry(xhr: XMLHttpRequest) {
-          return [408, 429, 500, 502, 503].includes(xhr.status);
+          return [408, 429, 502, 503].includes(xhr.status);
         },
       })
       .on("file-added", onFileAdded)
