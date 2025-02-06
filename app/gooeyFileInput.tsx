@@ -277,8 +277,11 @@ async function loadPreview({
   preview = contentType?.startsWith("image/") ? url : preview ? preview : image;
 
   if (!uppy.getFile(fileId)) return;
+  uppy.setFileMeta(fileId, {
+    name: title || filename,
+  });
+
   uppy.setFileState(fileId, {
-    name: title || filename || urlToFilename(url),
     size: contentLength ? parseInt(contentLength) : undefined,
     preview: preview,
   });
