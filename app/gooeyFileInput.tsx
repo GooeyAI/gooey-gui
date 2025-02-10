@@ -267,10 +267,11 @@ async function loadPreview({
   preview?: string;
 }) {
   if (uppy.getFile(fileId).meta.type?.startsWith("image/")) return;
-
-  const response = await fetch(
-    `https://metascraper.gooey.ai/fetchUrlMeta?url=${url}`
-  );
+  const metaScrapperApi = "https://metascraper.gooey.ai/fetchUrlMeta";
+  const params = new URLSearchParams({ url });
+  const apiUrl = new URL(metaScrapperApi);
+  apiUrl.search = params.toString();
+  const response = await fetch(apiUrl);
   const data = await response.json();
   const { content_type: contentType, image, title } = data;
   const contentLength = response.headers.get("content-length");
