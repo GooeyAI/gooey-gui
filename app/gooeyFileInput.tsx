@@ -55,8 +55,11 @@ export function GooeyFileInput({
       uploadMeta,
       defaultValue,
       setShowClearAll,
-      setValue,
-      onChange,
+      setValue(value) {
+        setValue(value);
+        onChange();
+        inputRef.current!.value = JSON.stringify(value);
+      },
     });
     setUppy(_uppy);
     return () => {
@@ -117,7 +120,6 @@ function initializeUppy({
   defaultValue,
   setShowClearAll,
   setValue,
-  onChange,
 }: {
   name: string;
   accept: string[] | undefined;
@@ -126,7 +128,6 @@ function initializeUppy({
   defaultValue: string | string[] | undefined;
   setShowClearAll: (value: boolean) => void;
   setValue: (value: string | string[]) => void;
-  onChange: () => void;
 }): Uppy {
   function onFilesChanged() {
     if (!_uppy || !_uppy.getState().initDone) return;
@@ -138,7 +139,6 @@ function initializeUppy({
       uploadUrls.length > 0 && _uppy.getState().totalProgress >= 100
     );
     setValue(multiple ? uploadUrls : uploadUrls[0]);
-    onChange();
   }
 
   function onFileUploaded(file: any) {
@@ -204,11 +204,11 @@ function initializeUppy({
   })
     .use(Url, { companionUrl: "/__/file-upload/" })
     .use(XHR, {
-        endpoint: "/__/file-upload/",
-        shouldRetry(xhr: XMLHttpRequest) {
-          return [408, 429, 502, 503].includes(xhr.status);
-        },
-      })
+      endpoint: "/__/file-upload/",
+      shouldRetry(xhr: XMLHttpRequest) {
+        return [408, 429, 502, 503].includes(xhr.status);
+      },
+    })
     .on("file-added", onFileAdded)
     .on("upload-success", onFileUploaded)
     .on("file-removed", onFilesChanged);
