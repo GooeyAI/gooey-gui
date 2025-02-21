@@ -26,9 +26,15 @@ import { lazyImport } from "./lazyImports";
 const { DataTable, DataTableRaw } = lazyImport(() => import("~/dataTable"));
 
 const { GooeyFileInput } = lazyImport(() => import("~/gooeyFileInput"), {
-  fallback: ({ label }) => (
+  fallback: ({ name, label, defaultValue }) => (
     <div className="gui-input">
       <InputLabel label={label} />
+      <input
+        type="hidden"
+        name={name}
+        value={JSON.stringify(defaultValue)}
+        readOnly
+      />
       <div
         className="d-flex align-items-center justify-content-center bg-light"
         style={{ height: "250px" }}
