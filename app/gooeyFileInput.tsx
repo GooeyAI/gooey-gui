@@ -6,10 +6,10 @@ import Url from "@uppy/url";
 import Webcam from "@uppy/webcam";
 import XHR from "@uppy/xhr-upload";
 import mime from "mime-types";
-import React, { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import type { TooltipPlacement } from "./components/GooeyTooltip";
 import { InputLabel } from "./gooeyInput";
 import { urlToFilename } from "./urlUtils";
-import type { TooltipPlacement } from "./components/GooeyTooltip";
 
 export function GooeyFileInput({
   name,
@@ -35,142 +35,48 @@ export function GooeyFileInput({
   tooltipPlacement?: TooltipPlacement;
 }) {
   const [uppy, setUppy] = useState<Uppy | null>(null);
-  const inputRef = React.useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [value, setValue] = useState(defaultValue);
   const [showClearAll, setShowClearAll] = useState(false);
 
+  // if the server value changes, update the uppy state
   useEffect(() => {
-    const onFilesChanged = () => {
-      const element = inputRef.current;
-      if (!element || !_uppy || !element.hasAttribute("initDone")) return;
-      const uploadUrls = _uppy
-        .getFiles()
-        .map((file: any) => file.uploadURL)
-        .filter((url) => url);
-      element.value =
-        JSON.stringify(multiple ? uploadUrls : uploadUrls[0]) || "";
-      setShowClearAll(
-        uploadUrls.length > 0 && _uppy.getState().totalProgress >= 100
-      );
-      onChange();
-    };
-    const onFileUploaded = (file: any) => {
-      onFilesChanged();
-      file = _uppy.getFile(file.id); // for some reason, the file object is not the same as the one in the uppy state
-      loadPreview({
-        url: file.uploadURL,
-        uppy: _uppy,
-        fileId: file.id,
-        filename: file.name,
-        preview: file.preview,
-      });
-    };
-    const onFileAdded = (file: UppyFile) => {
-      if (file.source != "Url") {
-        setShowClearAll(false);
-        return;
-      }
-      const url = file?.remote?.body?.url?.toString();
-      if (!url) return;
-      _uppy.setFileState(file.id, {
-        progress: {
-          uploadComplete: true,
-          uploadStarted: true,
-          percentage: 100,
-          bytesUploaded: file.data.size,
-        },
-        uploadURL: url,
-      });
-      _uppy.setFileMeta(file.id, {
-        name: urlToFilename(url),
-      });
-      (_uppy as any).calculateTotalProgress();
-      onFilesChanged();
-      loadPreview({
-        url: url,
-        uppy: _uppy,
-        fileId: file.id,
-        filename: file.name,
-        preview: file.preview,
-      });
-    };
-    const _uppy: Uppy = new Uppy({
-      id: name,
-      allowMultipleUploadBatches: true,
-      restrictions: {
-        maxFileSize: 250 * 1024 * 1024,
-        maxNumberOfFiles: multiple ? 500 : 1,
-        allowedFileTypes: accept ? accept.concat(["url/undefined"]) : undefined,
-      },
-      locale: {
-        strings: {
-          uploadComplete: "",
-          complete: "Uploaded",
-        },
-      },
-      meta: uploadMeta,
-      autoProceed: true,
-    })
-      .use(Url, { companionUrl: "/__/file-upload/" })
-      .use(XHR, {
-        endpoint: "/__/file-upload/",
-        shouldRetry(xhr: XMLHttpRequest) {
-          return [408, 429, 502, 503].includes(xhr.status);
-        },
-      })
-      .on("file-added", onFileAdded)
-      .on("upload-success", onFileUploaded)
-      .on("file-removed", onFilesChanged);
-
-    // only enable relevant plugins
-    if (
-      !accept ||
-      accept.some(
-        (a) =>
-          a.startsWith("image") || a.startsWith("video") || a.startsWith("*")
-      )
-    ) {
-      _uppy.use(Webcam);
+    if (uppy && value && JSON.stringify(value) != JSON.stringify(state[name])) {
+      setShowClearAll(loadUppyFiles(state[name] || [], uppy));
+      setValue(state[name]);
     }
-    if (
-      !accept ||
-      accept.some((a) => a.startsWith("audio") || a.startsWith("*"))
-    ) {
-      _uppy.use(Audio);
-    }
+  }, [state, name]);
 
-    setShowClearAll(initUppy(defaultValue, _uppy));
-    inputRef.current?.setAttribute("initDone", "true");
+  useEffect(() => {
+    let _uppy = initializeUppy({
+      name,
+      accept,
+      multiple,
+      uploadMeta,
+      defaultValue,
+      setShowClearAll,
+      setValue,
+      onChange,
+    });
     setUppy(_uppy);
-
-    // Clean up event handlers etc.
     return () => {
       _uppy.close();
     };
   }, []);
 
-  // if the server value changes, update the uppy state
-  useEffect(() => {
-    const element = inputRef.current;
-    if (uppy && element && JSON.stringify(state[name]) != element.value) {
-      element.value = JSON.stringify(state[name]) || "";
-      element.removeAttribute("initDone");
-      setShowClearAll(initUppy(state[name] || [], uppy));
-      element.setAttribute("initDone", "true");
-    }
-  }, [state, name]);
-
   return (
     <div className="gui-input">
-      <InputLabel
-        label={label}
-        help={help}
-        tooltipPlacement={tooltipPlacement}
-      />
       <input
         hidden
         ref={inputRef}
         name={name}
-        defaultValue={JSON.stringify(defaultValue)}
+        value={JSON.stringify(value)}
+        readOnly
+      />
+      <InputLabel
+        label={label}
+        help={help}
+        tooltipPlacement={tooltipPlacement}
       />
       {uppy ? (
         <div className="w-100 position-relative" style={{ zIndex: 0 }}>
@@ -203,10 +109,136 @@ export function GooeyFileInput({
   );
 }
 
-function initUppy(
+function initializeUppy({
+  name,
+  accept,
+  multiple,
+  uploadMeta,
+  defaultValue,
+  setShowClearAll,
+  setValue,
+  onChange,
+}: {
+  name: string;
+  accept: string[] | undefined;
+  multiple: boolean;
+  uploadMeta: Record<string, string>;
+  defaultValue: string | string[] | undefined;
+  setShowClearAll: (value: boolean) => void;
+  setValue: (value: string | string[]) => void;
+  onChange: () => void;
+}): Uppy {
+  function onFilesChanged() {
+    if (!_uppy || !_uppy.getState().initDone) return;
+    const uploadUrls = _uppy
+      .getFiles()
+      .map((file: any) => file.uploadURL)
+      .filter((url) => url);
+    setShowClearAll(
+      uploadUrls.length > 0 && _uppy.getState().totalProgress >= 100
+    );
+    setValue(multiple ? uploadUrls : uploadUrls[0]);
+    onChange();
+  }
+
+  function onFileUploaded(file: any) {
+    if (!_uppy || !_uppy.getState().initDone) return;
+    onFilesChanged();
+    file = _uppy.getFile(file.id); // for some reason, the file object is not the same as the one in the uppy state
+    loadPreview({
+      url: file.uploadURL,
+      uppy: _uppy,
+      fileId: file.id,
+      filename: file.name,
+      preview: file.preview,
+    });
+  }
+
+  function onFileAdded(file: UppyFile) {
+    if (!_uppy || !_uppy.getState().initDone) return;
+    if (file.source != "Url") {
+      setShowClearAll(false);
+      return;
+    }
+    const url = file?.remote?.body?.url?.toString();
+    if (!url) return;
+    _uppy.setFileState(file.id, {
+      progress: {
+        uploadComplete: true,
+        uploadStarted: true,
+        percentage: 100,
+        bytesUploaded: file.data.size,
+      },
+      uploadURL: url,
+    });
+    _uppy.setFileMeta(file.id, {
+      name: urlToFilename(url),
+    });
+    (_uppy as any).calculateTotalProgress();
+    onFilesChanged();
+    loadPreview({
+      url: url,
+      uppy: _uppy,
+      fileId: file.id,
+      filename: file.name,
+      preview: file.preview,
+    });
+  }
+
+  let _uppy: Uppy = new Uppy({
+    id: name,
+    allowMultipleUploadBatches: true,
+    restrictions: {
+      maxFileSize: 250 * 1024 * 1024,
+      maxNumberOfFiles: multiple ? 500 : 1,
+      allowedFileTypes: accept ? accept.concat(["url/undefined"]) : undefined,
+    },
+    locale: {
+      strings: {
+        uploadComplete: "",
+        complete: "Uploaded",
+      },
+    },
+    meta: uploadMeta,
+    autoProceed: true,
+  })
+    .use(Url, { companionUrl: "/__/file-upload/" })
+    .use(XHR, {
+        endpoint: "/__/file-upload/",
+        shouldRetry(xhr: XMLHttpRequest) {
+          return [408, 429, 502, 503].includes(xhr.status);
+        },
+      })
+    .on("file-added", onFileAdded)
+    .on("upload-success", onFileUploaded)
+    .on("file-removed", onFilesChanged);
+
+  // only enable relevant plugins
+  if (
+    !accept ||
+    accept.some(
+      (a) => a.startsWith("image") || a.startsWith("video") || a.startsWith("*")
+    )
+  ) {
+    _uppy.use(Webcam);
+  }
+  if (
+    !accept ||
+    accept.some((a) => a.startsWith("audio") || a.startsWith("*"))
+  ) {
+    _uppy.use(Audio);
+  }
+
+  setShowClearAll(loadUppyFiles(defaultValue, _uppy));
+
+  return _uppy;
+}
+
+function loadUppyFiles(
   defaultValue: string | string[] | undefined,
   uppy: Uppy
 ): boolean {
+  uppy.setState({ initDone: false });
   for (const file of uppy.getFiles()) {
     uppy.removeFile(file.id);
   }
@@ -250,8 +282,11 @@ function initUppy(
   if (hasFiles) {
     uppy.setState({ totalProgress: 100 });
   }
+  uppy.setState({ initDone: true });
   return hasFiles;
 }
+
+const metascraperUrl = "https://metascraper.gooey.ai/fetchUrlMeta";
 
 async function loadPreview({
   url,
@@ -267,20 +302,41 @@ async function loadPreview({
   preview?: string;
 }) {
   if (uppy.getFile(fileId).meta.type?.startsWith("image/")) return;
-  const metaScrapperApi = "https://metascraper.gooey.ai/fetchUrlMeta";
-  const params = new URLSearchParams({ url });
-  const apiUrl = new URL(metaScrapperApi);
-  apiUrl.search = params.toString();
-  const response = await fetch(apiUrl);
-  const data = await response.json();
-  const { content_type: contentType, image, title } = data;
-  const contentLength = response.headers.get("content-length");
-  preview = contentType?.startsWith("image/") ? url : preview ? preview : image;
 
-  if (!uppy.getFile(fileId)) return;
-  uppy.setFileMeta(fileId, {
-    name: title || filename,
-  });
+  let contentType, contentLength;
+  try {
+    let response = await fetch(url);
+    if (response.ok) {
+      contentType = response.headers.get("content-type") || "url/undefined";
+      contentLength = response.headers.get("content-length");
+    }
+  } catch (e) {
+    console.log("failed to HEAD:", url, e);
+  }
+
+  // if the content type is an image, show the image itself
+  if (contentType?.startsWith("image/")) {
+    preview = url;
+  }
+  // if its a webpage, then fetch the meta data
+  else if (!contentType || contentType.startsWith("text/html")) {
+    let apiUrl = new URL(metascraperUrl);
+    apiUrl.search = new URLSearchParams({ url }).toString();
+
+    let response = await fetch(apiUrl);
+    let data = await response.json();
+    let { content_type, image, logo, title } = data;
+
+    contentType = content_type;
+    preview = preview || image || logo;
+
+    if (!uppy.getFile(fileId)) return;
+    if (title) {
+      uppy.setFileMeta(fileId, {
+        name: title,
+      });
+    }
+  }
 
   uppy.setFileState(fileId, {
     size: contentLength ? parseInt(contentLength) : undefined,
