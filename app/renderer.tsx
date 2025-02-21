@@ -257,7 +257,7 @@ function RenderedTreeNode({
       );
     case "expander": {
       return (
-        <GuiExpander onChange={onChange} {...props}>
+        <GuiExpander onChange={onChange} state={state} {...props}>
           <RenderedChildren
             children={children}
             onChange={onChange}
@@ -622,31 +622,38 @@ function GooeySlider({
 export function GuiExpander({
   children,
   onChange,
+  state,
   ...props
 }: {
   onChange: () => void;
   children: ReactNode;
+  state: Record<string, any>;
   [key: string]: any;
 }) {
   const { open, name, label } = props;
 
-  const [JsonFormInput, isOpen, setIsOpen] = useJsonFormInput({
-    defaultValue: open,
-    name,
-    onChange,
-    args: props,
-  });
+  const ref = useRef<HTMLInputElement>(null);
+  let isOpen = ref.current ? Boolean(ref.current.value) : open;
+
+  useEffect(() => {
+    if (!ref.current) return;
+    if (open) {
+      ref.current.value = "yes";
+    } else if (ref.current.value && !state[name]) {
+      onChange();
+    }
+  }, [state[name]]);
 
   return (
     <div className="gui-expander accordion">
-      <JsonFormInput />
-      {/*{JsonFormInput}*/}
+      <input hidden ref={ref} name={name} />
       <div
         className={`gui-expander-header accordion-header accordion-button ${
           isOpen ? "" : "collapsed"
         }`}
         onClick={() => {
-          setIsOpen(!isOpen);
+          if (!ref.current) return;
+          ref.current.value = isOpen ? "" : "yes";
           onChange();
         }}
         {...props}

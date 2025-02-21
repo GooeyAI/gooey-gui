@@ -4,37 +4,29 @@ import { loadEventHandlers } from "./gooeyInput";
 export function useJsonFormInput<T>({
   defaultValue,
   name,
-  onChange,
-  encode = JSON.stringify,
-  decode = JSON.parse,
+  state,
   args,
+  encode = JSON.stringify,
 }: {
   defaultValue: T;
   name: string;
-  onChange?: () => void;
-  encode?: (value: T) => string;
-  decode?: (value: string) => T;
+  state?: Record<string, any>;
   args?: Record<string, any>;
+  encode?: (value: T) => string;
 }): [React.FunctionComponent, T, (value: T) => void] {
   const [value, setValue] = useState(defaultValue);
   const ref = useRef<HTMLInputElement>(null);
-
   loadEventHandlers(value, setValue, args);
 
+  // if the state value is changed by the server code, then update the value
   useEffect(() => {
-    if (!ref.current) return;
-    if (!ref.current.value) {
-      // initialize html input value
-      ref.current.value = value === undefined ? "" : encode(value);
-    } else if (ref.current.value != encode(value)) {
-      // restore value from html input
-      setValue(decode(ref.current.value));
-      onChange?.();
+    if (state && encode(state[name]) !== encode(value)) {
+      setValue(state[name]);
     }
-  }, [encode, decode, name, value, onChange]);
+  }, [state, name]);
 
   return [
-    () => <input hidden ref={ref} name={name} />,
+    () => <input hidden ref={ref} name={name} value={encode(value)} readOnly />,
     value,
     (value: T) => {
       if (ref.current) {

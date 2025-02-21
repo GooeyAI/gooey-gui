@@ -24,16 +24,9 @@ export default function GooeySelect({
   let [JsonFormInput, value, setValue] = useJsonFormInput({
     defaultValue,
     name,
-    onChange,
+    state,
     args,
   });
-
-  // if the state value is changed by the server code, then update the value
-  useEffect(() => {
-    if (state && state[name] !== value) {
-      setValue(state[name]);
-    }
-  }, [state, name]);
 
   let onSelectChange = (newValue: any) => {
     if (newValue === undefined) return;
@@ -67,16 +60,20 @@ export default function GooeySelect({
       <JsonFormInput />
       <ClientOnlySuspense
         fallback={
-          <div className="d-flex align-items-center" style={{ height: "38px" }}>
-            <RenderedMarkdown
-              body={
-                (selectValue &&
-                  selectValue.map((it: any) => it.label).join(" | ")) ||
-                "Loading..."
-              }
-              className="container-margin-reset"
-            />
-          </div>
+          <select
+            style={{ height: "38px", maxWidth: "90%", border: "none" }}
+            className="d-flex align-items-center"
+            disabled
+          >
+            {selectValue && (
+              <option selected>
+                {selectValue.map((it: any) => it.label).join(" | ")}
+              </option>
+            )}
+            {args.options.map((opt: any) => (
+              <option>{opt.label}</option>
+            ))}
+          </select>
         }
       >
         {() => (
