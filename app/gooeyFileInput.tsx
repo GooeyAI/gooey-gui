@@ -58,7 +58,7 @@ export function GooeyFileInput({
       setValue(value) {
         setValue(value);
         onChange();
-        inputRef.current!.value = JSON.stringify(value);
+        inputRef.current!.value = JSON.stringify(value) || "";
       },
     });
     setUppy(_uppy);
@@ -73,7 +73,7 @@ export function GooeyFileInput({
         hidden
         ref={inputRef}
         name={name}
-        value={JSON.stringify(value)}
+        value={JSON.stringify(value) || ""}
         readOnly
       />
       <InputLabel

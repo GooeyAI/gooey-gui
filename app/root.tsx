@@ -102,6 +102,7 @@ export function ErrorBoundary() {
   }
 
   captureRemixErrorBoundaryError(error);
+  console.error(error);
 
   // when true, this is what used to go to `CatchBoundary`
   if (isRouteErrorResponse(error)) {
