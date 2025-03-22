@@ -99,7 +99,7 @@ class HotReloadServer:
 
 
 def reload_modules(watcher: ChangeReload):
-    for module in list(sys.modules.values()):
+    for name, module in list(sys.modules.items()):
         try:
             if not module.__file__:
                 continue
@@ -112,7 +112,4 @@ def reload_modules(watcher: ChangeReload):
             modpath.is_relative_to(directory) for directory in watcher.reload_dirs
         ):
             continue
-        try:
-            importlib.reload(module)
-        except ModuleNotFoundError:
-            pass
+        sys.modules.pop(name, None)

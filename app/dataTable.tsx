@@ -25,7 +25,7 @@ export function DataTableRaw({ cells }: { cells: Array<any> }) {
           const width = Math.min(
             Math.max(
               ...cells.map(
-                (row: any) => `${row[idx].data || row[idx] || ""}`.length * 8
+                (row: any) => `${(row[idx] && row[idx].data) || ""}`.length * 8
               ),
               colName.length * 20
             ),
