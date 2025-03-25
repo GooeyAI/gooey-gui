@@ -29,7 +29,7 @@ def generate_poem(prompt, set_text):
     openai.api_key = os.getenv("OPENAI_API_KEY")
 
     completion = openai.chat.completions.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4o",
         messages=[
             {"role": "system", "content": "You are a brilliant poem writer."},
             {"role": "user", "content": prompt},
