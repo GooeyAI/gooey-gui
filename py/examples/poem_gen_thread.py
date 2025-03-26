@@ -1,47 +1,47 @@
 import os
-
-import openai
-from fastapi import FastAPI
+import uuid
+from threading import Thread
 
 import gooey_gui as gui
+import openai
+from fastapi import FastAPI
 
 app = FastAPI()
 
 
-@gui.route(app, "/")
+@gui.route(app, "/poem/")
 def root():
     gui.write("### Poem Generator")
     prompt = gui.text_input(
         "What kind of poem do you want to generate?", value="john lennon"
     )
     if gui.button("Generate 🪄"):
-        # set the flag to indicate that the thread should be started
-        gui.session_state["generating_poem"] = True
+        # a unique channel name for redis pubsub
+        gui.session_state["channel"] = channel = f"poem-generator/{uuid.uuid4()}"
+        # start the thread
+        Thread(target=generate_poem_thread, args=[prompt, channel]).start()
 
-    if not gui.session_state.get("generating_poem"):
-        # thread has not started yet, don't render anything
+    channel = gui.session_state.get("channel")
+    if not channel:
+        # no channel, no need to subscribe
         return
 
-    # start the thread, or if already running, return the result
-    result = gui.run_in_thread(
-        generate_poem_thread,
-        args=[prompt],
-        placeholder="Generating...",
-        ## if cache=True, the thread will cache its return value and avoid from re-running multiple times for the same args
-        # cache=True,
-    )
+    # fetch updates from redis pubsub
+    result = gui.realtime_pull([channel])[0]
     if result is None:
-        # thread has not finished execution, don't render anything
+        # no result yet
+        gui.write("Running Thread...")
         return
 
-    # thread has finished execution, show result
+    # display result / loading message
     gui.write(result)
 
-    # avoid re-running the thread
-    gui.session_state["generating_poem"] = False
+    ## optionally, stop subscribing from the channel and store result in session state
+    # gui.session_state.pop("channel")
+    # gui.session_state["poem"] = result
 
 
-def generate_poem_thread(prompt: str) -> str:
+def generate_poem_thread(prompt, channel):
     openai.api_key = os.getenv("OPENAI_API_KEY")
 
     completion = openai.chat.completions.create(
@@ -51,4 +51,7 @@ def generate_poem_thread(prompt: str) -> str:
             {"role": "user", "content": prompt},
         ],
     )
-    return completion.choices[0].message.content or ""
+    result = completion.choices[0].message.content or ""
+
+    # push the result to the channel + reload the UI
+    gui.realtime_push(channel, result)
