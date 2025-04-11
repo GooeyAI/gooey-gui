@@ -12,6 +12,7 @@ import {
   GooeyRadio,
   GooeyTextarea,
   InputLabel,
+  loadEventHandlers,
 } from "~/gooeyInput";
 import { useJsonFormInput } from "~/jsonFormInput";
 import { RenderedHTML } from "~/renderedHTML";
@@ -133,6 +134,7 @@ function RenderedTreeNode({
   state: Record<string, any>;
 }) {
   const { name, props, children } = node;
+  loadEventHandlers(undefined, undefined, props);
 
   switch (name) {
     case "":
@@ -469,7 +471,7 @@ function RenderedTreeNode({
     }
     case "script": {
       const { src, args } = props;
-      return <ExecJs src={src} args={args}></ExecJs>;
+      return <ExecJs state={state} src={src} args={args}></ExecJs>;
     }
     case "plotly-chart": {
       const { chart } = props;
@@ -512,20 +514,20 @@ function RenderedTreeNode({
   }
 }
 
-function ExecJs({ src, args }: { args: any; src: any }) {
-  const submit = useSubmit();
-
-  args.gooeyRefresh = () => {
-    const elem = document.getElementById("gooey-form");
-    if (elem) submit(elem as HTMLFormElement, ...arguments);
-  };
-
+function ExecJs({
+  src,
+  args,
+  state,
+}: {
+  src: string;
+  args: Record<string, any>;
+  state: Record<string, any>;
+}) {
   useEffect(() => {
     // eslint-disable-next-line no-new-func
     const fn = new Function(...Object.keys(args), src);
     fn(...Object.values(args));
   }, [src, args]);
-
   return null;
 }
 
