@@ -17,6 +17,7 @@ import {
   useActionData,
   useFetcher,
   useLoaderData,
+  useNavigate,
   useSearchParams,
   useSubmit,
 } from "@remix-run/react";
@@ -193,11 +194,27 @@ function App() {
   const [searchParams] = useSearchParams();
   const loaderData = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
-  const submit = useSubmit();
   const { base64Body, children, state, channels } = actionData ?? loaderData;
   const formRef = useRef<HTMLFormElement>(null);
   const realtimeEvent = useRealtimeChannels({ channels });
   const fetcher = useFetcher();
+  const submit = useSubmit();
+  const navigate = useNavigate();
+
+  if (typeof window !== "undefined") {
+    // @ts-ignore
+    window.gui = {
+      session_state: state,
+      navigate,
+      fetcher,
+      submit() {
+        if (formRef.current) submit(formRef.current, ...arguments);
+      },
+      rerun() {
+        if (formRef.current) submit(formRef.current);
+      },
+    };
+  }
 
   useEffect(() => {
     if (!base64Body) return;

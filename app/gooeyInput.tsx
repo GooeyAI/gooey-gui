@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { RenderedMarkdown } from "~/renderedMarkdown";
 import { TooltipPlacement } from "./components/GooeyTooltip";
+import { useSubmit } from "@remix-run/react";
 
 export function InputLabel({
   label,
@@ -242,17 +243,15 @@ export function useGooeyCheckedInput({
 }
 
 export function loadEventHandlers<T>(
-  value: T,
-  setValue: (value: T) => void,
+  value?: T,
+  setValue?: (value: T) => void,
   args?: Record<string, any>
 ) {
   if (!args) return;
   for (const [attr, body] of Object.entries(args)) {
-    if (!attr.startsWith("on")) continue;
+    if (!attr.startsWith("on") || typeof body !== "string") continue;
     args[attr] = (event: React.SyntheticEvent) => {
-      // new Function(...args, body)
       const fn = new Function("event", "value", "setValue", body);
-      // fn.call(thisArg, ...args)
       return fn.call(event.currentTarget, event.nativeEvent, value, setValue);
     };
   }

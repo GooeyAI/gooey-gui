@@ -581,8 +581,6 @@ def button(
             value="yes",
             name=key,
             label=dedent(label),
-            help=help,
-            tooltipPlacement=tooltip_placement,
             disabled=disabled,
             className=className,
             **props,
