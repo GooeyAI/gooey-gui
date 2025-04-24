@@ -30,6 +30,7 @@ module.exports = {
     /p-queue/,
     /p-timeout/,
     /is-network-error/,
+    /gooey-web-widget/
   ],
   routes(defineRoutes) {
     return defineRoutes((route) => {

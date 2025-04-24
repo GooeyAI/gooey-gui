@@ -922,3 +922,17 @@ def tooltip(
     )
     tooltip.mount()
     return core.NestingCtx(tooltip)
+
+def gooey_chat_widget(
+    messages,
+    config,
+    **props,
+):
+    return core.RenderTreeNode(
+        name="gw-chat-widget",
+        props=dict(
+            messages=messages,
+            config=config,
+            **props,
+        ),
+    ).mount()

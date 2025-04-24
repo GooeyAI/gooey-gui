@@ -22,6 +22,7 @@ import GooeySelect from "./components/GooeySelect";
 import GooeySwitch from "./components/GooeySwitch";
 import { GooeyTooltip } from "./components/GooeyTooltip";
 import { lazyImport } from "./lazyImports";
+import GooeyChatWidget from "./components/ChatComponents/GooeyChatWidget";
 
 const { DataTable, DataTableRaw } = lazyImport(() => import("~/dataTable"));
 
@@ -337,6 +338,9 @@ function RenderedTreeNode({
     }
     case "code-editor": {
       return <CodeEditor props={props} state={state} onChange={onChange} />;
+    }
+    case "gw-chat-widget": {
+      return <GooeyChatWidget {...props} state={state} onChange={onChange} />;
     }
     case "switch":
       return <GooeySwitch props={props} state={state} />;

@@ -1,6 +1,6 @@
 {
   "name": "gooey-gui",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "sideEffects": false,
   "scripts": {
     "build": "remix build",
@@ -44,6 +44,7 @@
     "@uppy/webcam": "^3.3.1",
     "@uppy/xhr-upload": "^3.2.0",
     "firebase-admin": "^11.9.0",
+    "gooey-web-widget": "file:.yalc/gooey-web-widget",
     "html-react-parser": "^4.0.0",
     "isbot": "^3.6.8",
     "jshint": "^2.13.6",
@@ -53,8 +54,8 @@
     "nprogress": "^0.2.0",
     "plotly.js": "^2.27.1",
     "puppeteer": "^22.14.0",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "react-plotly.js": "^2.6.0",
     "react-select": "^5.7.3",
     "react-syntax-highlighter": "^15.5.0",
