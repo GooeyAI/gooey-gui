@@ -47,6 +47,21 @@ def run_in_thread(
     key: str | None = None,
     ex=60,
 ):
+    """
+    Creates a new thread to run `fn(*args, **kwargs)`.
+
+    Returns:
+    - `None` until the function call is executing.
+    - The returned value of `fn(*args, **kwargs)` on the next call.
+      If `cache=True`, the same value will be cached in the `session_state`.
+      Further calls to `run_in_thread(fn, ...)` will return the same value
+      until the `session_state` is reset (e.g. with a page refresh).
+
+    Note that `fn.__name__` is used in the cache key. Because of this,
+    it won't work with `lambda`s and closures that don't have a fixed
+    value for `__name__`.
+    """
+
     if key is None:
         key = f"{run_in_thread.__name__}/{fn}"
 
