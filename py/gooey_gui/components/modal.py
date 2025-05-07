@@ -54,10 +54,12 @@ def alert_dialog(
     ref: AlertDialogRef,
     modal_title: str,
     large: bool = False,
+    unsafe_allow_html: bool = False,
 ) -> core.NestingCtx:
     header, body, _ = modal_scaffold(large=large)
     with header:
-        gui.write(modal_title)
+        with gui.div():
+            gui.write(modal_title, unsafe_allow_html=unsafe_allow_html)
         gui.button(
             '<i class="fa fa-times fa-xl">',
             key=ref.close_btn_key,
