@@ -15,9 +15,9 @@ def pill(
     if not unsafe_allow_html:
         title = html.escape(title)
 
-    className += f" badge rounded-pill"
+    className += " badge rounded-pill"
     if text_bg:
         className += f" text-bg-{text_bg}"
 
-    with gui.tag("span", className=className):
-        gui.html(title, **props)
+    with gui.tag("span", className=className, **props):
+        gui.html(title)
