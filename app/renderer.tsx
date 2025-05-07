@@ -475,7 +475,7 @@ function RenderedTreeNode({
     }
     case "plotly-chart": {
       const { chart } = props;
-      return <Plot {...chart} style={{ width: "100%" }} />;
+      return <Plot {...chart} style={{ width: "100%" }} config={{ displayModeBar: false }} />;
     }
     case "tooltip":
       const { content, placement } = props;
