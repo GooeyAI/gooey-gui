@@ -751,4 +751,4 @@ image = ["numpy", "opencv-contrib-python"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "e03af977d55e15878654f38ab4a43a5ccfe414e782a98ffdd787a3df01be1825"
+content-hash = "5124ce70f3d64682e638327412140a044f8e94c1e890a22a3f064ea1cdfda408"
