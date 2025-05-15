@@ -90,11 +90,13 @@ export function DataTable({ fileUrl }: { fileUrl: string }) {
       const rows: Array<any> = XLSX.utils.sheet_to_json(sheet, {
         range: range,
         raw: false,
+        defval: "",
       });
       if (!rows.length) return;
+      const filteredColumns = Object.keys(rows[0]).filter(colName => !colName.startsWith("__EMPTY"));
       setColumns(
         Array.from(
-          Object.keys(rows[0]).map((colName) => {
+          filteredColumns.map((colName) => {
             const width = Math.min(
               Math.max(
                 ...rows.map((row) => `${row[colName] || ""}`.length * 8),
