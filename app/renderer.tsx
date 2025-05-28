@@ -425,6 +425,7 @@ function RenderedTreeNode({
           style={{
             overflow: "scroll",
             marginTop: "1rem",
+            whiteSpace: "pre-wrap",
           }}
           rootName={false}
           value={props.value}
