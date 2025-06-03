@@ -1,13 +1,12 @@
 [tool.poetry]
 name = "gooey-gui"
-version = "0.5.4"
+version = "0.5.5"
 description = ""
 authors = ["Dev Aggarwal <devxpy@gmail.com>"]
 license = "Apache-2.0"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-pydantic = "*"
 fastapi = "*"
 redis = "^4.5.1"
 uvicorn = { extras = ["standard"], version = "*" }

@@ -1,12 +1,11 @@
-from pydantic import BaseModel
-
 from gooey_gui import core
 from gooey_gui.components import common as gui
 
 
-class AlertDialogRef(BaseModel):
-    key: str
-    is_open: bool = False
+class AlertDialogRef:
+    def __init__(self, key: str, is_open: bool = False):
+        self.key = key
+        self.is_open = is_open
 
     def set_open(self, value: bool):
         self.is_open = core.session_state[self.key] = value
@@ -23,6 +22,10 @@ class AlertDialogRef(BaseModel):
 class ConfirmDialogRef(AlertDialogRef):
     pressed_confirm: bool = False
 
+    @classmethod
+    def from_alert_dialog(cls, ref: AlertDialogRef) -> "ConfirmDialogRef":
+        return cls(key=ref.key, is_open=ref.is_open)
+
     @property
     def confirm_btn_key(self):
         return self.key + ":confirm"
@@ -32,7 +35,7 @@ def use_confirm_dialog(
     key: str,
     close_on_confirm: bool = True,
 ) -> ConfirmDialogRef:
-    ref = ConfirmDialogRef.parse_obj(use_alert_dialog(key))
+    ref = ConfirmDialogRef.from_alert_dialog(use_alert_dialog(key))
     if not ref.is_open:
         return ref
 

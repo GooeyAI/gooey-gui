@@ -4,7 +4,6 @@ from functools import partial, wraps
 
 from fastapi import Depends
 from fastapi.encoders import jsonable_encoder
-from pydantic import BaseModel
 from starlette.requests import Request
 from starlette.responses import JSONResponse, RedirectResponse, Response
 
@@ -27,18 +26,31 @@ def add_styles(className: str, css: str):
     threadlocal.styles[className] = css
 
 
-class RenderTreeNode(BaseModel):
-    name: str
-    props: ReactHTMLProps = {}
-    children: list["RenderTreeNode"] = []
+class RenderTreeNode:
+    def __init__(
+        self,
+        name: str,
+        props: ReactHTMLProps | None = None,
+        children: list["RenderTreeNode"] | None = None,
+    ):
+        self.name = name
+        self.props = props or {}
+        self.children = children or []
 
     def mount(self) -> "RenderTreeNode":
         threadlocal.render_root.children.append(self)
         return self
 
+    def to_dict(self) -> dict:
+        return dict(
+            name=self.name,
+            props=self.props,
+            children=[child.to_dict() for child in self.children],
+        )
+
 
 class NestingCtx:
-    def __init__(self, node: RenderTreeNode = None):
+    def __init__(self, node: RenderTreeNode | None = None):
         self.node = node or threadlocal.render_root
         self.parent = None
 
@@ -137,7 +149,7 @@ def renderer(
             return JSONResponse(
                 jsonable_encoder(
                     dict(
-                        children=root.children,
+                        children=root.to_dict()["children"],
                         state=get_session_state(),
                         channels=get_subscriptions(),
                         **(ret or {}),
