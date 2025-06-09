@@ -128,7 +128,6 @@ const Menu = (props: MenuProps) => {
     if (!menuRef.current) return;
     let rect = menuRef.current.getBoundingClientRect();
     let overflowRight = rect.right > window.innerWidth - 25;
-    console.log(rect.right, window.innerWidth, overflowRight);
     if (overflowRight) {
       menuRef.current.style.right = "0";
     }
