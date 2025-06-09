@@ -1,8 +1,10 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import type {
   CSSObjectWithLabel,
   OptionProps,
   SingleValueProps,
+  PlaceholderProps,
+  MenuProps,
 } from "react-select";
 import Select, { components } from "react-select";
 import { InputLabel } from "~/gooeyInput";
@@ -50,6 +52,16 @@ export default function GooeySelect({
     }
   }, [args.isMulti, args.options, selectValue, setValue]);
 
+  styles = {
+    ...styles,
+    menu: {
+      width: "max-content",
+      minWidth: "100%",
+      maxWidth: "80vw",
+      ...styles?.menu,
+    },
+  };
+
   return (
     <div className={`gui-input gui-input-select ${args.className ?? ""}`}>
       <InputLabel
@@ -66,21 +78,29 @@ export default function GooeySelect({
             disabled
           >
             {selectValue && (
-              <option selected>
-                {selectValue.map((it: any) => it.label).join(" | ")}
+              <option>
+                <RenderedMarkdown
+                  body={selectValue.map((it: any) => it.label).join(" | ")}
+                  className="container-margin-reset"
+                />
               </option>
             )}
             {args.options.map((opt: any) => (
-              <option>{opt.label}</option>
+              <option key={opt.value}>
+                <RenderedMarkdown
+                  body={opt.label}
+                  className="container-margin-reset"
+                />
+              </option>
             ))}
           </select>
         }
       >
         {() => (
           <Select
-            value={selectValue}
+            value={selectValue[0]?.value ? selectValue : null}
             onChange={onSelectChange}
-            components={{ Option, SingleValue }}
+            components={{ Option, SingleValue, Placeholder, Menu }}
             styles={{
               ...Object.fromEntries(
                 Object.entries(styles ?? {}).map(([key, style]) => {
@@ -92,6 +112,7 @@ export default function GooeySelect({
                 })
               ),
             }}
+            placeholder={selectValue[0]?.label}
             {...args}
           />
         )}
@@ -99,6 +120,27 @@ export default function GooeySelect({
     </div>
   );
 }
+
+const Menu = (props: MenuProps) => {
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!menuRef.current) return;
+    let rect = menuRef.current.getBoundingClientRect();
+    let overflowRight = rect.right > window.innerWidth - 25;
+    console.log(rect.right, window.innerWidth, overflowRight);
+    if (overflowRight) {
+      menuRef.current.style.right = "0";
+    }
+  }, [menuRef, props.selectProps.menuIsOpen]);
+
+  return (
+    <components.Menu {...props} innerRef={menuRef}>
+      {props.children}
+    </components.Menu>
+  );
+};
+
 const Option = (props: OptionProps) => (
   <components.Option
     {...props}
@@ -118,3 +160,18 @@ const SingleValue = ({ children, ...props }: SingleValueProps) => (
     ) : null}
   </components.SingleValue>
 );
+
+const Placeholder = (props: PlaceholderProps) => {
+  if (props.children) {
+    props = {
+      ...props,
+      children: (
+        <RenderedMarkdown
+          body={props.children.toString()}
+          className="container-margin-reset"
+        />
+      ),
+    };
+  }
+  return <components.Placeholder {...props} />;
+};
