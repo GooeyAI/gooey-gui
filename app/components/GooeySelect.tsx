@@ -58,6 +58,7 @@ export default function GooeySelect({
       width: "max-content",
       minWidth: "100%",
       maxWidth: "80vw",
+      zIndex: 9999,
       ...styles?.menu,
     },
   };

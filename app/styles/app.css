@@ -240,11 +240,6 @@ button .gui-html-container,
   color: rgba(255, 255, 255, var(--tw-text-opacity));
 }
 
-/* match any #react-select-XXX-listbox */
-div[id^="react-select-"][id$="-listbox"] {
-  z-index: 9999;
-}
-
 .uppy-Dashboard--clear-all {
   font-size: 14px;
   background: none;
