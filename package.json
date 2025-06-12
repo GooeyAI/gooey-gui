@@ -19,6 +19,7 @@
   ],
   "dependencies": {
     "@codemirror/lang-javascript": "^6.2.2",
+    "@codemirror/lang-python": "^6.2.1",
     "@codemirror/lint": "^6.8.1",
     "@glideapps/glide-data-grid": "^5.3.0",
     "@reach/tabs": "^0.18.0",

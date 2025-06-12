@@ -1,4 +1,6 @@
 import { javascript } from "@codemirror/lang-javascript";
+import { python } from "@codemirror/lang-python";
+import { indentUnit } from "@codemirror/language";
 import { lintGutter, linter } from "@codemirror/lint";
 import { dracula } from "@uiw/codemirror-theme-dracula";
 import CodeMirror from "@uiw/react-codemirror";
@@ -41,8 +43,16 @@ export default function CodeEditor({
   onChange: OnChange;
   state: Record<string, any>;
 }) {
-  const { name, defaultValue, height, label, help, tooltipPlacement, ...args } =
-    props;
+  const {
+    name,
+    defaultValue,
+    height,
+    label,
+    help,
+    tooltipPlacement,
+    language,
+    ...args
+  } = props;
   const [inputRef, value, setValue] = useGooeyStringInput<HTMLTextAreaElement>({
     state,
     name,
@@ -65,6 +75,13 @@ export default function CodeEditor({
     asi: true,
     expr: true,
   };
+
+  let extensions = [lintGutter()];
+  if (language === "javascript") {
+    extensions.push(javascript(), jsLinter(lintOptions));
+  } else if (language === "python") {
+    extensions.push(python(), indentUnit.of("    "));
+  }
 
   return (
     <div className="gui-input code-editor-wrapper position-relative">
@@ -91,7 +108,7 @@ export default function CodeEditor({
         theme={dracula}
         value={value}
         onChange={handleChange}
-        extensions={[javascript(), lintGutter(), jsLinter(lintOptions)]}
+        extensions={extensions}
         {...args}
       />
     </div>
