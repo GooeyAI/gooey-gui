@@ -57,7 +57,7 @@ const CodeEditor = lazyImport(() => import("./components/CodeEditor"), {
       <div className="gui-input">
         <InputLabel label={props.label} />
         <div
-          className="d-flex align-items-center justify-content-center bg-dark text-white"
+          className="d-flex align-items-center justify-content-center"
           style={{
             height: (props.defaultValue || "").split("\n").length * 1.5 + "rem",
             ...props.style,
@@ -476,7 +476,13 @@ function RenderedTreeNode({
     }
     case "plotly-chart": {
       const { chart } = props;
-      return <Plot {...chart} style={{ width: "100%" }} config={{ displayModeBar: false }} />;
+      return (
+        <Plot
+          {...chart}
+          style={{ width: "100%" }}
+          config={{ displayModeBar: false }}
+        />
+      );
     }
     case "tooltip":
       const { content, placement } = props;

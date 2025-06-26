@@ -1,37 +1,78 @@
-import { javascript } from "@codemirror/lang-javascript";
-import { python } from "@codemirror/lang-python";
-import { indentUnit } from "@codemirror/language";
-import { lintGutter, linter } from "@codemirror/lint";
-import { dracula } from "@uiw/codemirror-theme-dracula";
-import CodeMirror from "@uiw/react-codemirror";
-import type { LintOptions } from "jshint";
-import { JSHINT as jshint } from "jshint";
+import CodeMirror, {
+  type Extension,
+  type ReactCodeMirrorRef,
+} from "@uiw/react-codemirror";
+import { useEffect, useRef, useState } from "react";
 import type { OnChange } from "~/app";
 import { InputLabel, useGooeyStringInput } from "~/gooeyInput";
+import { EditorView } from "@codemirror/view";
+import { vscodeLightInit as theme } from "@uiw/codemirror-theme-vscode";
 
-const jsLinter = (lintOptions: LintOptions) => {
-  return linter((view) => {
-    const diagnostics: any = [];
-    const codeText = view.state.doc.toJSON();
-    jshint(codeText, lintOptions);
-    const errors = jshint?.data()?.errors;
+const linterDelay = 300;
 
-    if (errors && errors.length > 0) {
-      errors.forEach((error) => {
-        const selectedLine = view.state.doc.line(error.line);
+const codeEditorExtensions: Record<string, () => Promise<Extension[]>> = {
+  async jinja() {
+    const { jinja } = await import("@codemirror/lang-jinja");
+    const { markdown } = await import("@codemirror/lang-markdown");
 
-        const diagnostic = {
-          from: selectedLine.from,
-          to: selectedLine.to,
-          severity: "error",
-          message: error.reason,
-        };
+    return [jinja({ base: markdown() })];
+  },
+  async json() {
+    const { json, jsonParseLinter } = await import("@codemirror/lang-json");
+    const { linter, lintGutter } = await import("@codemirror/lint");
 
-        diagnostics.push(diagnostic);
-      });
-    }
-    return diagnostics;
-  });
+    return [
+      lintGutter(),
+      json(),
+      linter(jsonParseLinter(), { delay: linterDelay }),
+    ];
+  },
+  async python() {
+    const { python } = await import("@codemirror/lang-python");
+    const { indentUnit } = await import("@codemirror/language");
+
+    return [python(), indentUnit.of("    ")];
+  },
+  async javascript() {
+    const { javascript } = await import("@codemirror/lang-javascript");
+    const { linter, lintGutter } = await import("@codemirror/lint");
+    const { JSHINT } = (await import("jshint")).default;
+
+    let lintOptions = {
+      esversion: 11,
+      browser: true,
+      lastsemic: true,
+      asi: true,
+      expr: true,
+    };
+
+    return [
+      lintGutter(),
+      javascript(),
+      linter(
+        (view: EditorView) => {
+          const diagnostics: any = [];
+          const codeText = view.state.doc.toJSON();
+          JSHINT(codeText, lintOptions);
+          const errors = JSHINT.data()?.errors;
+          errors?.forEach((error) => {
+            const selectedLine = view.state.doc.line(error.line);
+
+            const diagnostic = {
+              from: selectedLine.from,
+              to: selectedLine.to,
+              severity: "error",
+              message: error.reason,
+            };
+
+            diagnostics.push(diagnostic);
+          });
+          return diagnostics;
+        },
+        { delay: linterDelay }
+      ),
+    ];
+  },
 };
 
 export default function CodeEditor({
@@ -59,6 +100,7 @@ export default function CodeEditor({
     defaultValue,
     args,
   });
+
   const handleChange = (val: string) => {
     setValue(val);
     // trigger the onChange event for Root Form
@@ -68,20 +110,21 @@ export default function CodeEditor({
     });
   };
 
-  const lintOptions: LintOptions = {
-    esversion: 11,
-    browser: true,
-    lastsemic: true,
-    asi: true,
-    expr: true,
-  };
+  let [extensions, setExtensions] = useState<Extension[]>([]);
 
-  let extensions = [lintGutter()];
-  if (language === "javascript") {
-    extensions.push(javascript(), jsLinter(lintOptions));
-  } else if (language === "python") {
-    extensions.push(python(), indentUnit.of("    "));
-  }
+  useEffect(() => {
+    codeEditorExtensions[language]?.call(null).then(setExtensions);
+  }, [language]);
+
+  extensions.push(EditorView.lineWrapping);
+
+  const ref = useRef<ReactCodeMirrorRef>(null);
+
+  useEffect(() => {
+    ref.current?.editor
+      ?.querySelector(".cm-content")
+      ?.setAttribute("data-gramm", "false");
+  }, [ref.current]);
 
   return (
     <div className="gui-input code-editor-wrapper position-relative">
@@ -91,9 +134,6 @@ export default function CodeEditor({
         tooltipPlacement={tooltipPlacement}
       />
       <textarea
-        data-gramm="false"
-        data-gramm_editor="false"
-        data-enable-grammarly="false"
         ref={inputRef}
         name={name}
         value={value}
@@ -102,13 +142,17 @@ export default function CodeEditor({
         }}
       />
       <CodeMirror
-        data-gramm="false"
-        data-gramm_editor="false"
-        data-enable-grammarly="false"
-        theme={dracula}
+        ref={ref}
+        theme={theme({
+          settings: {
+            fontFamily: "monospace",
+            fontSize: "14px",
+          },
+        })}
         value={value}
         onChange={handleChange}
         extensions={extensions}
+        basicSetup={{ foldGutter: false }}
         {...args}
       />
     </div>
