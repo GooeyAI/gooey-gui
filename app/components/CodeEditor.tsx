@@ -15,7 +15,16 @@ const codeEditorExtensions: Record<string, () => Promise<Extension[]>> = {
     const { jinja } = await import("@codemirror/lang-jinja");
     const { markdown } = await import("@codemirror/lang-markdown");
 
-    return [jinja({ base: markdown() })];
+    return [
+      jinja({
+        base: markdown({
+          completeHTMLTags: false,
+          extensions: {
+            remove: ["HTMLBlock", "HTMLTag", "Link"],
+          },
+        }),
+      }),
+    ];
   },
   async json() {
     const { json, jsonParseLinter } = await import("@codemirror/lang-json");
@@ -152,7 +161,7 @@ export default function CodeEditor({
         value={value}
         onChange={handleChange}
         extensions={extensions}
-        basicSetup={{ foldGutter: false }}
+        basicSetup={{ foldGutter: language !== "jinja" }}
         {...args}
       />
     </div>
