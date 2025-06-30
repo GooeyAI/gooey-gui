@@ -120,7 +120,7 @@ def _node(nodename: str, **props):
     return core.NestingCtx(node)
 
 
-def styled(css: str) -> core.RenderTreeNode:
+def styled(css: str) -> core.NestingCtx:
     css = dedent(css).strip()
     className = "gui-" + core.md5_values(css)
     selector = "." + className
