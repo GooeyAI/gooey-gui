@@ -7,6 +7,9 @@ import {
 import { useCallback, useEffect, useState } from "react";
 import XLSX from "xlsx";
 import LoadingFallback from "./loadingfallback";
+import * as cptable from "codepage";
+
+XLSX.set_cptable(cptable);
 
 const maxColWidth = 300;
 
@@ -93,7 +96,9 @@ export function DataTable({ fileUrl }: { fileUrl: string }) {
         defval: "",
       });
       if (!rows.length) return;
-      const filteredColumns = Object.keys(rows[0]).filter(colName => !colName.startsWith("__EMPTY"));
+      const filteredColumns = Object.keys(rows[0]).filter(
+        (colName) => !colName.startsWith("__EMPTY")
+      );
       setColumns(
         Array.from(
           filteredColumns.map((colName) => {
