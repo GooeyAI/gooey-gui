@@ -702,13 +702,12 @@ def json(value: typing.Any, expanded: bool = False, depth: int = 1, **props):
     ).mount()
 
 
-def data_table(file_url_or_cells: str | list):
+def data_table(file_url_or_cells: str | list, **props):
     if isinstance(file_url_or_cells, str):
-        file_url = file_url_or_cells
-        return _node("data-table", fileUrl=file_url)
+        props["fileUrl"] = file_url_or_cells
     else:
-        cells = file_url_or_cells
-        return _node("data-table-raw", cells=cells)
+        props["cells"] = file_url_or_cells
+    return _node("data-table", **props)
 
 
 def table(df: "pd.DataFrame"):

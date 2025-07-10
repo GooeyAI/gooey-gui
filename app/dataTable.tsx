@@ -1,190 +1,248 @@
-import type { GridCell, Item } from "@glideapps/glide-data-grid";
+import { useEffect, useState, useMemo } from "react";
+import { AgGridReact } from "ag-grid-react";
 import {
-  DataEditor,
-  GridCellKind,
-  GridColumnIcon,
-} from "@glideapps/glide-data-grid";
-import { useCallback, useEffect, useState } from "react";
-import XLSX from "xlsx";
-import LoadingFallback from "./loadingfallback";
+  ModuleRegistry,
+  AllCommunityModule,
+  themeQuartz,
+} from "ag-grid-community";
+import * as XLSX from "xlsx";
 import * as cptable from "codepage";
+
+const theme = themeQuartz.withParams({
+  borderRadius: 6,
+  browserColorScheme: "light",
+  fontFamily: "inherit",
+  headerFontSize: 14,
+  spacing: 4,
+  wrapperBorderRadius: 6,
+  columnBorder: true,
+  headerColumnBorder: true,
+  headerFontWeight: 700,
+  headerBackgroundColor: "#f7f7f7",
+});
 
 XLSX.set_cptable(cptable);
 
-const maxColWidth = 300;
+// Register all community modules for AG Grid v34+
+ModuleRegistry.registerModules([AllCommunityModule]);
 
-export function DataTableRaw({ cells }: { cells: Array<any> }) {
-  let [data, setData] = useState<Array<any>>([]);
-  let [columns, setColumns] = useState<Array<any>>([]);
+function decodeHTMLEntities(text: string) {
+  if (typeof text !== "string") return text;
+  const txt = document.createElement("textarea");
+  txt.innerHTML = text;
+  return txt.value;
+}
+
+export function DataTable({
+  fileUrl,
+  cells,
+  headerSelect,
+  onChange,
+  state,
+}: {
+  fileUrl?: string;
+  cells?: Array<any>;
+  headerSelect?: Record<string, any>;
+  onChange?: (value: any) => void;
+  state?: Record<string, any>;
+}) {
+  const [rowData, setRowData] = useState<Array<any>>([]);
+  const [colHeaders, setColHeaders] = useState<Array<string>>([]);
+  const [loading, setLoading] = useState<boolean>(!!fileUrl);
 
   useEffect(() => {
-    setData(cells.slice(1));
-    setColumns(
-      Array.from(
-        cells[0].map((colName: any, idx: number) => {
-          if (typeof colName === "object") {
-            colName = colName.data;
+    if (cells && cells.length > 1) {
+      let rows = cells.map((row: any) =>
+        row.map((cell: any) => {
+          if (!cell) {
+            cell = { value: "" };
+          } else if (typeof cell !== "object") {
+            cell = { value: cell };
           }
-          const width = Math.min(
-            Math.max(
-              ...cells.map(
-                (row: any) => `${(row[idx] && row[idx].data) || ""}`.length * 8
-              ),
-              colName.length * 20
-            ),
-            maxColWidth
-          );
-          return {
-            title: colName,
-            id: colName,
-            icon: GridColumnIcon.HeaderString,
-            width: width,
-          };
+          cell.value = decodeHTMLEntities(cell.value);
+          return cell;
         })
-      )
-    );
-  }, [cells]);
-
-  const getContent = useCallback(
-    ([col, row]: Item): GridCell => {
-      let cell = data[row] && data[row][col];
-      if (!cell) {
-        return {
-          kind: GridCellKind.Loading,
-          allowOverlay: false,
-        };
-      }
-      if (typeof cell !== "object") {
-        cell = {
-          data: `${cell ?? ""}`,
-        };
-      }
-      return {
-        kind: GridCellKind.Text,
-        allowOverlay: true,
-        readonly: true,
-        displayData: cell.data,
-        ...cell,
-      };
-    },
-    [data]
-  );
-
-  return DataTableComponent(data, getContent, columns, setColumns, setData);
-}
-
-export function DataTable({ fileUrl }: { fileUrl: string }) {
-  let [data, setData] = useState<Array<any>>([]);
-  let [columns, setColumns] = useState<Array<any>>([]);
-
-  useEffect(() => {
-    (async () => {
-      const response = await fetch(fileUrl);
-      const data = await response.arrayBuffer();
-      const workbook = XLSX.read(data, { codepage: 65001 });
-      const sheet = workbook.Sheets[workbook.SheetNames[0]];
-      let range = sheet["!ref"]!;
-      if (typeof sheet["A1"] === "undefined") {
-        range = XLSX.utils.encode_range({
-          s: { c: 1, r: 1 },
-          e: XLSX.utils.decode_range(range).e,
+      );
+      setColHeaders(rows[0].map((col: any) => col.value));
+      setRowData(
+        rows
+          .slice(1)
+          .map((row: any) =>
+            Object.fromEntries(
+              rows[0].map((col: any, idx: number) => [col.value, row[idx]])
+            )
+          )
+      );
+      setLoading(false);
+    } else if (fileUrl) {
+      (async () => {
+        setLoading(true);
+        const response = await fetch(fileUrl);
+        const data = await response.arrayBuffer();
+        const workbook = XLSX.read(data, { codepage: 65001 });
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        let range = sheet["!ref"]!;
+        if (typeof sheet["A1"] === "undefined") {
+          range = XLSX.utils.encode_range({
+            s: { c: 1, r: 1 },
+            e: XLSX.utils.decode_range(range).e,
+          });
+        }
+        const rows: Array<any> = XLSX.utils.sheet_to_json(sheet, {
+          range: range,
+          raw: false,
         });
-      }
-      const rows: Array<any> = XLSX.utils.sheet_to_json(sheet, {
-        range: range,
-        raw: false,
-        defval: "",
-      });
-      if (!rows.length) return;
-      const filteredColumns = Object.keys(rows[0]).filter(
-        (colName) => !colName.startsWith("__EMPTY")
-      );
-      setColumns(
-        Array.from(
-          filteredColumns.map((colName) => {
-            const width = Math.min(
-              Math.max(
-                ...rows.map((row) => `${row[colName] || ""}`.length * 8),
-                colName.length * 20
-              ),
-              maxColWidth
-            );
-            return {
-              title: colName,
-              id: colName,
-              icon: GridColumnIcon.HeaderString,
-              width: width,
-            };
-          })
-        )
-      );
-      setData(Array.from(rows));
-    })();
-  }, [fileUrl]);
+        if (!rows.length) return;
+        const filteredColumns = Object.keys(rows[0]).filter(
+          (colName) => !colName.startsWith("__EMPTY")
+        );
+        if (rows.length >= 1) {
+          setColHeaders(filteredColumns.map(decodeHTMLEntities));
+          setRowData(
+            rows.map((row) => {
+              const obj: Record<string, any> = {};
+              filteredColumns.forEach((col) => {
+                obj[decodeHTMLEntities(col)] = {
+                  value: decodeHTMLEntities(row[col]),
+                };
+              });
+              return obj;
+            })
+          );
+        }
+        setLoading(false);
+      })();
+    }
+  }, [cells, fileUrl]);
 
-  const getContent = useCallback(
-    (cell: Item): GridCell => {
-      const [col, row] = cell;
-      const dataRow = data[row];
-      if (!dataRow) {
-        return {
-          kind: GridCellKind.Loading,
-          allowOverlay: false,
-        };
-      }
-      const displayData = `${dataRow[columns[col].title] ?? ""}`;
-      return {
-        kind: GridCellKind.Text,
-        allowOverlay: true,
-        readonly: true,
-        displayData: displayData,
-        data: displayData,
-      };
-    },
-    [columns, data]
-  );
+  const columnDefs = useMemo(() => {
+    let cols = [
+      {
+        headerName: "",
+        field: "__rowNum__",
+        valueGetter: (params: any) =>
+          params.node ? params.node.rowIndex + 1 : "",
+        pinned: "left" as const,
+        width: 35,
+        suppressMovable: true,
+        suppressMenu: true,
+        suppressColumnsToolPanel: true,
+        suppressFiltersToolPanel: true,
+        suppressAutoSize: true,
+        sortable: false,
+        filter: false,
+        cellStyle: {
+          backgroundColor: "#f7f7f7",
+          color: "#989898",
+        },
+      },
+      ...colHeaders.map((header) => ({
+        field: header,
+        headerName: header,
+        editable: true,
+        cellEditor: "agLargeTextCellEditor",
+        cellEditorPopup: true,
+        valueGetter: (params: any) => {
+          // Always expect an object with a value property
+          const cell = params.data?.[header];
+          if (cell && typeof cell === "object" && "value" in cell) {
+            return cell.value;
+          }
+          return "";
+        },
+        cellStyle: (params: any) => {
+          const cell = params.data?.[header];
+          if (cell && typeof cell === "object" && cell.style) {
+            return cell.style;
+          }
+          return undefined;
+        },
+      })),
+    ];
+    return cols;
+  }, [colHeaders]);
 
-  return DataTableComponent(data, getContent, columns, setColumns, setData);
-}
+  if (loading) return <div>Loading...</div>;
 
-function DataTableComponent(
-  data: Array<any>,
-  getContent: (cell: Item) => GridCell,
-  columns: Array<any>,
-  setColumns: (
-    value: ((prevState: Array<any>) => Array<any>) | Array<any>
-  ) => void,
-  setData: (value: ((prevState: Array<any>) => Array<any>) | Array<any>) => void
-) {
-  return data.length ? (
-    <div style={{ border: "1px solid gray" }}>
-      <DataEditor
-        getCellContent={getContent}
-        keybindings={{ search: true }}
-        getCellsForSelection={true}
-        width={"100%"}
-        columns={columns}
-        smoothScrollX={true}
-        smoothScrollY={true}
-        overscrollX={200}
-        overscrollY={200}
-        rowMarkers={"both"}
-        verticalBorder={true}
-        rows={data.length}
-        height={"300px"}
-        onColumnResize={(col: any, width) => {
-          col.width = width;
-          setColumns([...columns]);
+  return (
+    <div
+      style={{ height: 300 }}
+      // style={{ maxHeight: 300, overflow: "auto" }}
+    >
+      <AgGridReact
+        theme={theme}
+        rowData={rowData}
+        // domLayout="autoHeight"
+        autoSizeStrategy={{
+          type: "fitCellContents",
+          defaultMaxWidth: 300,
         }}
-        onCellEdited={(cell, newValue) => {
-          const [col, row] = cell;
-          const dataRow = data[row];
-          dataRow[columns[col].title] = newValue.data;
-          setData([...data]);
-        }}
+        readOnlyEdit={true}
+        columnDefs={columnDefs}
+        defaultColDef={
+          headerSelect
+            ? {
+                headerComponent: HeaderWithSelect,
+                headerComponentParams: { headerSelect, onChange, state },
+              }
+            : {}
+        }
       />
     </div>
-  ) : (
-    <LoadingFallback />
+  );
+}
+
+function HeaderWithSelect({
+  displayName,
+  headerSelect,
+  onChange,
+  state,
+  className = "d-flex align-items-center justify-content-center gap-2 w-100",
+}: {
+  displayName: string;
+  headerSelect: Record<string, any>;
+  onChange: (value: any) => void;
+  state: Record<string, any>;
+  className?: string;
+}) {
+  if (!displayName) return null;
+  let { name, options, ...args } = headerSelect;
+  name = name?.replace("{col}", displayName);
+
+  let labelWidget = <span>{displayName}</span>;
+  if (!options || options.length === 0) {
+    return labelWidget;
+  }
+
+  let optionWidgets = [];
+  for (let option of options) {
+    if (option.value === displayName) {
+      return (
+        <div className={className}>
+          <input type="hidden" name={name} value={displayName} />
+          {labelWidget}
+        </div>
+      );
+    }
+    optionWidgets.push(
+      <option key={option.value} value={option.value}>
+        {option.label}
+      </option>
+    );
+  }
+
+  return (
+    <div className={className}>
+      {labelWidget}
+      <select
+        name={name}
+        onChange={onChange}
+        style={{ maxWidth: "150px" }}
+        defaultValue={state[name]}
+        {...args}
+      >
+        {optionWidgets}
+      </select>
+    </div>
   );
 }

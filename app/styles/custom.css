@@ -912,3 +912,7 @@ button {
     max-width: 35vw !important;
   }
 }
+
+.ag-horizontal-left-spacer, .ag-body-viewport {
+  background-color: #f7f7f7;
+}

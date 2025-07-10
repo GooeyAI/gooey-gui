@@ -24,7 +24,7 @@ import GooeySwitch from "./components/GooeySwitch";
 import { GooeyTooltip } from "./components/GooeyTooltip";
 import { lazyImport } from "./lazyImports";
 
-const { DataTable, DataTableRaw } = lazyImport(() => import("~/dataTable"));
+const { DataTable } = lazyImport(() => import("~/dataTable"));
 
 const { GooeyFileInput } = lazyImport(() => import("~/gooeyFileInput"), {
   fallback: ({ name, label, defaultValue }) => (
@@ -159,12 +159,9 @@ function RenderedTreeNode({
         </div>
       );
     case "data-table": {
-      const { fileUrl, ...tableProps } = props;
-      return <DataTable fileUrl={fileUrl}></DataTable>;
-    }
-    case "data-table-raw": {
-      const { cells, ...tableProps } = props;
-      return <DataTableRaw cells={cells}></DataTableRaw>;
+      return (
+        <DataTable {...props} onChange={onChange} state={state}></DataTable>
+      );
     }
     case "nav-tabs":
       return (
