@@ -7,6 +7,7 @@ import {
 } from "ag-grid-community";
 import * as XLSX from "xlsx";
 import * as cptable from "codepage";
+import ReactDOM from "react-dom";
 
 const theme = themeQuartz.withParams({
   borderRadius: 6,
@@ -26,13 +27,6 @@ XLSX.set_cptable(cptable);
 // Register all community modules for AG Grid v34+
 ModuleRegistry.registerModules([AllCommunityModule]);
 
-function decodeHTMLEntities(text: string) {
-  if (typeof text !== "string") return text;
-  const txt = document.createElement("textarea");
-  txt.innerHTML = text;
-  return txt.value;
-}
-
 export function DataTable({
   fileUrl,
   cells,
@@ -49,7 +43,6 @@ export function DataTable({
   const [rowData, setRowData] = useState<Array<any>>([]);
   const [colHeaders, setColHeaders] = useState<Array<string>>([]);
   const [loading, setLoading] = useState<boolean>(!!fileUrl);
-
   useEffect(() => {
     if (cells && cells.length > 1) {
       let rows = cells.map((row: any) =>
@@ -125,7 +118,6 @@ export function DataTable({
         pinned: "left" as const,
         width: 35,
         suppressMovable: true,
-        suppressMenu: true,
         suppressColumnsToolPanel: true,
         suppressFiltersToolPanel: true,
         suppressAutoSize: true,
@@ -165,14 +157,10 @@ export function DataTable({
   if (loading) return <div>Loading...</div>;
 
   return (
-    <div
-      style={{ height: 300 }}
-      // style={{ maxHeight: 300, overflow: "auto" }}
-    >
+    <FullscreenOverlay>
       <AgGridReact
         theme={theme}
         rowData={rowData}
-        // domLayout="autoHeight"
         autoSizeStrategy={{
           type: "fitCellContents",
           defaultMaxWidth: 300,
@@ -188,8 +176,15 @@ export function DataTable({
             : {}
         }
       />
-    </div>
+    </FullscreenOverlay>
   );
+}
+
+function decodeHTMLEntities(text: string) {
+  if (typeof text !== "string") return text;
+  const txt = document.createElement("textarea");
+  txt.innerHTML = text;
+  return txt.value;
 }
 
 function HeaderWithSelect({
@@ -245,4 +240,118 @@ function HeaderWithSelect({
       </select>
     </div>
   );
+}
+
+function FullscreenOverlay({ children }: { children: React.ReactNode }) {
+  const [fullscreen, setFullscreen] = useState(false);
+
+  // Prevent background scroll when fullscreen is open
+  useEffect(() => {
+    if (fullscreen) {
+      const original = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      // Add ESC key handler
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === "Escape") {
+          setFullscreen(false);
+        }
+      };
+      window.addEventListener("keydown", handleKeyDown);
+      return () => {
+        document.body.style.overflow = original;
+        window.removeEventListener("keydown", handleKeyDown);
+      };
+    }
+  }, [fullscreen]);
+
+  if (fullscreen) {
+    let overlay = (
+      <div
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100vw",
+          height: "100vh",
+          zIndex: 999999,
+          background: "rgba(255,255,255,0.85)",
+          backdropFilter: "blur(16px) saturate(180%)",
+          WebkitBackdropFilter: "blur(16px) saturate(180%)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <div
+          style={{
+            width: "80%",
+            height: "80%",
+            position: "relative",
+          }}
+        >
+          {/* Close button */}
+          <button
+            aria-label="Close fullscreen table"
+            onClick={() => setFullscreen(false)}
+            style={{
+              position: "absolute",
+              top: -16,
+              right: -16,
+              zIndex: 1001,
+              borderRadius: "50%",
+              width: 40,
+              height: 40,
+              background: "#fff",
+              border: "1px solid #ccc",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+              fontSize: 24,
+            }}
+          >
+            <i className="fa fa-times" aria-hidden="true"></i>
+          </button>
+          {/* Table */}
+          {children}
+        </div>
+      </div>
+    );
+    return ReactDOM.createPortal(overlay, document.body);
+  } else {
+    return (
+      <div style={{ position: "relative" }}>
+        {/* Table */}
+        <div style={{ height: 300 }}>{children}</div>
+        {/* Expand button */}
+        <button
+          aria-label="Expand table"
+          onClick={() => setFullscreen(true)}
+          style={{
+            position: "absolute",
+            bottom: -10,
+            right: -10,
+            zIndex: 2,
+            borderRadius: "50%",
+            width: 28,
+            height: 28,
+            background: "#fff",
+            border: "1px solid #ccc",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: "pointer",
+          }}
+        >
+          {/* FontAwesome expand icon */}
+          <i
+            className="fa-solid fa-sm fa-up-right-and-down-left-from-center"
+            aria-hidden="true"
+          ></i>
+        </button>
+      </div>
+    );
+  }
 }
