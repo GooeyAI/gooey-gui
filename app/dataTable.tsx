@@ -81,26 +81,29 @@ export function DataTable({
             e: XLSX.utils.decode_range(range).e,
           });
         }
-        const rows: Array<any> = XLSX.utils.sheet_to_json(sheet, {
+        // Use the first row as the header for columns
+        const allRows: any[][] = XLSX.utils.sheet_to_json(sheet, {
+          header: 1,
           range: range,
           raw: false,
         });
-        if (!rows.length) return;
-        const filteredColumns = Object.keys(rows[0]).filter(
-          (colName) => !colName.startsWith("__EMPTY")
-        );
-        if (rows.length >= 1) {
-          setColHeaders(filteredColumns.map(decodeHTMLEntities));
+        const headerRow: string[] = (allRows[0] || [])
+          .filter((colName: any) => colName && !colName.startsWith("__EMPTY"))
+          .map(decodeHTMLEntities);
+        if (allRows.length > 1 && headerRow.length > 0) {
+          setColHeaders(headerRow);
           setRowData(
-            rows.map((row) => {
-              const obj: Record<string, any> = {};
-              filteredColumns.forEach((col) => {
-                obj[decodeHTMLEntities(col)] = {
-                  value: decodeHTMLEntities(row[col]),
-                };
-              });
-              return obj;
-            })
+            allRows
+              .slice(1)
+              .filter((row: any) => row.length > 0)
+              .map((row: any[]) =>
+                Object.fromEntries(
+                  headerRow.map((col: string, idx: number) => [
+                    col,
+                    { value: decodeHTMLEntities(row[idx] ?? "") },
+                  ])
+                )
+              )
           );
         }
         setLoading(false);
@@ -163,6 +166,8 @@ export function DataTable({
         rowData={rowData}
         autoSizeStrategy={{
           type: "fitCellContents",
+          defaultMinWidth: 100,
+          columnLimits: [{ colId: "__rowNum__", minWidth: 0 }],
           defaultMaxWidth: 300,
         }}
         readOnlyEdit={true}
