@@ -76,37 +76,46 @@ export type TreeNode = {
   children: Array<TreeNode>;
 };
 
-export function getTransforms({
+export function applyFormDataTransforms({
   children,
+  formData,
 }: {
   children: Array<TreeNode>;
-}): Record<string, string> {
-  let ret: Record<string, string> = {};
+  formData: Record<string, FormDataEntryValue | null>;
+}) {
   for (const node of children) {
     const { name, props, children } = node;
-    switch (name) {
-      case "input":
-        ret[props.name] = props.type;
-        break;
-      default:
-        ret[props.name] = name;
-        break;
+    if (children) {
+      applyFormDataTransforms({ children, formData });
     }
-    if (!children) continue;
-    ret = { ...ret, ...getTransforms({ children }) };
+    let type;
+    if (name === "input") {
+      type = props.type;
+    } else {
+      type = name;
+    }
+    let transform = formDataTransforms[type];
+    if (!transform) continue;
+    formData[props.name] = transform(formData[props.name]);
   }
-  return ret;
 }
 
-export const applyTransform: Record<string, (val: FormDataEntryValue) => any> =
-  {
-    checkbox: Boolean,
-    number: parseIntFloat,
-    range: parseIntFloat,
-    select: (val) => (val ? JSON.parse(`${val}`) : null),
-    file: (val) => (val ? JSON.parse(`${val}`) : null),
-    switch: Boolean,
-  };
+const formDataTransforms: Record<
+  string,
+  (val: FormDataEntryValue | null) => any
+> = {
+  checkbox: Boolean,
+  switch: Boolean,
+  number: parseIntFloat,
+  range: parseIntFloat,
+  select: parseJSON,
+  file: parseJSON,
+};
+
+function parseJSON(val: FormDataEntryValue | null) {
+  if (!val) return null;
+  return JSON.parse(val.toString());
+}
 
 function parseIntFloat(
   val: FormDataEntryValue | undefined | null

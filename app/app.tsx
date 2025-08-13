@@ -1,15 +1,10 @@
 import { withSentry } from "@sentry/remix";
-import { useEffect, useRef } from "react";
+import { FormEvent, useEffect, useRef } from "react";
 
-import {
-  ActionArgs,
-  json,
-  LinksFunction,
-  LoaderArgs,
-  redirect,
-} from "@remix-run/node";
+import { json, LinksFunction, redirect } from "@remix-run/node";
 import type {
   ShouldRevalidateFunction,
+  SubmitOptions,
   V2_MetaFunction,
 } from "@remix-run/react";
 import {
@@ -23,9 +18,9 @@ import {
 } from "@remix-run/react";
 import path from "path";
 import { useDebouncedCallback } from "use-debounce";
-import { applyTransform, getTransforms, RenderedChildren } from "~/renderer";
 import { useEventSourceNullOk } from "~/event-source";
 import { handleRedirectResponse } from "~/handleRedirect";
+import { applyFormDataTransforms, RenderedChildren } from "~/renderer";
 
 import { gooeyGuiRouteHeader } from "~/consts";
 import appStyles from "~/styles/app.css";
@@ -64,53 +59,7 @@ export const links: LinksFunction = () => {
   ];
 };
 
-export async function loader({ request }: LoaderArgs) {
-  return await callServer({ request });
-}
-
-export async function action({ request }: ActionArgs) {
-  // proxy
-  let contentType = request.headers.get("Content-Type");
-  if (!contentType?.startsWith("application/x-www-form-urlencoded")) {
-    let body = await request.arrayBuffer();
-    return callServer({ request, body });
-  }
-  // proxy
-  let body = await request.text();
-  let formData = new URLSearchParams(body);
-  if (!formData.has("__gooey_gui_request_body")) {
-    return callServer({ request, body });
-  }
-
-  // parse request body
-  let { __gooey_gui_request_body, ...inputs } = Object.fromEntries(formData);
-  const {
-    transforms,
-    state,
-    ...jsonBody
-  }: {
-    transforms: Record<string, string>;
-    state: Record<string, any>;
-  } & Record<string, any> = JSON.parse(__gooey_gui_request_body.toString());
-  // apply transforms
-  for (let [field, inputType] of Object.entries(transforms)) {
-    let toJson = applyTransform[inputType];
-    if (!toJson) continue;
-    inputs[field] = toJson(inputs[field]);
-  }
-  // update state with new form data
-  jsonBody.state = { ...state, ...inputs };
-  request.headers.set("Content-Type", "application/json");
-  return callServer({ request, body: JSON.stringify(jsonBody) });
-}
-
-async function callServer({
-  request,
-  body,
-}: {
-  request: Request;
-  body?: BodyInit | null;
-}) {
+export async function loader({ request }: { request: Request }) {
   const requestUrl = new URL(request.url);
   const serverUrl = new URL(settings.SERVER_HOST!);
   serverUrl.pathname = path.join(serverUrl.pathname, requestUrl.pathname ?? "");
@@ -119,10 +68,15 @@ async function callServer({
   request.headers.delete("Host");
   request.headers.set(gooeyGuiRouteHeader, "1");
 
+  let body;
+  if (!["GET", "HEAD", "OPTIONS"].includes(request.method)) {
+    body = await request.arrayBuffer();
+  }
+
   let response = await fetch(serverUrl, {
     method: request.method,
     redirect: "manual",
-    body: body,
+    body,
     headers: request.headers,
   });
 
@@ -146,6 +100,8 @@ async function callServer({
     });
   }
 }
+
+export const action = loader;
 
 export const shouldRevalidate: ShouldRevalidateFunction = (args) => {
   if (
@@ -200,21 +156,6 @@ function App() {
   const submit = useSubmit();
   const navigate = useNavigate();
 
-  if (typeof window !== "undefined") {
-    // @ts-ignore
-    window.gui = {
-      session_state: state,
-      navigate,
-      fetcher,
-      submit() {
-        if (formRef.current) submit(formRef.current, ...arguments);
-      },
-      rerun() {
-        if (formRef.current) submit(formRef.current);
-      },
-    };
-  }
-
   useEffect(() => {
     if (!base64Body) return;
     let body = base64Decode(base64Body);
@@ -225,14 +166,9 @@ function App() {
 
   useEffect(() => {
     if (realtimeEvent && fetcher.state === "idle" && formRef.current) {
-      submit(formRef.current);
+      onSubmit();
     }
   }, [fetcher.state, realtimeEvent, submit]);
-
-  const debouncedSubmit = useDebouncedCallback((form: HTMLFormElement) => {
-    form.removeAttribute("debounceInProgress");
-    submit(form);
-  }, 500);
 
   const onChange: OnChange = (event) => {
     const target = event?.target;
@@ -267,27 +203,67 @@ function App() {
         "focusout",
         function () {
           form.removeAttribute("debounceInProgress");
-          submit(form);
+          onSubmit();
         },
         { once: true }
       );
     } else {
-      submit(form);
+      onSubmit();
     }
   };
 
-  if (!children) return <></>;
+  const debouncedSubmit = useDebouncedCallback((form: HTMLFormElement) => {
+    form.removeAttribute("debounceInProgress");
+    onSubmit();
+  }, 500);
 
-  const transforms = getTransforms({ children });
+  let submitOptions: SubmitOptions = {
+    method: "post",
+    action: "?" + searchParams,
+    encType: "application/json",
+  };
+
+  const onSubmit = (event?: FormEvent) => {
+    if (!formRef.current) return;
+    let formData = Object.fromEntries(new FormData(formRef.current));
+    if (event) {
+      event.preventDefault();
+      let submitter = (event.nativeEvent as SubmitEvent)
+        .submitter as HTMLFormElement;
+      if (submitter) {
+        formData[submitter.name] = submitter.value;
+      }
+    }
+    applyFormDataTransforms({ children, formData });
+    let body = { state: { ...state, ...formData } };
+    submit(body, submitOptions);
+  };
+
+  if (typeof window !== "undefined") {
+    // @ts-ignore
+    window.gui = {
+      navigate,
+      fetcher,
+      session_state: state,
+      update_session_state(newState: Record<string, any>) {
+        submit({ state: { ...state, ...newState } }, submitOptions);
+      },
+      set_session_state(newState: Record<string, any>) {
+        submit({ state: newState }, submitOptions);
+      },
+      rerun: onSubmit,
+    };
+  }
+
+  if (!children) return <></>;
 
   return (
     <div data-prismjs-copy="📋 Copy" data-prismjs-copy-success="✅ Copied!">
-      <Form
+      <form
         ref={formRef}
         id={"gooey-form"}
-        action={"?" + searchParams}
-        method="POST"
         onChange={onChange}
+        onSubmit={onSubmit}
         noValidate
       >
         <RenderedChildren
@@ -295,12 +271,7 @@ function App() {
           onChange={onChange}
           state={state}
         />
-        <input
-          type="hidden"
-          name="__gooey_gui_request_body"
-          value={JSON.stringify({ state, transforms })}
-        />
-      </Form>
+      </form>
       <script
         async
         defer
