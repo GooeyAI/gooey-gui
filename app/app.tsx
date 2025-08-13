@@ -246,10 +246,14 @@ function App() {
       fetcher,
       session_state: state,
       update_session_state(newState: Record<string, any>) {
-        submit({ state: { ...state, ...newState } }, submitOptions);
+        Object.assign(state, newState);
+        submit({ state }, submitOptions);
       },
       set_session_state(newState: Record<string, any>) {
-        submit({ state: newState }, submitOptions);
+        for (let key in state) {
+          state[key] = newState[key];
+        }
+        submit({ state }, submitOptions);
       },
       rerun: onSubmit,
     };
