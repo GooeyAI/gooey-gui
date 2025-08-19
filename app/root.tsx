@@ -9,6 +9,7 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  ShouldRevalidateFunction,
   useLoaderData,
   useRouteError,
 } from "@remix-run/react";
@@ -36,6 +37,7 @@ export async function loader() {
     },
   });
 }
+export const shouldRevalidate: ShouldRevalidateFunction = () => false;
 
 export default function App() {
   const data = useLoaderData<typeof loader>();
