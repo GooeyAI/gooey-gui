@@ -368,10 +368,8 @@ function RenderedTreeNode({
               label={props.label}
               accept={props.accept}
               multiple={props.multiple}
-              onChange={onChange}
               defaultValue={props.defaultValue}
               uploadMeta={props.uploadMeta}
-              state={state}
               help={props.help}
               tooltipPlacement={props.tooltipPlacement}
             />

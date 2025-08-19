@@ -10,16 +10,15 @@ import { useEffect, useRef, useState } from "react";
 import type { TooltipPlacement } from "./components/GooeyTooltip";
 import { InputLabel } from "./gooeyInput";
 import { urlToFilename } from "./urlUtils";
+import { useGlobalContext } from "./globalContext";
 
 export function GooeyFileInput({
   name,
   label,
   accept,
   multiple,
-  onChange,
   defaultValue,
   uploadMeta,
-  state,
   help,
   tooltipPlacement,
 }: {
@@ -27,10 +26,8 @@ export function GooeyFileInput({
   label: string;
   accept: string[] | undefined;
   multiple: boolean;
-  onChange: () => void;
   defaultValue: string | string[] | undefined;
   uploadMeta: Record<string, string>;
-  state: Record<string, any>;
   help?: string;
   tooltipPlacement?: TooltipPlacement;
 }) {
@@ -38,6 +35,8 @@ export function GooeyFileInput({
   const inputRef = useRef<HTMLInputElement>(null);
   const [value, setValue] = useState(defaultValue);
   const [showClearAll, setShowClearAll] = useState(false);
+  const ctx = useGlobalContext();
+  const state = ctx.current.session_state;
 
   // if the server value changes, update the uppy state
   useEffect(() => {
@@ -45,7 +44,7 @@ export function GooeyFileInput({
       setShowClearAll(loadUppyFiles(state[name] || [], uppy));
       setValue(state[name]);
     }
-  }, [state, name]);
+  }, [name, state[name]]);
 
   useEffect(() => {
     let _uppy = initializeUppy({
@@ -57,8 +56,8 @@ export function GooeyFileInput({
       setShowClearAll,
       setValue(value) {
         setValue(value);
-        onChange();
         inputRef.current!.value = JSON.stringify(value) || "";
+        ctx.current.rerun();
       },
     });
     setUppy(_uppy);

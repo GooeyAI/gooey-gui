@@ -8,7 +8,6 @@ import type {
   V2_MetaFunction,
 } from "@remix-run/react";
 import {
-  Form,
   useActionData,
   useFetcher,
   useLoaderData,
@@ -25,6 +24,7 @@ import { applyFormDataTransforms, RenderedChildren } from "~/renderer";
 import { gooeyGuiRouteHeader } from "~/consts";
 import appStyles from "~/styles/app.css";
 import customStyles from "~/styles/custom.css";
+import { GlobalContextProvider } from "./globalContext";
 import settings from "./settings";
 
 export const meta: V2_MetaFunction = ({ data }) => {
@@ -239,24 +239,24 @@ function App() {
     submit(body, submitOptions);
   };
 
+  let globalContext = {
+    navigate,
+    session_state: state,
+    update_session_state(newState: Record<string, any>) {
+      Object.assign(state, newState);
+      submit({ state }, submitOptions);
+    },
+    set_session_state(newState: Record<string, any>) {
+      for (let key in state) {
+        state[key] = newState[key];
+      }
+      submit({ state }, submitOptions);
+    },
+    rerun: onSubmit,
+  };
   if (typeof window !== "undefined") {
     // @ts-ignore
-    window.gui = {
-      navigate,
-      fetcher,
-      session_state: state,
-      update_session_state(newState: Record<string, any>) {
-        Object.assign(state, newState);
-        submit({ state }, submitOptions);
-      },
-      set_session_state(newState: Record<string, any>) {
-        for (let key in state) {
-          state[key] = newState[key];
-        }
-        submit({ state }, submitOptions);
-      },
-      rerun: onSubmit,
-    };
+    window.gui = globalContext;
   }
 
   if (!children) return <></>;
@@ -270,11 +270,13 @@ function App() {
         onSubmit={onSubmit}
         noValidate
       >
-        <RenderedChildren
-          children={children}
-          onChange={onChange}
-          state={state}
-        />
+        <GlobalContextProvider value={globalContext}>
+          <RenderedChildren
+            children={children}
+            onChange={onChange}
+            state={state}
+          />
+        </GlobalContextProvider>
       </form>
       <script
         async

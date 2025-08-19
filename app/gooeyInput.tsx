@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { RenderedMarkdown } from "~/renderedMarkdown";
-import { TooltipPlacement } from "./components/GooeyTooltip";
-import { useSubmit } from "@remix-run/react";
+import type { TooltipPlacement } from "./components/GooeyTooltip";
 
 export function InputLabel({
   label,
