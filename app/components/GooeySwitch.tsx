@@ -1,24 +1,38 @@
-import React from "react";
-import { useGooeyCheckedInput } from "~/gooeyInput";
-import { RenderedMarkdown } from "~/renderedMarkdown";
+import { InputLabel, useGooeyCheckedInput } from "~/gooeyInput";
 
-interface GooeySwitchProps {
-  props: Record<string, any>;
-  state: Record<string, any>;
-}
-
-const GooeySwitch: React.FC<GooeySwitchProps> = ({
+const GooeySwitch = ({
   props,
   state,
-}: GooeySwitchProps) => {
-  const { label, name, defaultChecked, className = "", size = 'large', ...args } = props;
+}: {
+  props: Record<string, any>;
+  state: Record<string, any>;
+}) => {
+  const {
+    label,
+    name,
+    defaultChecked,
+    className = "",
+    size = "large",
+    help,
+    tooltipPlacement,
+    ...args
+  } = props;
   const inputRef = useGooeyCheckedInput({
     stateChecked: state[name],
     defaultChecked,
   });
   return (
-    <div className={"d-flex justify-content-between align-items-center container-margin-reset py-2 gooey-switch-container" + className }>
-      <RenderedMarkdown body={label} />
+    <div
+      className={
+        "d-flex justify-content-between align-items-center container-margin-reset py-2 gooey-switch-container " +
+        className
+      }
+    >
+      <InputLabel
+        label={label}
+        help={help}
+        tooltipPlacement={tooltipPlacement}
+      />
       <div>
         <input
           hidden
@@ -33,7 +47,7 @@ const GooeySwitch: React.FC<GooeySwitchProps> = ({
         <label htmlFor={name} />
       </div>
     </div>
-  )
+  );
 };
 
 export default GooeySwitch;
