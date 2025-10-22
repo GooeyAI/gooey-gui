@@ -36,4 +36,6 @@ RUN SENTRY_LOG_LEVEL=debug npm run build-prod
 
 ENV NODE_ENV=production
 
+HEALTHCHECK CMD wget 127.0.0.1:3000/__/health || exit 1
+
 CMD ./scripts/run-prod.sh

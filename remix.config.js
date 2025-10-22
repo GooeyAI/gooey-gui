@@ -39,6 +39,7 @@ module.exports = {
       for (const path of wixUrls) {
         route(path, "wix.tsx", { id: "wix-" + path });
       }
+      route("/__/health", "health.ts");
       route("/__/*", "proxy.tsx");
       route("/__/realtime/*", "realtime.tsx");
       route("*", "app.tsx", { id: "app" });
