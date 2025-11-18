@@ -127,6 +127,18 @@ html {
   src: url("basiercircle-regular.otf");
 }
 
+@font-face {
+  font-family: basiercircle;
+  font-weight: 600;
+  src: url("https://static.parastorage.com/services/santa-resources/resources/viewer/user-site-fonts/fonts/Avenir_Family_Pack/v1/AvenirLTW05-85Heavy.woff2");
+}
+
+@font-face {
+  font-family: basiercircle;
+  font-weight: 700;
+  src: url("https://static.parastorage.com/services/santa-resources/resources/viewer/user-site-fonts/fonts/Avenir_Family_Pack/v1/AvenirLTW05-85Heavy.woff2");
+}
+
 body {
   font-family: "basiercircle", sans-serif;
   overflow-x: hidden;
@@ -509,7 +521,6 @@ textarea:disabled {
 .btn {
   margin: 0 0 0 1px;
   border-radius: 6px;
- /* font-weight: 800; */
 }
 
 .btn.btn-theme {
@@ -518,7 +529,6 @@ textarea:disabled {
   padding: 12px;
   border: 1px solid #000;
   transition: all 0.1s ease-in;
-  font-weight: bold;
 }
 
 .btn.btn-theme:hover {
