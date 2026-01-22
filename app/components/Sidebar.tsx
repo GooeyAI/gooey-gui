@@ -1,0 +1,96 @@
+import type { TreeNode } from "~/renderer";
+import { RenderedChildren } from "~/renderer";
+import type { OnChange } from "~/app";
+import { useEffect, useState } from "react";
+
+export default function GooeySidebar({
+    name,
+    children,
+    onChange,
+    state,
+    defaultOpen,
+    pageChildren,
+    disabled,
+}: {
+    name: string;
+    children: Array<TreeNode>;
+    onChange: OnChange;
+    state: Record<string, any>;
+    defaultOpen: boolean;
+    pageChildren: Array<TreeNode>;
+    disabled: boolean;
+}) {
+    let [isOpen, setOpen] = useState(defaultOpen);
+
+    useEffect(() => {
+        function handleOpen() {
+            setOpen(true);
+            for (const openBtn of document.getElementsByClassName(name + "-button") as HTMLCollectionOf<HTMLButtonElement>) {
+                openBtn.style.display = "none";
+            }
+        }
+        function handleClose() {
+            setOpen(false);
+            for (const openBtn of document.getElementsByClassName(name + "-button") as HTMLCollectionOf<HTMLButtonElement>) {
+                openBtn.style.display = "inline-block";
+            }
+        }
+        window.addEventListener(name + ":open", handleOpen);
+        window.addEventListener(name + ":close", handleClose);
+        return () => {
+            window.removeEventListener(name + ":open", handleOpen);
+            window.removeEventListener(name + ":close", handleClose);
+        };
+    }, [name])
+
+    useEffect(() => {
+        if (state[name] != isOpen) {
+            state[name] = isOpen;
+            if (isDesktop()) {
+                state[name + ":default-open"] = isOpen;
+            } else {
+                state[name + ":default-open"] = false;
+            }
+            onChange();
+        }
+    }, [isOpen, name, state])
+
+    if (disabled) {
+        return (
+            <div className="container-xl">
+                <RenderedChildren children={pageChildren} onChange={onChange} state={state} />
+            </div>
+        );
+    }
+
+    let sidebarClassName;
+    if (isOpen) {
+        sidebarClassName = "gooey-sidebar-open";
+    } else {
+        sidebarClassName = "gooey-sidebar-closed";
+    }
+
+    let pageClassName;
+    if (isOpen) {
+        pageClassName = "mx-2 w-100";
+    } else {
+        pageClassName = "container-xxl";
+    }
+
+    return (
+        <div className="d-flex w-100 h-100 position-relative" style={{ height: "100dvh" }}>
+            <div className={`d-flex flex-column flex-grow-1 gooey-sidebar ${sidebarClassName}`}>
+                <RenderedChildren children={children} onChange={onChange} state={state} />
+            </div>
+            <div className={`d-flex flex-grow-1 mw-100`}>
+                <div className={pageClassName}>
+                    <RenderedChildren children={pageChildren} onChange={onChange} state={state} />
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function isDesktop() {
+    return typeof window !== "undefined" && window.innerWidth >= 1140; // Bootstrap xl breakpoint
+}

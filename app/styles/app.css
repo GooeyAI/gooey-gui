@@ -1,8 +1,3 @@
-html {
-  /* fix for jumping scrollbar issue - https://css-tricks.com/elegant-fix-jumping-scrollbar-issue/ */
-  margin-left: calc(100vw - 100%);
-}
-
 .gui-img {
   width: 100%;
   max-width: 450px;
@@ -295,4 +290,61 @@ button .gui-html-container,
 
 .bg-hover-light:hover {
   background-color: var(--bs-gray-200) !important;
+}
+
+:root {
+  --sidebar_open_width: 340px;
+  --sidebar_closed_width: 0;
+  --sidebar_mobile_width: 100vw;
+}
+
+.gooey-sidebar {
+  background-color: #f9f9f9;
+  position: sticky;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 999;
+  border-right: 1px solid #e0e0e0;
+  height: 100dvh;
+}
+
+.gooey-sidebar-open {
+  min-width: var(--sidebar_open_width);
+  width: var(--sidebar_open_width);
+  max-width: var(--sidebar_open_width);
+}
+.gooey-sidebar-closed {
+  min-width: var(--sidebar_closed_width);
+  width: var(--sidebar_closed_width);
+  max-width: var(--sidebar_closed_width);
+  overflow: hidden;
+}
+
+.gooey-sidebar-closed:hover {
+  cursor: e-resize;
+}
+
+@media (max-width: 1140px) {
+  .gooey-sidebar-open {
+      position: fixed;
+      left: 0;
+      bottom: 0;
+      min-width: var(--sidebar_mobile_width);
+      width: var(--sidebar_mobile_width);
+      max-width: var(--sidebar_mobile_width);
+      z-index: 100;
+      border-left: 1px solid #e0e0e0;
+      border-right: none;
+      height: calc(100dvh); /* 4px for the progress bar */
+  }
+  .gooey-sidebar-closed {
+      position: sticky;
+      right: 0;
+      left: auto;
+      min-width: 0px;
+      width: 0px;
+      max-width: 0px;
+      overflow: hidden;
+  }
 }

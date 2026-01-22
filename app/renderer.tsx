@@ -3,7 +3,7 @@ import { useEffect, useRef } from "react";
 import { RenderedMarkdown } from "~/renderedMarkdown";
 
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from "@reach/tabs";
-import { Link, useSubmit } from "@remix-run/react";
+import { Link } from "@remix-run/react";
 import { JsonViewer } from "@textea/json-viewer";
 import { DownloadButton } from "~/downloadButton";
 import {
@@ -14,7 +14,6 @@ import {
   InputLabel,
   loadEventHandlers,
 } from "~/gooeyInput";
-import { useJsonFormInput } from "~/jsonFormInput";
 import { RenderedHTML } from "~/renderedHTML";
 import type { OnChange } from "./app";
 import CountdownTimer from "./components/countdown";
@@ -22,6 +21,7 @@ import GooeyPopover from "./components/GooeyPopover";
 import GooeySelect from "./components/GooeySelect";
 import GooeySwitch from "./components/GooeySwitch";
 import { GooeyTooltip } from "./components/GooeyTooltip";
+import GooeySidebar from "./components/Sidebar";
 import { lazyImport } from "./lazyImports";
 
 const { DataTable } = lazyImport(() => import("~/dataTable"));
@@ -192,9 +192,8 @@ function RenderedTreeNode({
         <Link to={to} {...args}>
           <li className="nav-item" role="presentation">
             <button
-              className={`nav-link  p-2 px-md-3 py-md-2  mx-0 mx-md-2 ${
-                active ? "active" : ""
-              }`}
+              className={`nav-link  p-2 px-md-3 py-md-2  mx-0 mx-md-2 ${active ? "active" : ""
+                }`}
               type="button"
               role="tab"
               aria-controls="run"
@@ -514,6 +513,19 @@ function RenderedTreeNode({
         />
       );
     }
+    case "sidebar": {
+      return (
+        <GooeySidebar
+          name={props.name}
+          children={children}
+          onChange={onChange}
+          state={state}
+          pageChildren={props.page_content.children}
+          disabled={props.disabled}
+          defaultOpen={props.defaultOpen}
+        />
+      );
+    }
     default:
       return (
         <div>
@@ -661,9 +673,8 @@ export function GuiExpander({
     <div className="gui-expander accordion">
       <input hidden ref={ref} name={name} />
       <div
-        className={`gui-expander-header accordion-header accordion-button ${
-          isOpen ? "" : "collapsed"
-        }`}
+        className={`gui-expander-header accordion-header accordion-button ${isOpen ? "" : "collapsed"
+          }`}
         onClick={() => {
           if (!ref.current) return;
           ref.current.value = isOpen ? "" : "yes";
