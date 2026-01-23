@@ -520,7 +520,6 @@ function RenderedTreeNode({
           children={children}
           onChange={onChange}
           state={state}
-          pageChildren={props.page_content.children}
           disabled={props.disabled}
           defaultOpen={props.defaultOpen}
         />

@@ -9,7 +9,6 @@ export default function GooeySidebar({
     onChange,
     state,
     defaultOpen,
-    pageChildren,
     disabled,
 }: {
     name: string;
@@ -17,10 +16,10 @@ export default function GooeySidebar({
     onChange: OnChange;
     state: Record<string, any>;
     defaultOpen: boolean;
-    pageChildren: Array<TreeNode>;
     disabled: boolean;
 }) {
     let [isOpen, setOpen] = useState(defaultOpen);
+
 
     useEffect(() => {
         function handleOpen() {
@@ -55,10 +54,12 @@ export default function GooeySidebar({
         }
     }, [isOpen, name, state])
 
+    let [sidebarDiv, pageDiv] = children;
+
     if (disabled) {
         return (
             <div className="container-xl">
-                <RenderedChildren children={pageChildren} onChange={onChange} state={state} />
+                <RenderedChildren children={pageDiv.children} onChange={onChange} state={state} />
             </div>
         );
     }
@@ -80,11 +81,11 @@ export default function GooeySidebar({
     return (
         <div className="d-flex w-100 h-100 position-relative" style={{ height: "100dvh" }}>
             <div className={`d-flex flex-column flex-grow-1 gooey-sidebar ${sidebarClassName}`}>
-                <RenderedChildren children={children} onChange={onChange} state={state} />
+                <RenderedChildren children={sidebarDiv.children} onChange={onChange} state={state} />
             </div>
             <div className={`d-flex flex-grow-1 mw-100`}>
                 <div className={pageClassName}>
-                    <RenderedChildren children={pageChildren} onChange={onChange} state={state} />
+                    <RenderedChildren children={pageDiv.children} onChange={onChange} state={state} />
                 </div>
             </div>
         </div>
