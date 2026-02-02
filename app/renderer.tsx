@@ -577,7 +577,8 @@ export function RenderedChildren({
       routeKey &&
       (node.name === "input" ||
         node.name === "textarea" ||
-        node.name === "code-editor")
+        node.name === "code-editor" ||
+        node.name === "select")
     ) {
       key = `${routeKey}:${key}`;
     }
