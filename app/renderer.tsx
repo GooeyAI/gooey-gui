@@ -3,7 +3,7 @@ import { useEffect, useRef } from "react";
 import { RenderedMarkdown } from "~/renderedMarkdown";
 
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from "@reach/tabs";
-import { Link } from "@remix-run/react";
+import { Link, useLocation } from "@remix-run/react";
 import { JsonViewer } from "@textea/json-viewer";
 import { DownloadButton } from "~/downloadButton";
 import {
@@ -564,12 +564,22 @@ export function RenderedChildren({
   state: Record<string, any>;
   className?: string;
 }) {
+  const location = useLocation();
+  const routeKey = `${location.pathname}${location.search}`;
   let elements = children.map((node, idx) => {
     let key;
     if (node.props.name) {
       key = inputId(node.props);
     } else {
       key = `idx:${idx}`;
+    }
+    if (
+      routeKey &&
+      (node.name === "input" ||
+        node.name === "textarea" ||
+        node.name === "code-editor")
+    ) {
+      key = `${routeKey}:${key}`;
     }
     let prevClassName = node.props.className || "";
     if (className && !prevClassName.includes(className)) {
