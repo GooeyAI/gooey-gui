@@ -314,11 +314,13 @@ button .gui-html-container,
 }
 
 .gooey-sidebar-open {
+  display: flex;
   min-width: var(--sidebar_open_width);
   width: var(--sidebar_open_width);
   max-width: var(--sidebar_open_width);
 }
 .gooey-sidebar-closed {
+  display: none;
   min-width: var(--sidebar_closed_width);
   width: var(--sidebar_closed_width);
   max-width: var(--sidebar_closed_width);

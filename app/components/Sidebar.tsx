@@ -20,7 +20,6 @@ export default function GooeySidebar({
 }) {
     let [isOpen, setOpen] = useState(defaultOpen);
 
-
     useEffect(() => {
         function handleOpen() {
             setOpen(true);
@@ -79,8 +78,8 @@ export default function GooeySidebar({
     }
 
     return (
-        <div className="d-flex w-100 h-100 position-relative" style={{ height: "100dvh" }}>
-            <div className={`d-flex flex-column flex-grow-1 gooey-sidebar ${sidebarClassName}`}>
+        <div className="d-flex gap-2 w-100 h-100 position-relative" style={{ height: "100dvh" }}>
+            <div className={`flex-column flex-grow-1 gooey-sidebar ${sidebarClassName}`}>
                 <RenderedChildren children={sidebarDiv.children} onChange={onChange} state={state} />
             </div>
             <div className={`d-flex flex-grow-1 mw-100`}>
