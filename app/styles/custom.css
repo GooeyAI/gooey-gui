@@ -127,6 +127,11 @@ html {
   src: url("basiercircle-regular.otf");
 }
 
+@font-face {
+  font-family: basiercircle-medium;
+  src: url("basiercircle-medium.otf");
+}
+
 body {
   font-family: "basiercircle", sans-serif;
   overflow-x: hidden;
