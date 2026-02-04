@@ -173,6 +173,10 @@ div.code-toolbar {
   word-break: break-word;
 }
 
+.gui-md-container strong {
+  font-family: basiercircle-medium;
+}
+
 button[type="submit"],
 button .gui-html-container,
 .gui-html-container button {
